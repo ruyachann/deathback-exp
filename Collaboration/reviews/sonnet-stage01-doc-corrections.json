@@ -1,0 +1,38 @@
+{
+  "task": "stage01-doc-corrections",
+  "file_hashes": {
+    "Docs/UNITY_ACCEPTANCE.md": "04b74921d50ee2d13f195da2deda84300f8c1778c1e198a8626526dea2d56090",
+    "Docs/DEVELOPMENT.md": "f63210d0c88d9f3a9e921e0dd3250bf47f717fe3598a06fa968b45364735fde4",
+    "AGENTS.md": "31c8309a77928da369e0e03d882419c631f2fec96a3e2a9e65d18d9c93e39d4a"
+  },
+  "verdict": "request_changes",
+  "findings": [
+    {
+      "id": "F1-message-runtimepresent-gap",
+      "file": "Docs/UNITY_ACCEPTANCE.md / Assets/LoopRoom/Scripts/DemoRig.cs",
+      "description": "DemoRig.CanStart（VR時）は FloorReady && HeadTracked && RuntimePresent() の全成立を要求するが、DemoRig.PreparationMessage は xrInitializing と FloorReady のみで分岐し、HeadTracked・RuntimePresent() を直接判定に使っていない。そのため FloorReady=true かつ HeadTracked=true だが RuntimePresent()=false という状態でも『頭の位置と向きの追跡を待っています。』という頭部追跡待ちの文言が表示される。UNITY_ACCEPTANCE.md 1章の箇条書き2『Floorが確定したまま頭部追跡が未達の場合は…』は実装の分岐条件（FloorReady成立のみ）を正確に反映しておらず、原因がランタイム未検出であっても文言は追跡待ちを示すため、受入時に誤った原因診断につながり得る。",
+      "severity": "medium"
+    },
+    {
+      "id": "F2-dependency-policy-doc-gap",
+      "file": "Docs/DEVELOPMENT.md / AGENTS.md",
+      "description": "AGENTS.md は『保存済みtask001の管理スクリプトは過去の限定されたmanifest変更の証跡であり、今後の依存更新の一般的な実行方法にはしない』と明記するが、Docs/DEVELOPMENT.md の対応節（1. 正本とディレクトリの扱い）には同等の注記がなく、UnityEditor.PackageManager.Client API使用の原則のみが書かれている。DEVELOPMENT.mdのみを参照する開発者は、task001由来のスクリプトを今後の依存更新手段として使ってよいと誤解し得る。両文書間で同一ポリシーの詳細度が非対称になっている。",
+      "severity": "low"
+    }
+  ],
+  "evidence": [
+    "Assets/LoopRoom/Scripts/DemoRig.cs (excerpt, first_line=20): CanStart => !xrInitializing && (IsVR ? FloorReady && HeadTracked && RuntimePresent() : forceDesktop || desktopFallback); PreparationMessage => xrInitializing ? \"...準備しています...\" : FloorReady ? \"...頭の位置と向きの追跡を待っています。\" : \"...準備ができませんでした...\" — PreparationMessageの分岐にHeadTrackedとRuntimePresent()への直接参照が存在しない。",
+    "Docs/UNITY_ACCEPTANCE.md (first_line=1) 1章箇条書き2: 「初期化待ちが終了し、Floor が確定したまま頭部追跡が未達の場合は…を表示する」— DemoRig.cs抜粋の実際の分岐条件（FloorReady成立のみで表示、HeadTracked未参照）と文言の説明範囲が一致しない。",
+    "AGENTS.md (first_line=24) 4行目: 「保存済みtask001の管理スクリプトは…今後の依存更新の一般的な実行方法にはしない」に対し、Docs/DEVELOPMENT.md (first_line=1) 1章にはこの限定注記が含まれない。"
+  ],
+  "deferred": [
+    "UNITY_ACCEPTANCE.md記載の『準備待ちのタイムアウト後もこの条件なら頭部追跡待ちとなり、追跡復帰で開始できる』というタイムアウト機構は、提供されたDemoRig.cs抜粋（first_line=20付近）に該当ロジックが含まれておらず、存在・挙動とも本レビューでは確認できない。",
+    "UNITY_ACCEPTANCE.md記載の『Floor 準備失敗の自動再試行は現行実装にない』という否定的主張は、部分抜粋のみからは反証も肯定もできず、該当コード全体（Initializeコルーチン等）の提示待ち。",
+    "F1は実機/ランタイムでの再現確認が必要であり、本レビューはソース抜粋の静的突合せに限定される。実機での文言表示挙動は未検証（Docs/UNITY_ACCEPTANCE.mdの前提通り、本書自体も合否を示さない）。"
+  ],
+  "unverified": [
+    "UNITY_ACCEPTANCE.md 1章手順2『Enterキーおよびコントローラーのprimary Button（A/X）を押下してもModel.Phase が Ready から変化しない』は、LoopDemo.cs / LoopModel.cs の抜粋が本レビュー対象に含まれておらず、CanStartとModel.Phase遷移の実際の結線を確認できない。",
+    "DemoRig.cs抜粋のHeadTrackedゲッター内 drivers[0] が常に頭部トラッキングデバイスを指すという前提、および配列初期化順序の妥当性は、Initialize/Awake等の該当箇所が抜粋に含まれないため検証できない。"
+  ],
+  "review_scope": "Only supplied corrected documentation sections and scope references; not entire runtime or all documents"
+}

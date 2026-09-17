@@ -8,6 +8,7 @@
 - ユーザーが旧 Unity プロジェクトを開いている場合、そのユーザー編集を保護し、上書きしない。
 - ユーザーが Unity を開いている間は、同一プロジェクトを別の Editor インスタンスで開かない。
 - `Library/` `Temp/` `PackageCache/` は変更禁止。依存関係の追加・削除・更新は Unity Package Manager の `UnityEditor.PackageManager.Client` API を使用し、manifest と lockfile の解決は Unity に行わせる。バージョン検出・提案と実際の更新を区別し、自動適用しない。
+- task001の管理スクリプトは過去の限定されたmanifest変更の証跡であり、今後の依存更新の一般的な実行方法にはしない。
 
 ## 2. ブランチ運用とドラフト PR
 

@@ -24,7 +24,7 @@
 - `C:\deathback\deathback-exp` が新しい正本。旧outputs/LoopRoomUnityは移行元の保存版。開いている旧Unityのユーザー編集を保護し、旧版を新正本の実機検証済みと扱わない。
 - 利用不可・タイムアウトは「未実施」と記録。指示ファイルを保存しただけで実行モデルの切替や相互レビューが完了したとは扱わない。
 - この分担は役割の指定であり、権限の拡大ではない。ネットワーク制限、プロキシ、承認機構を回避しない。認証情報や個人の設定を報告に含めない。
-- Library / Temp / PackageCacheの修正禁止。依存更新はPackages/manifest.jsonで行い、lockfileはUnityに解決させる。
+- Library / Temp / PackageCacheの修正禁止。今後の依存追加・削除・更新はUnityEditor.PackageManager.Client APIを使用し、manifestとlockfileはUnityに解決させる。保存済みtask001の管理スクリプトは過去の限定されたmanifest変更の証跡であり、今後の依存更新の一般的な実行方法にはしない。
 - ユーザーがUnityを開いている間は同じプロジェクトを別Editorで開かない。既存のシーン・ユーザー編集を上書きしない。
 - Unity統合コンパイル、独立モデルテスト、構文検査、実機確認を区別して報告する。
 

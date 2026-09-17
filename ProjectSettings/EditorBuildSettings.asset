@@ -9,5 +9,6 @@ EditorBuildSettings:
     path: Assets/LoopRoom/Scenes/LoopRoom.unity
     guid: 0eb6a2fa514085ac10294c5677efe5b3
   m_configObjects:
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 4f1bedbad49e1a4419bc7e72b49c2a32, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: b9fe670b911db57408332ecd739e713d, type: 2}
   m_UseUCBPForAssetBundles: 0
