@@ -1,11 +1,13 @@
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
+[Bb]in/
 [Ll]ogs/
 UserSettings/
 Builds/
 TestResults/
 *.csproj
+!/Tests/LoopModel.Tests/LoopModel.Tests.csproj
 *.sln
 **/__pycache__/
 *.pyc
