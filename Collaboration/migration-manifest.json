@@ -1,0 +1,481 @@
+{
+  "source": "previous approved prototype",
+  "files": [
+    {
+      "path": "Assets/LoopRoom.meta",
+      "sha256": "00c01f9846bf9f96bb9532d478e0b6d11fa2c3c0cac07de4e37e453db3c92f9e"
+    },
+    {
+      "path": "Assets/Settings.meta",
+      "sha256": "73c8e19843240273facb0af6bdbf430d719e397aded705629594060ce25ce7ad"
+    },
+    {
+      "path": "Assets/XR.meta",
+      "sha256": "85613a6005e1cbc6a81539fc121a6f3f6dab5618d052143f7baa5c55c39ef52c"
+    },
+    {
+      "path": "Assets/XRI.meta",
+      "sha256": "4169b388045e99915740440a174f719a949610c62269f434910d30c8629038a8"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor.meta",
+      "sha256": "1a2220fbf8d548b9c84be0f85ca6124b5825cce5ff0d418d48f1e47620ae8e32"
+    },
+    {
+      "path": "Assets/LoopRoom/Scenes.meta",
+      "sha256": "38921f22b438f6704f7bf6321bbd74e9a34be62844bce1e00f8530ae4cdadda6"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts.meta",
+      "sha256": "645e8932cb187ea1e646f0bd37df6639de81075323fe800b9380655ac0080f7a"
+    },
+    {
+      "path": "Assets/Settings/DefaultVolumeProfile.asset",
+      "sha256": "3a6f825e8d07fe8b9f3b52e7d4e2dfa0e22c555b22335adb19f0ecc66dfa38dd"
+    },
+    {
+      "path": "Assets/Settings/DefaultVolumeProfile.asset.meta",
+      "sha256": "efbcb026cee6b8e32fdf27018c06b0515296a6ccbb43969e792fea270310700a"
+    },
+    {
+      "path": "Assets/Settings/Mobile_Renderer.asset",
+      "sha256": "aa93274c9521fa941170becec9e87c5fa36b8587eefd5eeb5c0eed0d1d4b1dbe"
+    },
+    {
+      "path": "Assets/Settings/Mobile_Renderer.asset.meta",
+      "sha256": "a148ee2b4987b05b8ff7ae5f9bf84916184f77aefddc821dceb551f5a69f8179"
+    },
+    {
+      "path": "Assets/Settings/Mobile_RPAsset.asset",
+      "sha256": "2d5182d2b8884ac88bc6ed033a0a722c23cfb15a7bc8b7daa38db37227bafd09"
+    },
+    {
+      "path": "Assets/Settings/Mobile_RPAsset.asset.meta",
+      "sha256": "53ea46647712c615fd1a3f2e0dddfa8559eeedc649e9a1dbf93ff913de28544c"
+    },
+    {
+      "path": "Assets/Settings/PC_Renderer.asset",
+      "sha256": "3d0b01d8ded3327263b6690be128a3de58d17c514943ae42fe743a3e084a9c79"
+    },
+    {
+      "path": "Assets/Settings/PC_Renderer.asset.meta",
+      "sha256": "b5df8ddb2708c6ed4c133a5ff9ee95a75cc20e4ee3ed6181366a61aedbaf31ec"
+    },
+    {
+      "path": "Assets/Settings/PC_RPAsset.asset",
+      "sha256": "08a9c221b335a0dbca1b6967b7de5c42b957c5f0d5e43da9edb36ca8fce5966b"
+    },
+    {
+      "path": "Assets/Settings/PC_RPAsset.asset.meta",
+      "sha256": "bb469b9b6f318e9e9bed29c3b2e73e79371c04743c6f95dd6603941f1cd3e53e"
+    },
+    {
+      "path": "Assets/Settings/SampleSceneProfile.asset",
+      "sha256": "a8677d4bac051d24caa11cd622e39f968155ee277bfce132274f1de225692fe9"
+    },
+    {
+      "path": "Assets/Settings/SampleSceneProfile.asset.meta",
+      "sha256": "2e23abc214069f0adbf2b2207f1db54be7876629ec2a3681d0f4aa5b61622ef0"
+    },
+    {
+      "path": "Assets/Settings/UniversalRenderPipelineGlobalSettings.asset",
+      "sha256": "8b3e296a20ab96a8f9d03e0cc0b3634f4c3792364b2ce0f2eadabb179fbb365f"
+    },
+    {
+      "path": "Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta",
+      "sha256": "f61661d8bc8dbe531daf09f6211ef978c7ba145c9207c8e76524396ae0722d7c"
+    },
+    {
+      "path": "Assets/XR/Loaders.meta",
+      "sha256": "718de218ffdc3747e4104887c1c0bd89f4b0daf70251a06723c4b7e79bf45d94"
+    },
+    {
+      "path": "Assets/XR/Settings.meta",
+      "sha256": "e9e71d3a64d50e7582519993817358d3e86113cb38ba97e005d243b43c961a2b"
+    },
+    {
+      "path": "Assets/XRI/Settings.meta",
+      "sha256": "397b968e1dfcc1db939657d6b6eb96ee147045f53aae2ce29ded8df532ada2fd"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/DemoSetup.cs",
+      "sha256": "b8a42cb4698bc3bea7773832ed2bd9be1b52fdce3f0eeb222410109ec04873fb"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/DemoSetup.cs.meta",
+      "sha256": "a71d14d18249e819510599e61e940bdabd95424b3f4096ce2b9cad62ba0d1545"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/LoopModelChecks.cs",
+      "sha256": "3585f347546a97a92d2ffa74d526893f2ae7dca82624a522c1378ea25db80e61"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/LoopModelChecks.cs.meta",
+      "sha256": "0e8d2276de6f856ff7d70a59fd8c0cdd9b817a531e5c576703207dfb2da51154"
+    },
+    {
+      "path": "Assets/LoopRoom/Scenes/LoopRoom.unity",
+      "sha256": "1d03b160d401965c5913954a3e81d659fb1ae2907c69e47a50f53727f3031422"
+    },
+    {
+      "path": "Assets/LoopRoom/Scenes/LoopRoom.unity.meta",
+      "sha256": "7f6cc4fc36adb65244fed2ad3d04ea8380af0319e8c8e73f067a76621719f3cc"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/DemoRig.cs",
+      "sha256": "eb753e6b0685b92a771918bd7756086a486ea140ecfb3532dd164f666f421474"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/DemoRig.cs.meta",
+      "sha256": "b58fd7f06647667ebdcb6de6c59d956acbb4fcdc12f88a22400b3783c290d9d9"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopDemo.cs",
+      "sha256": "449b19bd9694afa8cb5eab145a70b46dadbab41a362404900923e893f172d39f"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopDemo.cs.meta",
+      "sha256": "8cc24d94c3c3e44122d634f241fa397b6eff330e870e85dd95ba97a0d3378862"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopModel.cs",
+      "sha256": "67599928845de6a3159fcd7ff2688f7ff783dbb5b0653b0d40e4f988e9cad55e"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopModel.cs.meta",
+      "sha256": "8b53a297ce9cf4ab3817c0bad40335cdc85942694ef927647183aaaaa31a1b0b"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs",
+      "sha256": "a9cb72a4e78a2b83f76a62b15434b93f433cab975bac29b6a475a655153d332f"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs.meta",
+      "sha256": "72b34873ed55cde6f2472121a6f8fe5be6e25d61253f3586fb28c2dbb4b2a969"
+    },
+    {
+      "path": "Assets/XR/Loaders/OpenXRLoader.asset",
+      "sha256": "3dade780ddfc9ef1e12c3275788df48569ad586f9310d96cd91105e1c5739a7a"
+    },
+    {
+      "path": "Assets/XR/Loaders/OpenXRLoader.asset.meta",
+      "sha256": "93f8e06e42801bea950813c0b7cbe7a22d1650214842703c60e4566995f15664"
+    },
+    {
+      "path": "Assets/XR/Settings/OpenXR Package Settings.asset",
+      "sha256": "16e48b50c48798db86ad6ed1b4abdec581f0c014c51f283e1b07af1684f430cb"
+    },
+    {
+      "path": "Assets/XR/Settings/OpenXR Package Settings.asset.meta",
+      "sha256": "0d95df9cfacfb6f300a7ccc8b8ce6a021ed1f83a36e5ef568cfe19f519382d67"
+    },
+    {
+      "path": "Assets/XRI/Settings/Resources.meta",
+      "sha256": "02058f310c83e1937513608d784db8af8e0c35c010854f33682cf0e7c506680f"
+    },
+    {
+      "path": "Assets/XRI/Settings/XRInteractionEditorSettings.asset",
+      "sha256": "476c223ec4af4a61805c100afb7436fee514d610affe4682328e13ab2e9989b2"
+    },
+    {
+      "path": "Assets/XRI/Settings/XRInteractionEditorSettings.asset.meta",
+      "sha256": "41d8ea43dad798687bbbcba0ca5dd4d86aadf9888d232c3b983527e75fe3b312"
+    },
+    {
+      "path": "Assets/XRI/Settings/Resources/InteractionLayerSettings.asset",
+      "sha256": "d816024d94d3969237a90ec80d77de13341bf0ddb75527649922a391745000a6"
+    },
+    {
+      "path": "Assets/XRI/Settings/Resources/InteractionLayerSettings.asset.meta",
+      "sha256": "5de15585c324e6d1f3034b0490c4cc7ee6ea8cfcdf8ecfa054cddfcf4a98e285"
+    },
+    {
+      "path": "Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset",
+      "sha256": "2bcf4032dccdb60972e9a9f19b35b47f0979f7f25fab94f56dbbb3ff767218a8"
+    },
+    {
+      "path": "Assets/XRI/Settings/Resources/XRDeviceSimulatorSettings.asset.meta",
+      "sha256": "6bbd5a69d0b39cb382c07e1f1b70b6d14e3c98e163f0a80efa245e7ffc6cfa8f"
+    },
+    {
+      "path": "Packages/manifest.json",
+      "sha256": "0f336bf41ff7dd0305ae2d0c459a37eac24b872d8cfd02115ceb6322ecb26c3a"
+    },
+    {
+      "path": "Packages/packages-lock.json",
+      "sha256": "e76186fad6ed91ab717a2e21052a123af1d561722ce1425480a4c7d0c9d6d357"
+    },
+    {
+      "path": "ProjectSettings/AudioManager.asset",
+      "sha256": "aeedeb3243f07b61dbbe854aa08b5ef6f0b5274dd9852ad9f6129dde3e105a31"
+    },
+    {
+      "path": "ProjectSettings/ClusterInputManager.asset",
+      "sha256": "40e65dd214bf254955d2c8829ca8ce2130fd3510485560ce012e9a1ddd93e623"
+    },
+    {
+      "path": "ProjectSettings/DynamicsManager.asset",
+      "sha256": "b7c9a9dc08b98990109d4346f68745e15e238de400f96c583e53e1c83c743a78"
+    },
+    {
+      "path": "ProjectSettings/EditorBuildSettings.asset",
+      "sha256": "021602533f93b8d39c5c3ebdd43a3960d2fdb9dfe514b4a5880c377fa210ea04"
+    },
+    {
+      "path": "ProjectSettings/EditorSettings.asset",
+      "sha256": "705e5dde8b4ceb8147971b0c8f3781ebbe566a12b8e280379ee24f2bd9ad9474"
+    },
+    {
+      "path": "ProjectSettings/GraphicsSettings.asset",
+      "sha256": "6736f33dc62c35b0e7a88e275242080bc7a1d94c91154d18fceb332b661a6bce"
+    },
+    {
+      "path": "ProjectSettings/InputManager.asset",
+      "sha256": "7a1bb836a1008d26d0860d143e9d9df7ca41731d30a72901b518063819c62df2"
+    },
+    {
+      "path": "ProjectSettings/MemorySettings.asset",
+      "sha256": "1e8379a461b10ae09f3f696911088c16875d63e87ed5f2d95df9e1892703f9fd"
+    },
+    {
+      "path": "ProjectSettings/MultiplayerManager.asset",
+      "sha256": "aba89fd1a1ddad182727ad82727e536d27372e90328a8196da2a4560398983dd"
+    },
+    {
+      "path": "ProjectSettings/NavMeshAreas.asset",
+      "sha256": "80106cfa7e6181a1928b142c075f3e510d527441e3d79bc83590e4ac91e7cd66"
+    },
+    {
+      "path": "ProjectSettings/PackageManagerSettings.asset",
+      "sha256": "a7dabba589abe7fc2b45bd3d3fba3fe9be97043492703f716da2d9131c13a807"
+    },
+    {
+      "path": "ProjectSettings/Physics2DSettings.asset",
+      "sha256": "e3cbdbf0be15244b7b67d2f07bdb8e8981911c11a8c7fe8035f5261272fec658"
+    },
+    {
+      "path": "ProjectSettings/PresetManager.asset",
+      "sha256": "29c125923fe6e29f90190d4fce1c82d660e7051546e2c9d02908d18c9cf2436c"
+    },
+    {
+      "path": "ProjectSettings/ProjectSettings.asset",
+      "sha256": "307f7a7f796454e1b24be229d175becbcda9fedd6be69eb19279abc764ef68da"
+    },
+    {
+      "path": "ProjectSettings/ProjectVersion.txt",
+      "sha256": "eb53e4b5d12d3d06d286e892c35ad0e21a56c047ae570b0797f78cbc4b1bfdb7"
+    },
+    {
+      "path": "ProjectSettings/QualitySettings.asset",
+      "sha256": "6814d6cc3eb850dd7d2a069a8b17ba9f7591deba8b1758a855978bd9c8627643"
+    },
+    {
+      "path": "ProjectSettings/ShaderGraphSettings.asset",
+      "sha256": "cdba1e5d65bcf6e3269d76ed3e60b6c21f98322002996642c9d74f1eb89f6b91"
+    },
+    {
+      "path": "ProjectSettings/TagManager.asset",
+      "sha256": "23fc56b484aa3d7edf5914cd3591f7a823ccef5e3f3496f8a51f30388ead63dc"
+    },
+    {
+      "path": "ProjectSettings/TimeManager.asset",
+      "sha256": "1a83e54adbbda7c9f4851103a0c6ab7f6448a3343d4ea5b7620452fa08416ecd"
+    },
+    {
+      "path": "ProjectSettings/UnityConnectSettings.asset",
+      "sha256": "1e06370b3d2256d4dbc8892f59a8467d9f9785f034a4836a6790380252eb4916"
+    },
+    {
+      "path": "ProjectSettings/URPProjectSettings.asset",
+      "sha256": "c317fe22b9488785c0611f0642429922e5d324430d929bffb41648130f30c218"
+    },
+    {
+      "path": "ProjectSettings/VersionControlSettings.asset",
+      "sha256": "e7bda45bf7a394745fee1316e6c71fa676004d591ad1f3aa247fd3e4ceb86071"
+    },
+    {
+      "path": "ProjectSettings/VFXManager.asset",
+      "sha256": "f066c6483919961332415ee64204f74fe52f38c02e82892eb02b7a5b2e381f0e"
+    },
+    {
+      "path": "ProjectSettings/XRSettings.asset",
+      "sha256": "edd2beb4a2e388312b4b7da241aa51070434005d82c59363f1237dd2e567585f"
+    },
+    {
+      "path": "Tools/automation.py",
+      "sha256": "cf17becf0541f980f1386a81baa8e45713924b105aafc1711592cb9a092e8b33"
+    },
+    {
+      "path": "Tools/sonnet_packet.py",
+      "sha256": "c3778a799753a5df89153203c7a98d14fed61f48a4fa9c89cec075af94941406"
+    },
+    {
+      "path": "Tools/test_automation.py",
+      "sha256": "20153199571fe6d110667d54b55d9e619fd64cc7ebe69f5bc16e8f7a8fed6d26"
+    },
+    {
+      "path": "Tools/windows_job.py",
+      "sha256": "5041aae843c9aa2eac2063f511128cb58f56804c5d8336cbdd302dbda4ed5021"
+    },
+    {
+      "path": "Validation/automation-offline-checks.md",
+      "sha256": "37981a2cebd5b70967d1cb88c09dca9f2e7f944a5ecee6cd8dc55483e34dc929"
+    },
+    {
+      "path": "Validation/VR_demo_model_test_results.txt",
+      "sha256": "0fda6d9466e378051bdd16323e16889de395d663af9fa5fd5238b40bcca03fcc"
+    },
+    {
+      "path": "Validation/VR_demo_syntax_check.txt",
+      "sha256": "75bf783ab39c9c7bc49156af9b2c31998dd6cfa13eb4f0a8e69c780badf66bfd"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "aa0f5eac36ad85cfeec42db56d34bff1a1bcc87d1ea566eb9634b2767f9f94c2"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "86bf4db2fcc606759ae702e2dea558c8bb6680c705347a3ed34953790aceca6e"
+    },
+    {
+      "path": "Build-Demo.ps1",
+      "sha256": "69bb6017d36a312721011600626584200e8a69ffda0acaffe8f43b3f82fc2f76"
+    },
+    {
+      "path": "Start-Astra.ps1",
+      "sha256": "11c71e8c00959c746de2d6f3e986dc9e435250e3fcb57bd2ab863fe0c8d4a7ac"
+    },
+    {
+      "path": "Start-Sol.ps1",
+      "sha256": "3e13dca989da62df2d8b02787af1b96ad59981e17487f08d777c42f94acd5c10"
+    },
+    {
+      "path": "Start-Sonnet.ps1",
+      "sha256": "b1ea9fd6db74a9a395db47887de848e5ab3dd4fe05eb31479f1c84dd43c5ecc1"
+    },
+    {
+      "path": "Start-Automation.cmd",
+      "sha256": "aa6664736e46fa7e3ebca9d8368dd7e5c7e6379b7e233093494c1186fa4ed9b7"
+    },
+    {
+      "path": ".codex/config.toml",
+      "sha256": "cf57d0b80e197f4061d6251d59d6d1c7d3160a9564358759735877008a52658b"
+    },
+    {
+      "path": ".claude/settings.json",
+      "sha256": "e0db88fc7c5c3f5771c8a83e7a33a8d10d62d3da9bf927e3c406cd2c8c2be29c"
+    },
+    {
+      "path": "Collaboration/history/AUTOMATION_GUIDE.md",
+      "sha256": "d5b117bfd009b6a65c01fab0975287f9722b6f2b1575cf59f1bff2f93e235056"
+    },
+    {
+      "path": "Collaboration/history/CLAUDE_CONNECTION_CHECK.md",
+      "sha256": "8fe266e5916011360fde0b777413a058e3522c9cdb388906681f606df7aabc33"
+    },
+    {
+      "path": "Collaboration/history/README.md",
+      "sha256": "7c02245a8104e29f7ad7192b7ff8b8d7a3ff5b3c3131867881193f2ff6577f17"
+    },
+    {
+      "path": "Collaboration/history/RESUME-before-resume-20260917.md",
+      "sha256": "f5b88a460dd052c616d53604ff0219a4254fafa51829c0363787a0a549ce8a1a"
+    },
+    {
+      "path": "Collaboration/history/RESUME.md",
+      "sha256": "a610f33ff1a55268b6f917a9b8adbe08c856be0b00288118dded8fa36e0818c3"
+    },
+    {
+      "path": "Collaboration/history/SONNET_401_ROOT_CAUSE.md",
+      "sha256": "385d2f8b88a6eea5c0e6e67fdd27d58ce188c9054b047bce08847aa30153d65b"
+    },
+    {
+      "path": "Collaboration/history/STATE-before-resume-20260917.md",
+      "sha256": "9efc0fb32d8858d606e83901409c41b085200334a9df1a1e52bdf88ff4ad2f6f"
+    },
+    {
+      "path": "Collaboration/history/STATE.md",
+      "sha256": "d67e2ae6d2419f1914f2be27498fda7c033f0462211bd1d8ad4d2180cc1fb7da"
+    },
+    {
+      "path": "Collaboration/history/WORKFLOW_MIGRATION_HANDOFF.md",
+      "sha256": "4f16f6c0c73a7b9436dc0bb864fb22a4d5791801d625f590920b8809d7326247"
+    },
+    {
+      "path": "Collaboration/tasks/001-input-system.md",
+      "sha256": "e89ad047437542413b70444a1ac24bd7e4c570d75dd4330ae9d39a67ea0cd58e"
+    },
+    {
+      "path": "Collaboration/tasks/002-xr-startup.md",
+      "sha256": "2c768bb6c3dd7ec4fb99f260ef39df4beeb4591c1b31dd3bff74e9bcaa85e004"
+    },
+    {
+      "path": "Collaboration/tasks/003-finite-timings.md",
+      "sha256": "a2da9ac84df661f836f8977b0c61511f32224e85fada7949171e2ad461b80c82"
+    },
+    {
+      "path": "Collaboration/reviews/astra-automation.md",
+      "sha256": "47e56f6ff52d9da6eccba151d00ba5bc9ef435d6a45455b22a3c9b12fe650e8c"
+    },
+    {
+      "path": "Collaboration/reviews/astra-initial.md",
+      "sha256": "8e54629a361b8da7350e78ee60f37396158c3b1d26e83047c7c4d5bf668013fb"
+    },
+    {
+      "path": "Collaboration/reviews/astra-model-checks-20260917.txt",
+      "sha256": "901ccfab5308e77497f7ef3288c0724eb1a8266008b4866e3e7f39bd6e56a77d"
+    },
+    {
+      "path": "Collaboration/reviews/astra-next-plan-hashes.json",
+      "sha256": "2e4ec25a79cc57d473a1447c434cad7b2433963cd1db6f241eed9ba186a76739"
+    },
+    {
+      "path": "Collaboration/reviews/astra-next-plan.md",
+      "sha256": "768bd24baf475444f00f3bb886796e748a6f9d692918448f880ab10fb5ab662f"
+    },
+    {
+      "path": "Collaboration/reviews/astra-resume-assessment.md",
+      "sha256": "7ccc397a33b666c897b1d6d717780de92a3cf8ce25c01ac63ec528ce50c85bf8"
+    },
+    {
+      "path": "Collaboration/reviews/astra-workflow-initial.md",
+      "sha256": "fecabfd1eb4fd659443b8541afa8b1db766ddb0b39b979e8e8661f63a0dd36a4"
+    },
+    {
+      "path": "Collaboration/reviews/sol-002-implementation.md",
+      "sha256": "7835c0a056b9c4d748cc5c7f6b8181ee3be8cd283c96564bc32f5df85dab7e98"
+    },
+    {
+      "path": "Collaboration/reviews/sol-002-independent.md",
+      "sha256": "f2403d17a3ac1c42781bd499a4c4a406d836b3dd615d3fccb79af08920b6826b"
+    },
+    {
+      "path": "Collaboration/reviews/sol-003-implementation.md",
+      "sha256": "a3b25209b4ed0aa604f51f22738ec33d080a01fff561e547ad05349ce68d18bc"
+    },
+    {
+      "path": "Collaboration/reviews/sol-003-independent.md",
+      "sha256": "c857f1654a78411c54113a382796b71732e46b65bc807877d0d14473b2eaecd3"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-003-exchange.json",
+      "sha256": "7fc7666c420c84cd7a54a8627c39903f57d46ea66a2bf21d10959acfc719e81d"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-003-independent.json",
+      "sha256": "83291f42fd51e8a89eb2773b93ec730697e6161f592ebbf327462b8bf0e7ca70"
+    },
+    {
+      "path": "Docs/Plans/VR_demo_first_milestone.md",
+      "sha256": "4a113f7860925310634e422c6572aa8d51d7cef94466e66f4a533421a7103f57"
+    },
+    {
+      "path": "Docs/Plans/VR_demo_implementation_status.md",
+      "sha256": "63484765db983af58c4339553dc02047e2cc07223ea057522b4ddeb6c1dfbf0b"
+    },
+    {
+      "path": "Docs/Plans/VR_demo_plan_v0.1.md",
+      "sha256": "e3c220bfa3406bfcae66aa397be893f65ba5f21e6d955cca0c0373e4c1d3334e"
+    }
+  ]
+}

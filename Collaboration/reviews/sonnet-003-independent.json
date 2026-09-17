@@ -1,0 +1,24 @@
+{
+  "verdict": "approve",
+  "file_hashes": {
+    "Assets/LoopRoom/Scripts/LoopModel.cs": "67599928845de6a3159fcd7ff2688f7ff783dbb5b0653b0d40e4f988e9cad55e",
+    "Assets/LoopRoom/Editor/LoopModelChecks.cs": "3585f347546a97a92d2ffa74d526893f2ae7dca82624a522c1378ea25db80e61"
+  },
+  "findings": [
+    "LoopModel.cs: Validate()冒頭に7項目（firstShot, searchShot, exitOpens, exitCloses, blackout, playLimit, endingLength）すべてに対しdouble.IsNaN/double.IsInfinityによる拒否ブロックを追加。既存の大小比較ブロックより前に配置されており、NaN比較が常にfalseを返すことで従来チェックをすり抜けていた欠陥を正しく塞いでいる。",
+    "既存のAdvance(delta)で使われているIsNaN/IsInfinityと同じ記法を再利用しており、新規using/新規依存の追加なし。タスクの制約に合致。",
+    "LoopModel.cs内の変更はValidate()のガード追加のみで、既定値・イベント名・状態遷移・Advance()のロジックは無変更。差分は最小。",
+    "LoopModelChecks.cs: 新規Checkが1件追加され、7項目×{NaN, PositiveInfinity, NegativeInfinity}=21ケースを1つのCheckブロック内でループ検証。各ケースで`new LoopRules()`を都度生成しており「毎ケース新しいLoopRulesを作る」の要件を満たす。",
+    "新規Checkは既存9件の後、最後に追加されており、既存10Check（Invalid timing含む）のロジック・順序は変更されていない。合計11 Check構成は受入条件1と整合。",
+    "変更対象ファイルは許可された2ファイルのみで、スコープ超過や無関係な変更は見当たらない。",
+    "軽微所見（ブロッキングではない）: 新設のNaN/Infinityガードと既存の順序チェックが同一の例外メッセージ「Invalid loop timing rules」を共有しており、失敗時にどちらの条件で拒否されたか文字列からは判別できない。ただしCheck側は例外の有無のみを見ているため、テストの合否には影響しない。",
+    "新規Checkはrules.Validate()を直接呼び出しており、`new LoopModel(rules)`経由のコンストラクタ呼び出しは通っていない。コンストラクタ経由での伝播は既存の「Invalid timing and non-finite delta are rejected」Checkで別途カバーされているため、実害のある抜け漏れではないと判断する。"
+  ],
+  "unverified": [
+    "独立.NET実行（コンソール等でのLoopModelChecks.Run()実行）は本レビューでは未実施。",
+    "Unity Editor内でのコンパイル・実行（Editor拡張としてのLoopModelChecks動作）は本レビューでは未実施。",
+    "受入条件2（通常無操作モデルがTotalTime=180でFinished/TimedOutのまま）は、Advance()/End()ロジック自体が無変更であることから静的には妥当と判断できるが、実行による再確認はしていない。",
+    "提供されたSHA256値がソース内容と実際に一致するかの再計算検証は行っていない（指示に従い値をそのまま転記）。",
+    "Sol側の独立レビュー結果との指摘交換・突合は本セッション内では未実施。STATE.md/reviews配下での記録が別途必要。"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "baseline": {
+    "expected": "3078d77f331363dadef21182dea6b5de0e1b3b3b5d8555f8e3af3bf4e694edbd",
+    "actual": "3078d77f331363dadef21182dea6b5de0e1b3b3b5d8555f8e3af3bf4e694edbd",
+    "length": 64
+  },
+  "base": {
+    "expected": "a984627e25bad0b69f9eb184bac1ec5134b60f46d3d501d6c89708e2bf60ce62",
+    "actual": "a984627e25bad0b69f9eb184bac1ec5134b60f46d3d501d6c89708e2bf60ce62"
+  },
+  "design": {
+    "expected": "318f5b39f2ebd07e7bc65f4122665dc06a29afe8839b316850dbf6e8961ab956",
+    "actual": "318f5b39f2ebd07e7bc65f4122665dc06a29afe8839b316850dbf6e8961ab956"
+  },
+  "candidate": {
+    "expected": "b8714962dc551ad6ce87e03b0f1bca69797d1e3dbed60758a90fc276018364c4",
+    "actual": "b8714962dc551ad6ce87e03b0f1bca69797d1e3dbed60758a90fc276018364c4"
+  },
+  "current_manifest": "b8714962dc551ad6ce87e03b0f1bca69797d1e3dbed60758a90fc276018364c4",
+  "current_baseline_changes": {
+    "Packages/manifest.json": {
+      "original": "a984627e25bad0b69f9eb184bac1ec5134b60f46d3d501d6c89708e2bf60ce62",
+      "current": "b8714962dc551ad6ce87e03b0f1bca69797d1e3dbed60758a90fc276018364c4"
+    }
+  }
+}

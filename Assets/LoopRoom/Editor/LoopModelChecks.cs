@@ -1,0 +1,86 @@
+using System;
+using System.Collections.Generic;
+using LoopRoom;
+
+public static class LoopModelChecks
+{
+    public static List<string> Run()
+    {
+        var passed=new List<string>();
+        Check(passed,"Unprotected attack returns immediately and resets only world state",()=>{
+            var m=new LoopModel(); m.Start(); m.Advance(6);
+            Need(m.Phase==SessionPhase.Blackout,"death boundary");
+            m.Advance(.16);
+            Need(m.LoopId==2 && m.Phase==SessionPhase.Playing,"new loop");
+            Near(m.TotalTime,6.16); Near(m.LoopTime,0);
+            Need(!m.ShieldRaised && !m.ShotResolved,"world reset");
+        });
+        Check(passed,"Shield grants a real escape window",()=>{
+            var m=new LoopModel();m.Start();m.Advance(2);m.RaiseShield(m.LoopId);m.Advance(4.5);
+            Need(m.ExitAvailable && m.TryExit(m.LoopId),"escape");
+            Need(!m.Kill(m.LoopId,"late"),"no death after escape");
+            m.Advance(8);Need(m.Phase==SessionPhase.Finished && m.Outcome==SessionPhase.Escaped,"ending");
+        });
+        Check(passed,"No escape before unlocking or with a stale loop id",()=>{
+            var m=new LoopModel();m.Start();Need(!m.TryExit(1),"locked");m.Advance(6.16);
+            Need(!m.RaiseShield(1) && !m.Kill(1,"stale"),"stale ignored");
+            m.RaiseShield(2);m.Advance(6.5);Need(!m.TryExit(1) && m.TryExit(2),"correct loop only");
+        });
+        Check(passed,"Repeated death callbacks produce only one reset",()=>{
+            var m=new LoopModel();m.Start();Need(m.Kill(1,"one"),"first accepted");
+            Need(!m.Kill(1,"two"),"duplicate rejected");m.Advance(.16);Need(m.LoopId==2,"once");
+        });
+        Check(passed,"Deadline includes blackouts and ends within 180 seconds",()=>{
+            var m=new LoopModel();m.Start();m.Advance(1000);
+            Need(m.Phase==SessionPhase.Finished && m.Outcome==SessionPhase.TimedOut,"timeout");Near(m.TotalTime,180);
+        });
+        Check(passed,"Missing escape window allows the enemy to flank",()=>{
+            var m=new LoopModel();m.Start();m.RaiseShield(1);m.Advance(12);
+            Need(m.Phase==SessionPhase.Blackout && !m.TryExit(1),"flank before late input");
+            Need(m.Records[m.Records.Count-1].kind=="flanked","cause");
+        });
+        Check(passed,"Large and small time steps yield the same no-input outcome",()=>{
+            var a=new LoopModel();var b=new LoopModel();a.Start();b.Start();a.Advance(80);
+            for(int i=0;i<8000;i++)b.Advance(.01);
+            Need(a.LoopId==b.LoopId && a.Phase==b.Phase,"same phase");Near(a.LoopTime,b.LoopTime);
+            Need(a.Records.Count==b.Records.Count,"same event count");
+        });
+        Check(passed,"100 resets reject old events and clear shield state",()=>{
+            var m=new LoopModel();m.Start();
+            for(int i=0;i<100;i++){
+                int old=m.LoopId;m.RaiseShield(old);Need(m.Kill(old,"test"),"kill");m.Advance(.16);
+                Need(m.LoopId==old+1 && !m.ShieldRaised && !m.ShotResolved,"clear state");
+                Need(!m.Kill(old,"delayed"),"old callback ignored");
+            }
+            Near(m.TotalTime,16);
+        });
+        Check(passed,"Stop is distinct from death and does not resume the same session",()=>{
+            var m=new LoopModel();m.Start();m.Advance(1);m.Interrupt();m.Advance(8);
+            Need(m.Outcome==SessionPhase.Interrupted && m.LoopId==1,"interrupted");
+            m.Start();Need(m.LoopId==1 && m.TotalTime==0 && m.Outcome==SessionPhase.Ready,"fresh session");
+        });
+        Check(passed,"Invalid timing and non-finite delta are rejected",()=>{
+            bool bad=false;try{new LoopModel(new LoopRules{blackout=0});}catch(ArgumentException){bad=true;}
+            Need(bad,"bad rules");bad=false;try{new LoopModel().Advance(double.NaN);}catch(ArgumentException){bad=true;}
+            Need(bad,"bad delta");
+        });
+        Check(passed,"All seven timings reject NaN and both infinities",()=>{
+            string[] names={"firstShot","searchShot","exitOpens","exitCloses","blackout","playLimit","endingLength"};
+            Action<LoopRules,double>[] setters={
+                (r,v)=>r.firstShot=v,(r,v)=>r.searchShot=v,(r,v)=>r.exitOpens=v,
+                (r,v)=>r.exitCloses=v,(r,v)=>r.blackout=v,(r,v)=>r.playLimit=v,(r,v)=>r.endingLength=v
+            };
+            double[] values={double.NaN,double.PositiveInfinity,double.NegativeInfinity};
+            for(int i=0;i<setters.Length;i++)foreach(double value in values){
+                var rules=new LoopRules();setters[i](rules,value);
+                bool bad=false;try{rules.Validate();}catch(ArgumentException){bad=true;}
+                Need(bad,names[i]+" accepted "+value);
+            }
+        });
+        return passed;
+    }
+
+    static void Check(List<string> list,string name,Action test){test();list.Add("PASS: "+name);}
+    static void Need(bool condition,string message){if(!condition)throw new Exception(message);}
+    static void Near(double a,double b){Need(Math.Abs(a-b)<.00001,"Expected "+a+" ~ "+b);}
+}
