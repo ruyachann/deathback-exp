@@ -15,6 +15,7 @@ namespace LoopRoom
         public double blackout = 0.16;
         public double playLimit = 172.0;
         public double endingLength = 8.0;
+        public bool enforcePlayLimit = false;
         public void Validate()
         {
             if (double.IsNaN(firstShot) || double.IsInfinity(firstShot) ||
@@ -27,7 +28,8 @@ namespace LoopRoom
                 throw new ArgumentException("Invalid loop timing rules");
             if (firstShot <= 0 || searchShot <= firstShot || exitOpens < firstShot ||
                 exitCloses > searchShot || exitCloses <= exitOpens || blackout <= 0 ||
-                playLimit <= 0 || endingLength <= 0 || playLimit + endingLength > 180.0)
+                playLimit <= 0 || endingLength <= 0 ||
+                (enforcePlayLimit && playLimit + endingLength > 180.0))
                 throw new ArgumentException("Invalid loop timing rules");
         }
     }
@@ -44,6 +46,7 @@ namespace LoopRoom
     // Pure deterministic state model. No coroutines, XR dependency or wall-clock resets.
     public sealed class LoopModel
     {
+        public const double MaxStep = 3600.0;
         public readonly LoopRules Rules;
         public readonly List<LoopRecord> Records = new List<LoopRecord>();
         public SessionPhase Phase { get; private set; } = SessionPhase.Ready;
@@ -116,7 +119,7 @@ namespace LoopRoom
         // Split time at event boundaries so slow frames cannot skip an attack or grant free time.
         public void Advance(double delta)
         {
-            if (double.IsNaN(delta) || double.IsInfinity(delta) || delta < 0)
+            if (double.IsNaN(delta) || double.IsInfinity(delta) || delta < 0 || delta > MaxStep)
                 throw new ArgumentOutOfRangeException(nameof(delta));
             while (delta > 0.0000001)
             {
@@ -128,20 +131,20 @@ namespace LoopRoom
                     if (endingRemaining < 0.0000001) Phase = SessionPhase.Finished;
                     continue;
                 }
-                double untilLimit = Rules.playLimit - TotalTime;
+                double untilLimit = Rules.enforcePlayLimit ? Rules.playLimit - TotalTime : double.PositiveInfinity;
                 if (untilLimit < 0.0000001) { End(SessionPhase.TimedOut); continue; }
                 if (Phase == SessionPhase.Blackout)
                 {
                     double step = Math.Min(delta, Math.Min(BlackoutRemaining, untilLimit));
                     TotalTime += step; BlackoutRemaining -= step; delta -= step;
-                    if (TotalTime >= Rules.playLimit - 0.0000001) End(SessionPhase.TimedOut);
+                    if (Rules.enforcePlayLimit && TotalTime >= Rules.playLimit - 0.0000001) End(SessionPhase.TimedOut);
                     else if (BlackoutRemaining < 0.0000001) BeginLoop();
                     continue;
                 }
                 double next = ShotResolved ? Rules.searchShot : Rules.firstShot;
                 double slice = Math.Min(delta, Math.Min(next - LoopTime, untilLimit));
                 LoopTime += slice; TotalTime += slice; delta -= slice;
-                if (TotalTime >= Rules.playLimit - 0.0000001) { End(SessionPhase.TimedOut); continue; }
+                if (Rules.enforcePlayLimit && TotalTime >= Rules.playLimit - 0.0000001) { End(SessionPhase.TimedOut); continue; }
                 if (LoopTime >= next - 0.0000001)
                 {
                     if (!ShotResolved)

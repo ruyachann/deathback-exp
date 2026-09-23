@@ -8,9 +8,9 @@ internal static class Program
         try
         {
             var existing = LoopModelChecks.Run();
-            Require(existing.Count == 11, "Expected 11 existing checks.");
+            Require(existing.Count == 14, "Expected 14 existing checks.");
             foreach (var result in existing) Console.WriteLine(result);
-            var model = new LoopModel(); model.Start(); model.Advance(172);
+            var model = new LoopModel(new LoopRules { enforcePlayLimit = true }); model.Start(); model.Advance(172);
             Require(model.Phase == SessionPhase.TimedOut, "Timeout at 172 seconds.");
             Require(model.Outcome == SessionPhase.TimedOut, "Retain timeout outcome.");
             Near(model.TotalTime, 172);
@@ -22,7 +22,7 @@ internal static class Program
             Near(model.TotalTime, 180);
             Require(model.Records.Count == records, "Finished stops recording.");
             Console.WriteLine("PASS: No-action deadline and retained outcome at 180 seconds");
-            Console.WriteLine("PASS: 12 model checks"); return 0;
+            Console.WriteLine("PASS: 15 model checks"); return 0;
         }
         catch (Exception error) { Console.Error.WriteLine("FAIL: " + error); return 1; }
     }

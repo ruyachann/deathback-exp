@@ -31,8 +31,31 @@ public static class LoopModelChecks
             Need(!m.Kill(1,"two"),"duplicate rejected");m.Advance(.16);Need(m.LoopId==2,"once");
         });
         Check(passed,"Deadline includes blackouts and ends within 180 seconds",()=>{
-            var m=new LoopModel();m.Start();m.Advance(1000);
+            var m=new LoopModel(new LoopRules{enforcePlayLimit=true});m.Start();m.Advance(1000);
             Need(m.Phase==SessionPhase.Finished && m.Outcome==SessionPhase.TimedOut,"timeout");Near(m.TotalTime,180);
+        });
+        Check(passed,"Default rules keep looping without a session deadline",()=>{
+            var m=new LoopModel();m.Start();m.Advance(1000);
+            Need(m.Phase==SessionPhase.Playing || m.Phase==SessionPhase.Blackout,"session continues");
+            Need(m.Outcome==SessionPhase.Ready && m.LoopId>1,"loops continue");
+        });
+        Check(passed,"Advance accepts MaxStep and rejects larger finite deltas without mutation",()=>{
+            var m=new LoopModel();m.Start();m.Advance(LoopModel.MaxStep);
+            Need(m.Phase==SessionPhase.Playing || m.Phase==SessionPhase.Blackout,"session continues at MaxStep");
+            Need(m.Outcome==SessionPhase.Ready && m.LoopId>1,"loops continue at MaxStep");
+            Near(m.TotalTime,LoopModel.MaxStep);
+            int loop=m.LoopId;double total=m.TotalTime;int records=m.Records.Count;
+            bool bad=false;try{m.Advance(LoopModel.MaxStep*2);}catch(ArgumentOutOfRangeException){bad=true;}
+            Need(bad,"delta over MaxStep accepted");
+            Need(m.LoopId==loop && m.TotalTime==total && m.Records.Count==records,"state changed after MaxStep rejection");
+            bad=false;try{m.Advance(double.MaxValue);}catch(ArgumentOutOfRangeException){bad=true;}
+            Need(bad,"double.MaxValue accepted");
+            Need(m.LoopId==loop && m.TotalTime==total && m.Records.Count==records,"state changed after double.MaxValue rejection");
+        });
+        Check(passed,"Session deadline validation is conditional",()=>{
+            new LoopRules{playLimit=180}.Validate();
+            bool bad=false;try{new LoopRules{playLimit=180,enforcePlayLimit=true}.Validate();}catch(ArgumentException){bad=true;}
+            Need(bad,"enabled deadline accepted over 180 seconds");
         });
         Check(passed,"Missing escape window allows the enemy to flank",()=>{
             var m=new LoopModel();m.Start();m.RaiseShield(1);m.Advance(12);
