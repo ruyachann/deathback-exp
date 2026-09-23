@@ -8,7 +8,7 @@
 
 | 順 | 項目 | 担当 | 状態 / 次の一手 |
 | --- | --- | --- | --- |
-| 1 | task005 相互レビュー | レビュー: Sol(MCP) / Sonnet(済) | Sonnet `approve_with_open_items`（2026-09-22）。Sol独立レビュー（同SHA、MCP）は **request_changes**: 高 OnApplicationPause が VR 中も中断（LoopDemo.cs:199）、中 長フレームで Latch 欠落。照合で両方採用（reviews/task005-exchange-20260923.md）。次は同じ2ファイルで追修正→再レビュー |
+| 1 | task005 相互レビュー | レビュー: Sol(MCP) / Sonnet(済) | Sonnet `approve_with_open_items`（2026-09-22）。Sol独立レビュー（同SHA、MCP）は **request_changes**: 高 OnApplicationPause が VR 中も中断（LoopDemo.cs:199）、中 長フレームで Latch 欠落。照合で両方採用（reviews/task005-exchange-20260923.md）。2026-09-23 追修正 R-1/R-2 を Opus 5.5 が実装（LoopDemo.cs `9d6925b4…`、RoomVisuals.cs 不変）。batchmode コンパイル エラー0/警告0（local-logs/unity-batchmode-20260923.log）。再レビュー: Sonnet approve / Sol request_changes（周回をまたぐ長フレームで Latch 欠落）。交換で既知の制限として両者 **approve**（reviews/task005-rereview-exchange-20260923.md）。**相互レビュー完了。最終受入は Quest3 実機（条件3）と Latch 可聴確認待ち** |
 | 2 | task006 正式化 | 計画: Astra or Opus | A-1 は2026-09-23ユーザー決定「180秒制限は当面なくし、まずしっかり遊べるように」→ AGENTS/STAGE_PLAN/task006 に反映。LoopModel の180秒検証・TimedOut 経路の扱いは次のタスクで決める。Quest3不要のB-6（Rules複製）・B-4（再準備）を先に正式タスク化。B-5はOpus相談条件（身体位置）に該当、B-7は実機待ち |
 | 3 | Sync-PublishedBranch.ps1 修正 | 実装: Sol or Sonnet | unborn HEAD で必ず失敗するバグ（9行目）。小タスク化して修正→相互レビュー |
 | 3b | peer_review_mcp.py の Codex 呼出し修正 | 実装: Sol or Sonnet（Codexセッションが作成者） | 2026-09-23 判明: (1) `shutil.which("codex")` が PATH 上に codex.exe が無く失敗（実体は `%LOCALAPPDATA%\OpenAI\Codex\bin\<hash>\codex.exe`）、(2) `--ask-for-approval` は codex-cli 0.155 ではトップレベル引数で `exec` の後ろだと exit 2。今回の task005 Sol レビューは呼出し側でこの2点のみ補正して実行（スナップショット・プロンプトは同一） |

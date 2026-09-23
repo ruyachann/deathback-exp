@@ -109,12 +109,11 @@ namespace LoopRoom
                 if(keyboard.spaceKey.wasPressedThisFrame) RaiseShield();
                 if(keyboard.eKey.wasPressedThisFrame) TryExit();
             }
-            if(Model.Phase==SessionPhase.Playing)
-            {
-                if(lastLoopTime<3 && Model.LoopTime>=3) enemyAudio.PlayOneShot(room.Latch);
-                if(lastLoopTime<Model.Rules.exitOpens && Model.LoopTime>=Model.Rules.exitOpens)
-                    room.Sound.PlayOneShot(room.Open,.6f);
-            }
+            // A long frame can cross t=3 and the shot together; LoopTime is frozen in Blackout, so the latch still plays.
+            if((Model.Phase==SessionPhase.Playing || Model.Phase==SessionPhase.Blackout) && lastLoopTime<3 && Model.LoopTime>=3)
+                enemyAudio.PlayOneShot(room.Latch);
+            if(Model.Phase==SessionPhase.Playing && lastLoopTime<Model.Rules.exitOpens && Model.LoopTime>=Model.Rules.exitOpens)
+                room.Sound.PlayOneShot(room.Open,.6f);
             if(lastRecords<Model.Records.Count)
             {
                 for(int i=lastRecords;i<Model.Records.Count;i++)
@@ -196,7 +195,8 @@ namespace LoopRoom
             catch(Exception e) { logMessage="記録保存に失敗: "+e.GetType().Name; Debug.LogWarning(logMessage); }
         }
 
-        void OnApplicationPause(bool paused) { if(paused && Model!=null) Model.Interrupt(); }
+        // In VR, only Esc and lost tracking interrupt; runtime pause notices (dashboard, focus) must not end the session.
+        void OnApplicationPause(bool paused) { if(paused && Model!=null && !rig.IsVR) Model.Interrupt(); }
 
         void OnGUI()
         {
