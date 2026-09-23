@@ -4,6 +4,8 @@
 
 2026-09-23 19:50 再開: ユーザーの明示指示（「Codexと作業を進める」）で PAUSE.json を解除し `history/PAUSE-cleared-20260923.json` へ保存。Codex 5時間枠は使用8%（残92%、10:47Z の rollout rate_limits、週枠使用1%）。Claude 枠は機械検証なし。Claude の `peer_codex` MCP は承認済み・Connected。Codex 側 `peer_claude` は未接続（deathback-exp の信頼設定待ち）のため、現状の相互レビューは Claude→Codex 方向の MCP のみ。
 
+2026-09-24 運用ルール追加（ユーザー指定、AGENTS.md「計画の立て直しと証拠の共有」）: 計画の動的な立て直しは Opus 5.5 または GPT-6 Astra だけが行う。完成したもの（部分でも）には証拠画像・スクリーンショットを `Collaboration/evidence/` に保存し、ユーザーにも送る。コマンド出力の画像化は `Tools/Capture-Evidence.ps1`。既存の証拠: evidence/20260924-task007（モデル15チェック、Unity コンパイル）、20260924-task008（Sync 受入4件）、20260924-task009（MCP 受入）、20260924-item5-reviews。
+
 ## 現在の計画（2026-09-23 更新、Claude Opus 5.5 `claude-opus-5-5` が整理）
 
 | 順 | 項目 | 担当 | 状態 / 次の一手 |
@@ -13,7 +15,8 @@
 | 3 | Sync-PublishedBranch.ps1 修正 | 計画: Opus 5.5 / 実装: Sol | unborn HEAD で必ず失敗するバグ（9行目）。**task008 受入済み（2026-09-24）**: Sol が修正（`82b58822…`）、PS5.1 の一時リポジトリで受入テスト4件 OK、Sol/Sonnet とも approve（reviews/task008-exchange-20260924.md） |
 | 3b | peer_review_mcp.py の Codex 呼出し修正 | **task009 受入済み（2026-09-24）**: Sol 実装（`20ecfd09…`）、MCP stdio で補正なしの受入3件 OK、Sol/Sonnet approve（reviews/task009-exchange-20260924.md）。以下は当初の記録 → 実装: Sol or Sonnet（Codexセッションが作成者） | 2026-09-23 判明: (1) `shutil.which("codex")` が PATH 上に codex.exe が無く失敗（実体は `%LOCALAPPDATA%\OpenAI\Codex\bin\<hash>\codex.exe`）、(2) `--ask-for-approval` は codex-cli 0.155 ではトップレベル引数で `exec` の後ろだと exit 2。今回の task005 Sol レビューは呼出し側でこの2点のみ補正して実行（スナップショット・プロンプトは同一） |
 | 4 | 未コミット変更の保存 | ユーザー承認後 | MCP設定・task005・文書類が作業ツリーのみ。作業ブランチへ commit/push は承認待ち |
-| 5 | task004 settings 交換 / 段階1 Sonnet最終文書確認 | Sonnet + Sol | 旧タイムアウト分。MCP経由で再実施可能 |
+| 5 | task004 settings 交換 / 段階1 Sonnet最終文書確認 | Sonnet + Sol | **完了（2026-09-24）**: task004 設定は交換後 Sonnet も approve、段階1文書は Sonnet 最終 approve。**段階1の相互レビュー完了**（reviews/task004-settings-exchange-20260924.md、証拠 evidence/20260924-item5-reviews/） |
+| 5b | UNITY_ACCEPTANCE.md の180秒節を現行方針に合わせる | 計画: Opus 5.5 | Sonnet の別件指摘。文書更新タスクとして task006 正式化と合わせて扱う |
 | 6 | Quest3 実機受入 | ユーザー | 接続可能になり次第（task005受入条件3を含む）。**2026-09-24 ユーザー報告: 実機が Meta Quest 3S になる可能性がある。** 決まるまでは Quest 3 / 3S の両方を想定する。3S も Link による PCVR と Touch Plus コントローラーなので、task006 B-7（Touch Plus プロファイル有効化）の優先度を上げる。視野角・解像度・レンズの違いによる見え方（机・時計・取っ手の視認性、文字サイズ）は実機受入の確認項目に加える。機種が決まったら AGENTS.md の不変条件と STAGE_PLAN の対象機種を更新する |
 
 2026-09-17。正本C:/deathback/deathback-exp。移行元119ファイルのコピー時SHAはmigration-manifest.jsonに保持（後の正当な編集は別レビュー）。

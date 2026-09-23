@@ -1,0 +1,10 @@
+﻿task007: Unity 6000.3.15f1 batchmode compile
+2026-09-24 01:51:46 +09:00  commit c506fd8  cwd C:\deathback\deathback-exp
+
+PS> Select-String -Path Collaboration\local-logs\unity-batchmode-20260923-task007.log -Pattern 'Requested script compilation|error CS|warning CS|Exiting batchmode' | % Line; 'error CS count: ' + (Select-String -Path Collaboration\local-logs\unity-batchmode-20260923-task007.log -Pattern 'error CS').Count; 'warning CS count: ' + (Select-String -Path Collaboration\local-logs\unity-batchmode-20260923-task007.log -Pattern 'warning CS').Count
+[ScriptCompilation] Requested script compilation because: Assetdatabase observed changes in script compilation related files
+Exiting batchmode successfully now!
+error CS count: 0
+warning CS count: 0
+
+[exit code: 0]
