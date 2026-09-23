@@ -1,0 +1,31 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local\\OpenAI\\Codex\\bin\\247581e40ee272fb\\codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/013-acceptance-doc-time-limit.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "c7a53997e17be6079c1f3c8f675fbca3ebf74757f14665036a7b019b4656f731"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/013-acceptance-doc-time-limit.md",
+      "sha256": "173827b92d516771dd8fef3b383ced696d9e6b7148bc74feb9fed471431c4ae6"
+    },
+    {
+      "path": "Docs/UNITY_ACCEPTANCE.md",
+      "sha256": "b1b1f081ae69374df6eafabccabc8d90b571d03fbfb26d1747bcc4f5cbd7e9e1"
+    },
+    {
+      "path": "Collaboration/tasks/007-remove-session-time-limit.md",
+      "sha256": "b68f8be11b02b8642387c07d5b881ec59d594044396390de82390bfa8c4b6fc2"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260923T173949713311Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

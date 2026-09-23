@@ -38,6 +38,58 @@ public static class LoopModelChecks
             var m=new LoopModel();m.Start();m.Advance(1000);
             Need(m.Phase==SessionPhase.Playing || m.Phase==SessionPhase.Blackout,"session continues");
             Need(m.Outcome==SessionPhase.Ready && m.LoopId>1,"loops continue");
+            Near(m.TotalTime,1000);
+        });
+        Check(passed,"Model owns a copy of its loop rules",()=>{
+            var rules=new LoopRules();var m=new LoopModel(rules);rules.firstShot=1;
+            Need(!ReferenceEquals(rules,m.Rules),"rules shared with caller");
+            Near(m.Rules.firstShot,6);
+        });
+        Check(passed,"Minimum interval boundaries are enforced",()=>{
+            var boundary=new LoopRules{
+                firstShot=LoopRules.MinInterval,searchShot=LoopRules.MinInterval*2,
+                exitOpens=LoopRules.MinInterval,exitCloses=LoopRules.MinInterval*2,
+                blackout=LoopRules.MinInterval,playLimit=LoopRules.MinInterval,
+                endingLength=LoopRules.MinInterval
+            };
+            boundary.Validate();
+            new LoopRules{
+                firstShot=6.0,searchShot=6.05,exitOpens=6.0,exitCloses=6.05
+            }.Validate();
+            new LoopRules{exitOpens=6.5,exitCloses=6.55}.Validate();
+            Action<LoopRules>[] makeTooSmall={
+                r=>r.firstShot=LoopRules.MinInterval/2,
+                r=>{r.firstShot=LoopRules.MinInterval;r.searchShot=LoopRules.MinInterval*1.5;
+                    r.exitOpens=r.firstShot;r.exitCloses=r.searchShot;},
+                r=>{r.exitOpens=6.5;r.exitCloses=6.5+LoopRules.MinInterval/2;},
+                r=>r.blackout=LoopRules.MinInterval/2,
+                r=>r.endingLength=LoopRules.MinInterval/2,
+                r=>r.playLimit=LoopRules.MinInterval/2
+            };
+            string[] names={"firstShot","search interval","exit interval","blackout","endingLength","playLimit"};
+            for(int i=0;i<makeTooSmall.Length;i++){
+                var rules=new LoopRules();makeTooSmall[i](rules);
+                bool bad=false;try{rules.Validate();}catch(ArgumentException){bad=true;}
+                Need(bad,names[i]+" accepted below MinInterval");
+            }
+        });
+        Check(passed,"Extremely small loop timings are rejected",()=>{
+            var rules=new LoopRules{
+                firstShot=1e-200,searchShot=2e-200,exitOpens=1e-200,exitCloses=2e-200,
+                blackout=1e-200,playLimit=1e-200,endingLength=1e-200
+            };
+            bool bad=false;try{rules.Validate();}catch(ArgumentException){bad=true;}
+            Need(bad,"extremely small timings accepted");
+        });
+        Check(passed,"Minimum intervals remain bounded at MaxStep",()=>{
+            var rules=new LoopRules{
+                firstShot=LoopRules.MinInterval,searchShot=LoopRules.MinInterval*2,
+                exitOpens=LoopRules.MinInterval,exitCloses=LoopRules.MinInterval*2,
+                blackout=LoopRules.MinInterval,playLimit=LoopRules.MinInterval,
+                endingLength=LoopRules.MinInterval
+            };
+            var m=new LoopModel(rules);m.Start();m.Advance(LoopModel.MaxStep);
+            Near(m.TotalTime,LoopModel.MaxStep);
         });
         Check(passed,"Advance accepts MaxStep and rejects larger finite deltas without mutation",()=>{
             var m=new LoopModel();m.Start();m.Advance(LoopModel.MaxStep);

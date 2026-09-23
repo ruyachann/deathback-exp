@@ -1,0 +1,12 @@
+﻿task010+task011: Unity batchmode compile + DemoSetup.Validate
+2026-09-24 02:38:41 +09:00  commit 645158b  cwd C:\deathback\deathback-exp
+
+PS> Select-String -Path 'C:\deathback\deathback-exp\Collaboration\local-logs\unity-batchmode-20260924-task010-011.log' -Pattern 'Requested script compilation|error CS|warning CS|LoopRoom:|Exiting batchmode|No valid Unity' | % Line; 'error CS count: ' + (Select-String -Path 'C:\deathback\deathback-exp\Collaboration\local-logs\unity-batchmode-20260924-task010-011.log' -Pattern 'error CS').Count; 'warning CS count: ' + (Select-String -Path 'C:\deathback\deathback-exp\Collaboration\local-logs\unity-batchmode-20260924-task010-011.log' -Pattern 'warning CS').Count
+[ScriptCompilation] Requested script compilation because: Assetdatabase observed changes in script compilation related files
+LoopRoom: controller profiles: Oculus Touch=True, Meta Quest Touch Plus=True.
+LoopRoom: 18 model checks passed; XR configuration checked. HMD behavior still requires playtesting.
+Exiting batchmode successfully now!
+error CS count: 0
+warning CS count: 0
+
+[exit code: 0]

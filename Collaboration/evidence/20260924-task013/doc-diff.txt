@@ -1,0 +1,99 @@
+﻿task013 (after review fixes): Docs/UNITY_ACCEPTANCE.md diff, whitespace/EOL hidden, sha256 b1b1f081ae69374d
+2026-09-24 02:38:41 +09:00  commit 645158b  cwd C:\deathback\deathback-exp
+
+diff --git a/Docs/UNITY_ACCEPTANCE.md b/Docs/UNITY_ACCEPTANCE.md
+index 4414670..04c7e86 100644
+--- a/Docs/UNITY_ACCEPTANCE.md
++++ b/Docs/UNITY_ACCEPTANCE.md
+@@ -1,13 +1,13 @@
+ # Unity/実機 受入手順書（第零室デモ）
+ 
+-本書は Quest 3 PCVR 版デモ（現行設計、Docs/Plans/STAGE_PLAN.md 段階2相当）に対する**手動受入テストの手順書**である。
++本書は Quest 3 / Quest 3S PCVR 版デモ（現行設計、Docs/Plans/STAGE_PLAN.md 段階2相当）に対する**手動受入テストの手順書**である。実機が Quest 3S になる可能性があるため、機種が確定するまで両方を想定する（2026-09-24 追記）。
+ 
+ **重要**: 本書はテストの実施方法・期待される証拠・不合格判定基準を定めるものであり、実施結果や合格を示すものではない。各項目は実施後に日付・実施者・対象コミットSHA・結果（実施済み/未実施/合格/不合格）を別途記録すること。未実施の項目を実施済み・合格として扱ってはならない。
+ 
+ ## 0. 前提条件
+ 
+-- Unity 6000.3.15f1、対象は Meta Quest 3（PCVR、Quest Link もしくは Air Link）。
+-- プレイ領域は 2m 四方。装着作業を除き、1セッションは 180 秒以内を目標とする。
++- Unity 6000.3.15f1、対象は Meta Quest 3 / Quest 3S（PCVR、Quest Link もしくは Air Link、Touch Plus コントローラー）。機種が確定次第、本書と AGENTS.md の不変条件・STAGE_PLAN の対象機種を更新する（2026-09-24 追記）。
++- プレイ領域は 2m 四方。時間上限は当面なし（`LoopRules.enforcePlayLimit=false`）。再導入はユーザー判断（2026-09-23 決定、2026-09-24 本書へ反映）。
+ - `Assets/LoopRoom/Editor/DemoSetup.cs` の Editor メニューを使用する。実在するメニューは以下のみ：
+   - `LoopRoom/1 - Prepare project and scene`
+   - `LoopRoom/2 - Configure Quest Link OpenXR`
+@@ -34,14 +34,15 @@
+ ## 2. Floor / 頭部 / 手の追跡確認
+ 
+ **手順**
+-1. Quest 3 を装着し、Link/Air Link 接続後にビルドを起動する。
++1. Quest 3 または Quest 3S を装着し、Link/Air Link 接続後にビルドを起動する。
+ 2. Floor 基準（`TrackingOriginModeFlags.Floor`）が確定し、`FloorReady` が true になった後、実際の床面と仮想床面の高さが一致していることを確認する（しゃがむ・立つ動作でずれがないか）。
+ 3. 頭を左右上下に動かし、視点の位置・回転（`HeadTracked`）が実際の動きと一致することを確認する。
+ 4. 両手のコントローラーを動かし、コントローラープロキシ（球体、PrivateLayer 表示）が実際の手の位置・向きに追従することを確認する。
++5.（2026-09-24 追記）Quest 3S で実施する場合は、視野角・解像度・レンズの違いによる机・時計・取っ手の視認性、および案内パネル（第零室メッセージ、操作説明）の文字が判読できることを確認する。desktop モードでは案内パネルの文字が Game ビューからはみ出す見た目が確認されている（`Collaboration/evidence/20260924-editor-play`）。VR では見え方が異なる可能性があるため、HMD 内での見え方として別途確認する。
+ 
+-**期待される証拠**: 床面ずれなし、頭部回転・位置追従の目視確認記録、両手のプロキシが実位置と一致する記録（可能であれば映像）。
++**期待される証拠**: 床面ずれなし、頭部回転・位置追従の目視確認記録、両手のプロキシが実位置と一致する記録（可能であれば映像）。Quest 3S 使用時は視認性・文字サイズの確認結果（使用機種を記録）。
+ 
+-**不合格基準**: 床面に有意なオフセットがある、頭部の回転が反映されない、手のプロキシが表示されない・大きくずれる。
++**不合格基準**: 床面に有意なオフセットがある、頭部の回転が反映されない、手のプロキシが表示されない・大きくずれる。Quest 3S で机・時計・取っ手が視認できない、または案内パネルの文字が判読できない。
+ 
+ ## 3. デスクトップ `--desktop` 経路の確認
+ 
+@@ -59,7 +60,7 @@
+ 
+ **手順**
+ 1. `LoopRoom/1 - Prepare project and scene` でシーンを準備済みの状態から、Editor で Play を開始する。
+-2. Ready → 開始 → セッション進行（脱出またはタイムアウトまたは中断のいずれか）→ 終了までを 1 サイクルとし、Play を停止する。
++2. Ready → 開始 → セッション進行（脱出または中断のいずれか。タイムアウトは既定では発生しない。第8章の参考手順で `enforcePlayLimit=true` にした場合のみ発生する）→ 終了までを 1 サイクルとし、Play を停止する。
+ 3. 同一 Editor セッションを再起動せずに、これを連続 3 回繰り返す。
+ 
+ **期待される証拠**: 3 回とも Console にエラー・例外が出ないこと、`XR Origin`/`Interaction Manager` などの生成物が Stop 時に正しく破棄され、次の Play で重複や警告が出ないこと。
+@@ -69,7 +70,7 @@
+ ## 5. 3 回の死亡ループと XR 原点非再割当の確認
+ 
+ **手順**
+-1. セッションを開始し、遮蔽を上げずに攻撃を受けるなどして実際の死亡を、アプリを再起動せずに連続 3 回発生させる。各回で Playing → Blackout → Playing と `Model.LoopId` の増加を確認する。タイムアウトはセッション終了であり、死亡によるループ再開として数えない。
++1. セッションを開始し、遮蔽を上げずに攻撃を受けるなどして実際の死亡を、アプリを再起動せずに連続 3 回発生させる。各回で Playing → Blackout → Playing と `Model.LoopId` の増加を確認する。タイムアウト（既定では発生しない。第8章の参考手順で `enforcePlayLimit=true` にした場合のみ発生する）はセッション終了であり、死亡によるループ再開として数えない。
+ 2. `LoopId` 変化のたびに `rig.ClearSelection()` とチャイム音（`room.Chime`）が発生することを確認する（`LoopDemo.Update` の該当分岐）。
+ 3. **最重要確認**: `room.Root` の位置・回転は `Begin()`（`Model.Start()` 呼び出し前）で一度だけ、その時点のプレイヤー実位置・向きに基づき設定される。ループ 2 回目・3 回目でユーザーが物理的に移動・再キャリブレーションを求められないこと、また `room.Root` や Floor 原点が変化しないことを確認する。
+ 
+@@ -104,19 +105,30 @@
+ 
+ **追加確認**: VR の観客表示では F2 の運営表示を無効にしておく。F2 を有効にすると `LoopDemo.OnGUI()` が攻略キーと経過時間を PC 画面に描くため、観客へ見せない。公開の手プロキシ、音、影、その他の表示から攻略操作が推測できないかも実機で確認する。ソース確認だけで観客表示の合格とは扱わない。
+ 
+-## 8. 180 秒以内の確認
++## 8. セッション時間の記録（2026-09-24: 180 秒の合否基準を撤廃し改題。2026-09-23 のユーザー決定を反映）
++
++時間上限は当面なし（`LoopRules.enforcePlayLimit=false`）。合否基準は時間の長さではなく、セッションが脱出（Escaped）または運営の中断（Interrupted、Esc/追跡喪失）のいずれかで終わり、`TimedOut` が出ないこととする。
+ 
+ **手順**
+ 1. 装着と準備が完了した後、開始操作により最初の `Model.Start()` が実行される時点（最初の開始チャイムを目印にできる）を計測起点とする。Ready の準備待ち時間は含めない。
+-2. `Model.Phase` が Finished に遷移するまでの実時間を外部ストップウォッチで計測する。Escaped/TimedOut/Interrupted への遷移後の 8 秒の終了演出も含め、これらの結果フェーズへの遷移時点で計測を止めない。
+-3. 開始・Finished 到達時刻と合計秒数を記録する。`Model.TotalTime` は参考値に留め、追跡瞬断によるモデル停止などを含む実時間の代わりにしない。F2 の運営表示を使う場合は観客に見せない。
++2. `Model.Phase` が Finished に遷移するまでの実時間を外部ストップウォッチで計測する。Escaped/Interrupted への遷移後の 8 秒の終了演出も含め、これらの結果フェーズへの遷移時点で計測を止めない。
++3. 開始・Finished 到達時刻と合計秒数、`outcome`（Escaped または Interrupted）を記録する。`Model.TotalTime` は参考値に留め、追跡瞬断によるモデル停止などを含む実時間の代わりにしない。F2 の運営表示を使う場合は観客に見せない。
++4. セッションログ（`Application.persistentDataPath/Sessions/<sessionId>.json`）の `elapsed` と `outcome` を記録し、`outcome=TimedOut` が出ていないことを確認する。あわせて `timings.enforcePlayLimit` が `false` であることを確認する。シーンに `playLimit=172` が保存されていても、`enforcePlayLimit=false` の間は使用されない。
++
++**期待される証拠**: 開始・終了時刻、合計秒数、`outcome`、セッションログの `elapsed` と `timings.enforcePlayLimit` の記録。
++
++**不合格基準**: `outcome` が `TimedOut` になる、Escaped/Interrupted 以外で終わる、`timings.enforcePlayLimit` が `true` になっている、または計測不能（クラッシュ・フリーズ等）。
++
++**参考: 時間上限を再導入した場合の確認手順**（`LoopRules.enforcePlayLimit=true` に設定して確認する場合のみ使用する。既定では実施しない）
+ 
+-**期待される証拠**: 開始・終了時刻および合計秒数の記録。
++1. `enforcePlayLimit=true` の設定でビルドまたは Editor Play を実行する。
++2. 172 秒経過時点で `Model.Phase` が `TimedOut` に遷移し、以後 8 秒のエンディング演出を経て `Finished` になることを確認する。
++3. 合計時間が 180 秒（172+8）を超えないことを確認する。
+ 
+-**不合格基準**: 合計時間が 180 秒を超える、または計測不能（クラッシュ・フリーズ等）。
++**不合格基準（参考手順のみ）**: `enforcePlayLimit=true` で合計時間が 180 秒を超える、または `TimedOut` に遷移しない。
+ 
+ ## 9. 記録・保存に関する注意
+ 
+-- セッションログは `Application.persistentDataPath/Sessions/<sessionId>.json` に保存される（`sessionId`, `mode`, `outcome`, `elapsed`, `timings`, `events` を含む）。受入記録に添付する場合は必要な範囲のみを抜粋する。
++- セッションログは `Application.persistentDataPath/Sessions/<sessionId>.json` に保存される（`sessionId`, `mode`, `outcome`, `elapsed`, `timings`（`enforcePlayLimit` を含む）, `events` を含む）。受入記録に添付する場合は必要な範囲のみを抜粋する。
+ - 個人情報や接続環境固有の情報を含みうる生ログ・詳細診断ログは受入記録に含めない。
+ - 各項目について「実施日」「実施者」「対象コミットSHA」「結果（実施済み/未実施、合格/不合格）」「証拠の保存場所」を別紙・別セクションに記録すること。本書自体には結果を書き込まない。
+

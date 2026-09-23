@@ -98,9 +98,12 @@ public static class DemoSetup
             var profile=openxr.GetFeature<OculusTouchControllerProfile>();
             if(profile!=null){profile.enabled=true;EditorUtility.SetDirty(profile);}
             else Debug.LogWarning("Enable Oculus Touch Controller Profile in Project Settings > XR Plug-in Management > OpenXR (Windows), then run menu 3.");
+            var touchPlusProfile=openxr.GetFeature<MetaQuestTouchPlusControllerProfile>();
+            if(touchPlusProfile!=null){touchPlusProfile.enabled=true;EditorUtility.SetDirty(touchPlusProfile);}
+            else Debug.LogWarning("Enable Meta Quest Touch Plus Controller Profile in Project Settings > XR Plug-in Management > OpenXR (Windows), then run menu 3.");
             EditorUtility.SetDirty(openxr);AssetDatabase.SaveAssets();
         }
-        else Debug.LogWarning("Open Project Settings > XR Plug-in Management > OpenXR (Windows) to create the OpenXR settings, add Oculus Touch Controller Profile, then run menu 3.");
+        else Debug.LogWarning("Open Project Settings > XR Plug-in Management > OpenXR (Windows) to create the OpenXR settings, add Oculus Touch Controller Profile and Meta Quest Touch Plus Controller Profile, then run menu 3.");
         Debug.Log("LoopRoom: OpenXR loader configured; machine runtime and headset connection are not changed by this menu.");
     }
 
@@ -114,8 +117,12 @@ public static class DemoSetup
         if(general.InitManagerOnStart) throw new InvalidOperationException("Automatic XR startup must be disabled: input is created before manual initialization.");
         var settings=OpenXRSettings.GetSettingsForBuildTargetGroup(BuildTargetGroup.Standalone);
         var profile=settings!=null?settings.GetFeature<OculusTouchControllerProfile>():null;
-        if(profile==null || !profile.enabled) throw new InvalidOperationException("Enable Oculus Touch Controller Profile in OpenXR settings.");
+        var touchPlusProfile=settings!=null?settings.GetFeature<MetaQuestTouchPlusControllerProfile>():null;
+        bool oculusTouchEnabled=profile!=null && profile.enabled;
+        bool touchPlusEnabled=touchPlusProfile!=null && touchPlusProfile.enabled;
+        if(!oculusTouchEnabled && !touchPlusEnabled) throw new InvalidOperationException("Enable Oculus Touch Controller Profile or Meta Quest Touch Plus Controller Profile in OpenXR settings.");
         Directory.CreateDirectory("TestResults");File.WriteAllLines("TestResults/model-checks.txt",results);
+        Debug.Log("LoopRoom: controller profiles: Oculus Touch="+oculusTouchEnabled+", Meta Quest Touch Plus="+touchPlusEnabled+".");
         Debug.Log("LoopRoom: "+results.Count+" model checks passed; XR configuration checked. HMD behavior still requires playtesting.");
     }
 

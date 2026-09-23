@@ -13,6 +13,14 @@
 - 案内文言（PreparationMessage）の「準備ができませんでした」に「R: 再準備（運営）」を加える。OnGUI の運営表示にも R を加える。
 - 詳細（XR の停止・破棄の手順）は実装者が XR Management の API を確認して決め、報告する。
 
+### 設計の修正（2026-09-24、計画担当 Opus 5.5。初回実装の報告を読んで判明）
+
+初回の設計 `CanRetryPreparation => !xrInitializing && !CanStart && !forceDesktop` では、XR の準備に失敗して **desktop fallback になった状態では CanStart が true になるため R が効かない**。「起動時に Link が外れていて desktop fallback → 再接続して VR に戻したい」という最も起こりやすい場面で使えない。計画の穴なので次のように直す。
+- `CanRetryPreparation => !xrInitializing && !forceDesktop && (desktopFallback || !CanStart);`
+- desktop fallback 中（開始はできる）でも、運営表示（OnGUI の2行目以降）に「R: VR 再準備（運営）」を出す。長さが収まらなければ行を分ける。PreparationMessage は変えない（desktop fallback 中は表示されないため）。
+- RetryPreparation の中身（自分が起動した XR だけ停止、フラグと origin・floorInputs の初期化、xrInitializing を先に立ててからコルーチン再開）は初回実装のままでよい。OnDestroy からの `StopOwnedXR()` 抽出と `origin.enabled=false` の追加も承認する。
+- 受入2の Editor Play（HMD なし、desktop fallback）で、R を押すと再準備が走って再び desktop fallback に戻ることを確認できるようになる。
+
 ## 許可ファイル
 
 - `Assets/LoopRoom/Scripts/DemoRig.cs`

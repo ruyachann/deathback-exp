@@ -17,7 +17,10 @@
 | 4 | 未コミット変更の保存 | ユーザー承認後 | MCP設定・task005・文書類が作業ツリーのみ。作業ブランチへ commit/push は承認待ち |
 | 5 | task004 settings 交換 / 段階1 Sonnet最終文書確認 | Sonnet + Sol | **完了（2026-09-24）**: task004 設定は交換後 Sonnet も approve、段階1文書は Sonnet 最終 approve。**段階1の相互レビュー完了**（reviews/task004-settings-exchange-20260924.md、証拠 evidence/20260924-item5-reviews/） |
 | 5c | Editor Play 証拠（2026-09-24） | Opus 5.5（computer-use） | **完了**: desktop Play で37周・228.96秒、Console は既知の警告4件から増えず（task005 受入2の警告部分）、180秒超でも継続（task007 受入4）、遮蔽→脱出で Escaped、TimedOut 0件（evidence/20260924-editor-play/）。可聴音と実機は未確認。気づき: desktop で案内パネルの文字が Game ビューからはみ出す（計画6の見え方確認で扱う） |
-| 5b | UNITY_ACCEPTANCE.md の180秒節を現行方針に合わせる | 計画: Opus 5.5 | **task013** に正式化（実装 Sonnet） |
+| 5b | UNITY_ACCEPTANCE.md の180秒節を現行方針に合わせる | 計画: Opus 5.5 | **task013 受入（2026-09-24）**: 実装 Sonnet、1回の追修正後 Sol/Sonnet approve |
+| 7a | task010 Rules 複製＋区間最小値 | 実装 Sol | **受入（2026-09-24）**: 1回の追修正後 Sol/Sonnet approve、モデル19チェック PASS、batchmode 0/0。残り: 生成後の Rules 書き換え防止（Issue4） |
+| 7b | task011 Touch Plus プロファイル | 実装 Sol | **受入（2026-09-24）**: Sol approve、Sonnet は証拠の交換後 approve。asset は Touch Plus の m_enabled 1行のみ。実機入力は計画6 |
+| 7c | task012 XR 再準備キー R | 実装 Sonnet | 実装中: 設計の穴（desktop fallback 中に R が効かない）を計画担当が修正し、Sonnet が追修正済み。次: batchmode コンパイル、Editor Play で R の証拠、Sol/Sonnet レビュー |
 | 7 | task006 の正式化（2026-09-24、Opus 5.5） | 計画: Opus 5.5 | DRAFT を分割: **task010** B-6 Rules 複製＋区間の最小値（実装 Sol）→ **task011** B-7 Touch Plus プロファイル（実装 Sol）→ **task012** B-4 XR 再準備キー R（実装 Sonnet）→ **task013** 文書（実装 Sonnet）。確認しやすい順。B-5（机の位置、身体位置の判断）は Quest 3/3S 実機で見え方を確かめてからユーザーと決める |
 | 8 | **今後: 体験のクオリティ向上**（2026-09-24 ユーザー指定） | 計画: Opus 5.5 / Astra | 仮想空間内の見た目（素材・照明・部屋の作り込み、敵の造形とアニメーション）、音（足音・射撃・環境音）、演出（暗転・脱出の余韻）、案内表示の読みやすさ。STAGE_PLAN 段階3と合わせ、task010〜013 と実機受入のあとに計画を立てる |
 | 6 | Quest3 実機受入 | ユーザー | 接続可能になり次第（task005受入条件3を含む）。**2026-09-24 ユーザー報告: 実機が Meta Quest 3S になる可能性がある。** 決まるまでは Quest 3 / 3S の両方を想定する。3S も Link による PCVR と Touch Plus コントローラーなので、task006 B-7（Touch Plus プロファイル有効化）の優先度を上げる。視野角・解像度・レンズの違いによる見え方（机・時計・取っ手の視認性、文字サイズ）は実機受入の確認項目に加える。機種が決まったら AGENTS.md の不変条件と STAGE_PLAN の対象機種を更新する |

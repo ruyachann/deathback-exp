@@ -8,6 +8,8 @@ namespace LoopRoom
     [Serializable]
     public sealed class LoopRules
     {
+        public const double MinInterval = 0.05;
+        const double IntervalTolerance = 1e-9;
         public double firstShot = 6.0;
         public double searchShot = 12.0;
         public double exitOpens = 6.5;
@@ -16,6 +18,9 @@ namespace LoopRoom
         public double playLimit = 172.0;
         public double endingLength = 8.0;
         public bool enforcePlayLimit = false;
+
+        public LoopRules Clone() => (LoopRules)MemberwiseClone();
+
         public void Validate()
         {
             if (double.IsNaN(firstShot) || double.IsInfinity(firstShot) ||
@@ -30,6 +35,13 @@ namespace LoopRoom
                 exitCloses > searchShot || exitCloses <= exitOpens || blackout <= 0 ||
                 playLimit <= 0 || endingLength <= 0 ||
                 (enforcePlayLimit && playLimit + endingLength > 180.0))
+                throw new ArgumentException("Invalid loop timing rules");
+            if (firstShot < MinInterval - IntervalTolerance ||
+                searchShot - firstShot < MinInterval - IntervalTolerance ||
+                exitCloses - exitOpens < MinInterval - IntervalTolerance ||
+                blackout < MinInterval - IntervalTolerance ||
+                endingLength < MinInterval - IntervalTolerance ||
+                playLimit < MinInterval - IntervalTolerance)
                 throw new ArgumentException("Invalid loop timing rules");
         }
     }
@@ -63,7 +75,7 @@ namespace LoopRoom
 
         public LoopModel(LoopRules rules = null)
         {
-            Rules = rules ?? new LoopRules();
+            Rules = (rules ?? new LoopRules()).Clone();
             Rules.Validate();
         }
 
