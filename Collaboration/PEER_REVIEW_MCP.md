@@ -10,7 +10,9 @@
 
 このリポジトリを信頼した Codex は `.codex/config.toml` から `peer_claude` を読み、`review_with_claude` を使える。Claude Code はルートの `.mcp.json` から `peer_codex` を読み、`review_with_codex` を使える。両方とも `Tools/peer_review_mcp.py` を標準入出力の MCP サーバーとして起動する。設定はこのマシンの正本パス `C:/deathback/deathback-exp` を指す。移動した場合は両設定のスクリプトパスを更新する。
 
-接続確認は正本のルートで `codex mcp list` と `claude mcp list` を実行する。2026-09-23、ユーザーの明示承認後、Codex の正本リポジトリだけを信頼済みに登録し、`peer_claude` が有効として表示された。Claude の `peer_codex` も初回承認待ちは解消したが、Codex の制限付きシェルからのヘルスチェックは `uv_spawn 'python'` の `EPERM` で失敗した。Claude の通常セッションからの接続と実際のモデル応答は未確認。通信・プロセス制限を迂回して接続を成立させない。接続確認とモデル応答確認は別であり、レビュー成功まで認証・ネットワーク・モデル利用権を証明しない。
+接続確認は正本のルートで `codex mcp list` と `claude mcp list` を実行する。2026-09-23、ユーザーの明示承認後、Codex の正本リポジトリだけを信頼済みに登録し、`peer_claude` が有効として表示された。Claude の `peer_codex` も初回承認待ちは解消したが、Codex の制限付きシェルからのヘルスチェックは `uv_spawn 'python'` の `EPERM` で失敗した。Claude の通常セッションからの接続と実際のモデル応答は未確認。通信・プロセス制限を迂回して接続を成立させない。
+
+2026-09-24 追記: Claude Code の通常セッションで `claude mcp list` が `peer_codex` を Connected と表示。`review_with_codex` の Codex 呼出し不具合（PATH、`--ask-for-approval` の位置）は task009 で修正し、MCP サーバーを stdio で起動した `review_with_codex`（Sol）と `review_with_claude`（Sonnet、modelUsage で確認）の両方が実際のレビューを返すことを確認した。codex.exe が PATH に無い環境では `CODEX_CLI_PATH`、無ければ `%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe` の最新を使う。Codex 側の制限付きシェルから `peer_claude` を起動する経路（`EPERM`）は未確認のまま。接続確認とモデル応答確認は別であり、レビュー成功まで認証・ネットワーク・モデル利用権を証明しない。
 
 ## レビュー手順
 

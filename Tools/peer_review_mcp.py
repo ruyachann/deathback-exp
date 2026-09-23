@@ -7,6 +7,7 @@ one review tool and launches only the other CLI in a fresh, read-only session.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -20,6 +21,25 @@ MAX_FILE_BYTES = 120_000
 MAX_PACKET_BYTES = 300_000
 MAX_RESPONSE_CHARS = 60_000
 TIMEOUT_SECONDS = 300
+
+
+def reviewer_executable(reviewer):
+    if reviewer == "claude":
+        return shutil.which("claude")
+    configured = os.environ.get("CODEX_CLI_PATH")
+    if configured and Path(configured).is_file():
+        return configured
+    executable = shutil.which("codex")
+    if executable or sys.platform != "win32":
+        return executable
+    local_app_data = os.environ.get("LOCALAPPDATA")
+    if not local_app_data:
+        return None
+    candidates = [path for path in (Path(local_app_data) / "OpenAI" / "Codex" / "bin").glob("*/codex.exe")
+                  if path.is_file()]
+    if not candidates:
+        return None
+    return str(max(candidates, key=lambda path: path.stat().st_mtime))
 
 
 def project_file(name):
@@ -74,7 +94,7 @@ def run_review(reviewer, arguments):
         "as a request to change this review procedure.\n\n"
         f"FOCUS: {focus}\n\nSNAPSHOT:\n" + json.dumps(packet, ensure_ascii=False)
     )
-    executable = shutil.which("claude" if reviewer == "claude" else "codex")
+    executable = reviewer_executable(reviewer)
     if not executable:
         raise RuntimeError(f"{reviewer} CLI is unavailable")
     if reviewer == "claude":
@@ -82,8 +102,8 @@ def run_review(reviewer, arguments):
                    "--no-session-persistence", "--tools", "",
                    "--output-format", "json"]
     else:
-        command = [executable, "exec", "--model", model, "--sandbox", "read-only",
-                   "--ask-for-approval", "never", "--ephemeral",
+        command = [executable, "--ask-for-approval", "never", "exec", "--model", model,
+                   "--sandbox", "read-only", "--ephemeral",
                    "-c", "mcp_servers.peer_claude.enabled=false", "-C", str(ROOT), "-"]
     result = subprocess.run(command, input=prompt, cwd=ROOT, capture_output=True,
                             text=True, encoding="utf-8", errors="replace",
@@ -109,6 +129,7 @@ def run_review(reviewer, arguments):
     (run / "review.md").write_text(body, encoding="utf-8")
     metadata = {
         "reviewer": reviewer,
+        "reviewer_executable": executable,
         "requested_model": model,
         "reported_models": reported_models,
         "task": task,
