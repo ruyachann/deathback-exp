@@ -1,6 +1,6 @@
 # 012 — XR 準備の再試行（task006 B-4）
 
-状態: 計画確定（2026-09-24）。計画 Claude Opus 5.5。実装 Claude Sonnet 5（今回は Claude 側が実装し、Sol と別セッションの Sonnet がレビュー）。
+状態: **相互レビュー完了・受入待ち（Editor Play の証拠）（2026-09-24）**。結果は `reviews/task012-exchange-20260924.md`。計画確定（2026-09-24）。計画 Claude Opus 5.5。実装 Claude Sonnet 5（今回は Claude 側が実装し、Sol と別セッションの Sonnet がレビュー）。
 
 ## 目的
 
@@ -20,6 +20,14 @@
 - desktop fallback 中（開始はできる）でも、運営表示（OnGUI の2行目以降）に「R: VR 再準備（運営）」を出す。長さが収まらなければ行を分ける。PreparationMessage は変えない（desktop fallback 中は表示されないため）。
 - RetryPreparation の中身（自分が起動した XR だけ停止、フラグと origin・floorInputs の初期化、xrInitializing を先に立ててからコルーチン再開）は初回実装のままでよい。OnDestroy からの `StopOwnedXR()` 抽出と `origin.enabled=false` の追加も承認する。
 - 受入2の Editor Play（HMD なし、desktop fallback）で、R を押すと再準備が走って再び desktop fallback に戻ることを確認できるようになる。
+
+### 追修正（2026-09-24、独立レビュー指摘への対応。計画担当 Opus 5.5 の決定）
+
+Sol・Sonnet とも request_changes（`sol-task012-independent-mcp.md`、`sonnet-task012-independent-mcp.md`）。
+1. 採用（Sol 中）: `idle` を Begin() の前に1回だけ計算しているため、Enter と R を同じフレームに押すと、開始直後に再準備が走る。開始と再準備を排他にする（R の判定を `else if` にする、または判定直前に現在の Phase を見直す）。
+2. 不採用（Sonnet 重大）: 「Interrupted の間は idle にならず R が効かない」。LoopModel では Interrupted は `endingLength`（8秒）の後に Finished に移る（LoopModel.cs の Advance、Escaped/TimedOut/Interrupted の分岐）。Finished では R が効くので欠陥ではない。中断直後の8秒間だけ R を受け付けないのは許容する。
+3. 採用（Sonnet 中）: `FloorReady` だが頭の追跡や表示ランタイムが無く `CanRetryPreparation` が true になる状態で、PreparationMessage（「頭の位置と向きの追跡を待っています。」）に R の案内が出ない。この分岐にも `CanRetryPreparation` が true のとき「R: 再準備（運営）」を加える。
+4. 採用（Sonnet 低）: XR ローダーを外部が起動していた（`ownsXR=false`）場合、RetryPreparation はローダーを作り直さず Floor と追跡の再確認だけになる。動作は変えず、その場合に `Debug.Log` で「ローダーは外部所有のため Floor と追跡の再確認のみ」と知らせる。
 
 ## 許可ファイル
 

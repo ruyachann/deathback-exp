@@ -23,9 +23,10 @@ namespace LoopRoom
                 (int)(InputTrackingState.Position | InputTrackingState.Rotation);
         public bool CanStart => !xrInitializing && (IsVR ? FloorReady && HeadTracked && RuntimePresent() :
             forceDesktop || desktopFallback);
+        public bool CanRetryPreparation => !xrInitializing && !forceDesktop && (desktopFallback || !CanStart);
         public string PreparationMessage => xrInitializing ? "第零室\nVRを準備しています。\n接続とプレイエリアを確認してください。" :
-            FloorReady ? "第零室\n頭の位置と向きの追跡を待っています。" :
-            "第零室\nVRの準備ができませんでした。\n接続とプレイエリアを確認してください。";
+            FloorReady ? "第零室\n頭の位置と向きの追跡を待っています。" + (CanRetryPreparation ? "\nR: 再準備（運営）" : "") :
+            "第零室\nVRの準備ができませんでした。\n接続とプレイエリアを確認してください。\nR: 再準備（運営）";
         public Transform[] Hands { get; private set; }
         public bool StartPressed => startAction.WasPressedThisFrame();
         public bool NeedsRelease => needsRelease[0] || needsRelease[1];
@@ -290,13 +291,31 @@ namespace LoopRoom
             Debug.LogWarning(reason,this);
         }
 
-        void OnDestroy()
+        void StopOwnedXR()
         {
             if(ownsXR && XRGeneralSettings.Instance!=null && XRGeneralSettings.Instance.Manager!=null)
             {
                 XRGeneralSettings.Instance.Manager.StopSubsystems();
                 XRGeneralSettings.Instance.Manager.DeinitializeLoader();
             }
+        }
+
+        public void RetryPreparation()
+        {
+            if(!CanRetryPreparation) return;
+            var xrRunning=XRGeneralSettings.Instance!=null && XRGeneralSettings.Instance.Manager!=null && XRGeneralSettings.Instance.Manager.activeLoader!=null;
+            if(xrRunning && !ownsXR) Debug.Log("ローダーは外部所有のため Floor と追跡の再確認のみ",this);
+            StopOwnedXR();
+            ownsXR=false; desktopFallback=false; floorPrepared=false; preparationReported=false;
+            origin.enabled=false;
+            floorInputs.Clear();
+            xrInitializing=true;
+            StartCoroutine(StartXR());
+        }
+
+        void OnDestroy()
+        {
+            StopOwnedXR();
             foreach (var action in actions) action.Dispose();
         }
     }

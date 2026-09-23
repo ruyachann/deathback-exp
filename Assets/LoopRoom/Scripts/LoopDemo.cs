@@ -81,6 +81,7 @@ namespace LoopRoom
             var keyboard=Keyboard.current;
             bool enter=keyboard!=null && keyboard.enterKey.wasPressedThisFrame;
             if (idle && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed))) Begin();
+            else if (idle && keyboard!=null && keyboard.rKey.wasPressedThisFrame && rig.CanRetryPreparation) rig.RetryPreparation();
             if (keyboard!=null && keyboard.escapeKey.wasPressedThisFrame) Model.Interrupt();
             if (keyboard!=null && keyboard.f2Key.wasPressedThisFrame) privateOverlay=!privateOverlay;
             // Focus loss ends only the desktop check mode; in VR the HMD keeps running (runInBackground) while the operator uses other windows.
@@ -207,14 +208,20 @@ namespace LoopRoom
                 title=new GUIStyle(GUI.skin.label){font=font,fontSize=28}; title.normal.textColor=new Color(.9f,.85f,.7f);
                 body=new GUIStyle(title){fontSize=18}; small=new GUIStyle(title){fontSize=13};
             }
-            GUI.Box(new Rect(16,16,360,rig.IsVR&&!privateOverlay?112:182),GUIContent.none);
+            bool showRetryHint=(!rig.IsVR || privateOverlay) && rig.CanRetryPreparation;
+            float boxHeight=rig.IsVR&&!privateOverlay?112:showRetryHint?206:182;
+            GUI.Box(new Rect(16,16,360,boxHeight),GUIContent.none);
             GUI.Label(new Rect(32,28,340,40),"第零室 / THE ROOM BEFORE",title);
             GUI.Label(new Rect(32,72,340,28),"LOOP "+Model.LoopId.ToString("00")+"  ·  "+PublicState(),body);
             if(!rig.IsVR || privateOverlay)
             {
-                GUI.Label(new Rect(32,107,340,26),rig.CanStart ? "Enter 開始 / Space 遮蔽 / E 出口" : "開始前の接続と追跡を確認中",small);
-                GUI.Label(new Rect(32,131,340,26),"右ドラッグ 視点 / Esc 中断 / F2 運営表示",small);
-                GUI.Label(new Rect(32,155,340,26),"S01  "+Model.TotalTime.ToString("F1")+"s  "+logMessage,small);
+                float y=107;
+                GUI.Label(new Rect(32,y,340,26),rig.CanStart ? "Enter 開始 / Space 遮蔽 / E 出口" : "開始前の接続と追跡を確認中",small);
+                y+=24;
+                if(rig.CanRetryPreparation) { GUI.Label(new Rect(32,y,340,26),"R: VR 再準備（運営）",small); y+=24; }
+                GUI.Label(new Rect(32,y,340,26),"右ドラッグ 視点 / Esc 中断 / F2 運営表示",small);
+                y+=24;
+                GUI.Label(new Rect(32,y,340,26),"S01  "+Model.TotalTime.ToString("F1")+"s  "+logMessage,small);
             }
         }
 

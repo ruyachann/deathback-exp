@@ -1,0 +1,12 @@
+﻿task012: Unity 6000.3.15f1 batchmode compile (after review fixes)
+2026-09-24 03:00:14 +09:00  commit b9cc4dd  cwd C:\deathback\deathback-exp
+
+PS> Get-FileHash Assets\LoopRoom\Scripts\DemoRig.cs,Assets\LoopRoom\Scripts\LoopDemo.cs | % { 'sha256 ' + $_.Hash.ToLower() + '  ' + (Split-Path $_.Path -Leaf) }; Select-String -Path 'C:\deathback\deathback-exp\Collaboration\local-logs\unity-batchmode-20260924-task012.log' -Pattern 'Requested script compilation|error CS|warning CS|Exiting batchmode|No valid Unity' | % Line; 'error CS count: ' + (Select-String -Path 'C:\deathback\deathback-exp\Collaboration\local-logs\unity-batchmode-20260924-task012.log' -Pattern 'error CS').Count; 'warning CS count: ' + (Select-String -Path 'C:\deathback\deathback-exp\Collaboration\local-logs\unity-batchmode-20260924-task012.log' -Pattern 'warning CS').Count
+sha256 793caa1e50c3efd52d48f278cc8043598dddb7d68833d395e2e885b737730bbc  DemoRig.cs
+sha256 6ccb7a3550c9bb1a9331d61195153c1b37851be473eb2aee91a677bccb2dc28f  LoopDemo.cs
+[ScriptCompilation] Requested script compilation because: Assetdatabase observed changes in script compilation related files
+Exiting batchmode successfully now!
+error CS count: 0
+warning CS count: 0
+
+[exit code: 0]
