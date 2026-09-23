@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace LoopRoom
@@ -115,6 +116,8 @@ namespace LoopRoom
             var go=new GameObject("Public spectator camera"); go.transform.SetParent(Root,false);
             Spectator=go.AddComponent<Camera>(); Spectator.stereoTargetEye=StereoTargetEyeMask.None;
             Spectator.cullingMask=~(1<<PrivateLayer); Spectator.depth=10;
+            // URP ignores stereoTargetEye; without this the spectator view (depth 10) is also rendered into the HMD.
+            Spectator.GetUniversalAdditionalCameraData().allowXRRendering=false;
             Spectator.transform.position=new Vector3(-2.0f,2.65f,-1.8f);
             Spectator.transform.LookAt(new Vector3(0,1.1f,.8f)); Spectator.fieldOfView=63;
             Spectator.clearFlags=CameraClearFlags.SolidColor; Spectator.backgroundColor=new Color(.015f,.025f,.035f);

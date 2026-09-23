@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "peer_codex": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["C:/deathback/deathback-exp/Tools/peer_review_mcp.py", "--reviewer", "codex"]
+    }
+  }
+}

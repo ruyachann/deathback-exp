@@ -45,7 +45,10 @@ namespace LoopRoom
             controls = new[]{room.ShieldHandle,room.ExitHandle};
             room.ShieldHandle.selectEntered.AddListener(_ => RaiseShield());
             room.ExitHandle.selectEntered.AddListener(_ => TryExit());
-            enemyAudio = room.Enemy.gameObject.AddComponent<AudioSource>();
+            // Enemy is inactive until LoopTime>=3, and a disabled AudioSource plays nothing;
+            // keep the source on an always-active object that follows the enemy instead.
+            enemyAudio = new GameObject("Enemy audio").AddComponent<AudioSource>();
+            enemyAudio.transform.SetParent(room.Root,false); enemyAudio.playOnAwake=false;
             enemyAudio.spatialBlend=1; enemyAudio.minDistance=.5f; enemyAudio.maxDistance=10; enemyAudio.volume=.22f;
             room.Sound.transform.position = new Vector3(0,1.4f,.7f);
             room.Sound.spatialBlend=1; room.Sound.minDistance=.4f; room.Sound.maxDistance=8;
@@ -80,7 +83,8 @@ namespace LoopRoom
             if (idle && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed))) Begin();
             if (keyboard!=null && keyboard.escapeKey.wasPressedThisFrame) Model.Interrupt();
             if (keyboard!=null && keyboard.f2Key.wasPressedThisFrame) privateOverlay=!privateOverlay;
-            if (!Application.isFocused && !Application.isEditor && !idle) Model.Interrupt();
+            // Focus loss ends only the desktop check mode; in VR the HMD keeps running (runInBackground) while the operator uses other windows.
+            if (!rig.IsVR && !Application.isFocused && !Application.isEditor && !idle) Model.Interrupt();
             if (rig.IsVR && (Model.Phase==SessionPhase.Playing || Model.Phase==SessionPhase.Blackout))
             {
                 trackingLost = !rig.HeadTracked || !rig.RuntimePresent() ? trackingLost+Time.unscaledDeltaTime : 0;
@@ -161,6 +165,7 @@ namespace LoopRoom
             float move=Mathf.Clamp01((t-8)/3.5f);
             room.Enemy.localPosition=Vector3.Lerp(new Vector3(.8f,0,2.5f),new Vector3(1.25f,0,.38f),move);
             room.Enemy.localRotation=Quaternion.Euler(0,move*75,0);
+            enemyAudio.transform.localPosition=room.Enemy.localPosition+new Vector3(0,1.4f,0);
             room.Clock.text="00 : "+Mathf.FloorToInt(t).ToString("00");
             Color lamp=Model.ExitAvailable?new Color(.25f,1,.66f):new Color(.7f,.13f,.09f);
             room.ExitLamp.material.color=lamp;

@@ -1,5 +1,21 @@
 # 現在の状態
 
+2026-09-23 運用更新: 企画・計画・実装・レビューは Codex/Claude の双方が編集可能。計画は GPT-6 Astra または確認済み Claude Opus、実装は GPT-5.6 Sol または Claude Sonnet 5 を優先する。Codex は正本リポジトリの信頼登録後 `peer_claude` が有効。Claude の `peer_codex` は初回承認待ちが解消したが、この Codex シェルからのヘルスチェックは `uv_spawn 'python'` の EPERM で失敗。通常 Claude セッションでの接続と実レビューは未確認。詳細は AGENTS.md と PEER_REVIEW_MCP.md。以下の過去の分担記録は当時の証跡として残す。
+
+2026-09-23 19:50 再開: ユーザーの明示指示（「Codexと作業を進める」）で PAUSE.json を解除し `history/PAUSE-cleared-20260923.json` へ保存。Codex 5時間枠は使用8%（残92%、10:47Z の rollout rate_limits、週枠使用1%）。Claude 枠は機械検証なし。Claude の `peer_codex` MCP は承認済み・Connected。Codex 側 `peer_claude` は未接続（deathback-exp の信頼設定待ち）のため、現状の相互レビューは Claude→Codex 方向の MCP のみ。
+
+## 現在の計画（2026-09-23 更新、Claude Opus 5.5 `claude-opus-5-5` が整理）
+
+| 順 | 項目 | 担当 | 状態 / 次の一手 |
+| --- | --- | --- | --- |
+| 1 | task005 相互レビュー | レビュー: Sol(MCP) / Sonnet(済) | Sonnet `approve_with_open_items`（2026-09-22）。Sol独立レビュー（同SHA、MCP）は **request_changes**: 高 OnApplicationPause が VR 中も中断（LoopDemo.cs:199）、中 長フレームで Latch 欠落。照合で両方採用（reviews/task005-exchange-20260923.md）。次は同じ2ファイルで追修正→再レビュー |
+| 2 | task006 正式化 | 計画: Astra or Opus | A-1 は2026-09-23ユーザー決定「180秒制限は当面なくし、まずしっかり遊べるように」→ AGENTS/STAGE_PLAN/task006 に反映。LoopModel の180秒検証・TimedOut 経路の扱いは次のタスクで決める。Quest3不要のB-6（Rules複製）・B-4（再準備）を先に正式タスク化。B-5はOpus相談条件（身体位置）に該当、B-7は実機待ち |
+| 3 | Sync-PublishedBranch.ps1 修正 | 実装: Sol or Sonnet | unborn HEAD で必ず失敗するバグ（9行目）。小タスク化して修正→相互レビュー |
+| 3b | peer_review_mcp.py の Codex 呼出し修正 | 実装: Sol or Sonnet（Codexセッションが作成者） | 2026-09-23 判明: (1) `shutil.which("codex")` が PATH 上に codex.exe が無く失敗（実体は `%LOCALAPPDATA%\OpenAI\Codex\bin\<hash>\codex.exe`）、(2) `--ask-for-approval` は codex-cli 0.155 ではトップレベル引数で `exec` の後ろだと exit 2。今回の task005 Sol レビューは呼出し側でこの2点のみ補正して実行（スナップショット・プロンプトは同一） |
+| 4 | 未コミット変更の保存 | ユーザー承認後 | MCP設定・task005・文書類が作業ツリーのみ。作業ブランチへ commit/push は承認待ち |
+| 5 | task004 settings 交換 / 段階1 Sonnet最終文書確認 | Sonnet + Sol | 旧タイムアウト分。MCP経由で再実施可能 |
+| 6 | Quest3 実機受入 | ユーザー | 接続可能になり次第（task005受入条件3を含む） |
+
 2026-09-17。正本C:/deathback/deathback-exp。移行元119ファイルのコピー時SHAはmigration-manifest.jsonに保持（後の正当な編集は別レビュー）。
 
 ## Git保存
@@ -30,6 +46,10 @@
 ## 利用枠
 
 Codex5時間枠はアカウント共通、停止時13%残（ツール）。Claudeは開始時100%とユーザー報告、最新は「5時間枠は大丈夫」と回答（正確な現在%は未取得、機械検証なし）。usage.local.jsonは非公開ローカル記録。残量10%未満で新規呼出しを止めPAUSEと引き継ぎを書く。現在の数値を次回へ持ち越して推定しない。
+
+## 2026-09-19 追記（Fable 実装）
+
+ユーザー指示でClaude Fable 5.1がtask005（B-2/B-3/B-1、詳細はtasks/005とreviews/fable-task005-implementation.md）を実装。LoopDemo.cs 4554d309…、RoomVisuals.cs 2ba19368…。batchmodeコンパイルはエラー0・警告0。Editor Play/実機/Sol・Sonnetレビューは未実施。指定モデルclaude-sonnet-5ではないため相互レビューの片側と数えるかはユーザー判断。PAUSE.jsonは据え置き。ローカルGitは依然unborn main、Sync未実行。
 
 ## 停止
 
