@@ -16,6 +16,7 @@
 | 3b | peer_review_mcp.py の Codex 呼出し修正 | **task009 受入済み（2026-09-24）**: Sol 実装（`20ecfd09…`）、MCP stdio で補正なしの受入3件 OK、Sol/Sonnet approve（reviews/task009-exchange-20260924.md）。以下は当初の記録 → 実装: Sol or Sonnet（Codexセッションが作成者） | 2026-09-23 判明: (1) `shutil.which("codex")` が PATH 上に codex.exe が無く失敗（実体は `%LOCALAPPDATA%\OpenAI\Codex\bin\<hash>\codex.exe`）、(2) `--ask-for-approval` は codex-cli 0.155 ではトップレベル引数で `exec` の後ろだと exit 2。今回の task005 Sol レビューは呼出し側でこの2点のみ補正して実行（スナップショット・プロンプトは同一） |
 | 4 | 未コミット変更の保存 | ユーザー承認後 | MCP設定・task005・文書類が作業ツリーのみ。作業ブランチへ commit/push は承認待ち |
 | 5 | task004 settings 交換 / 段階1 Sonnet最終文書確認 | Sonnet + Sol | **完了（2026-09-24）**: task004 設定は交換後 Sonnet も approve、段階1文書は Sonnet 最終 approve。**段階1の相互レビュー完了**（reviews/task004-settings-exchange-20260924.md、証拠 evidence/20260924-item5-reviews/） |
+| 5c | Editor Play 証拠（2026-09-24） | Opus 5.5（computer-use） | **完了**: desktop Play で37周・228.96秒、Console は既知の警告4件から増えず（task005 受入2の警告部分）、180秒超でも継続（task007 受入4）、遮蔽→脱出で Escaped、TimedOut 0件（evidence/20260924-editor-play/）。可聴音と実機は未確認。気づき: desktop で案内パネルの文字が Game ビューからはみ出す（計画6の見え方確認で扱う） |
 | 5b | UNITY_ACCEPTANCE.md の180秒節を現行方針に合わせる | 計画: Opus 5.5 | Sonnet の別件指摘。文書更新タスクとして task006 正式化と合わせて扱う |
 | 6 | Quest3 実機受入 | ユーザー | 接続可能になり次第（task005受入条件3を含む）。**2026-09-24 ユーザー報告: 実機が Meta Quest 3S になる可能性がある。** 決まるまでは Quest 3 / 3S の両方を想定する。3S も Link による PCVR と Touch Plus コントローラーなので、task006 B-7（Touch Plus プロファイル有効化）の優先度を上げる。視野角・解像度・レンズの違いによる見え方（机・時計・取っ手の視認性、文字サイズ）は実機受入の確認項目に加える。機種が決まったら AGENTS.md の不変条件と STAGE_PLAN の対象機種を更新する |
 
