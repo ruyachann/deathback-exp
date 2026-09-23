@@ -19,12 +19,14 @@
 | B-4 XR準備の再試行手段が無い | 中 | DemoRig.cs:259,266,283 | `RetryPreparation()`を追加し、`!xrInitializing && !CanStart`時に準備フラグをリセットして`StartXR()`再実行。LoopDemoで運営キー(例: R)に割当 | Quest3実機でのみ効果検証可能。誤って周回中に再トリガーしない入力条件の確認が必要 |
 | B-5 机の近縁が頭位置から0.17mで身体と交差 | 中 | RoomVisuals.cs:72、LoopDemo.Begin:137 | Desk/取っ手/時計を一括+0.15m程度ずらし、机近縁を0.30〜0.35mへ | 体験の身体位置に関わる変更のため、AGENTS.mdの「Opus優先の相談条件」(2m活動範囲・身体位置)に該当する可能性がある。実装前にOpus/ユーザー確認を検討 |
 | B-6 LoopRulesの共有参照と再検証なし | 中 | LoopDemo.cs:11,41、LoopModel.cs:61-65 | `Model=new LoopModel(timings)`前に`timings`を複製(`JsonUtility`往復)して渡す最小修正。恒久対応はIssue4 | 最小修正のみなら影響範囲は小さい |
-| B-7 Quest3のコントローラープロファイル | 中 | DemoSetup.cs:98,117 | `MetaQuestTouchPlusControllerProfile`も有効化、Validateは「どちらか一方が有効」を合格条件に | 実機(Quest3接続)でのみ最終確認可能。現在Quest3接続不可のため検証が保留になる |
+| B-7 Quest3のコントローラープロファイル（2026-09-24: 実機が Quest 3S になる可能性あり。3S も Touch Plus なので優先度を上げる） | 中→高候補 | DemoSetup.cs:98,117 | `MetaQuestTouchPlusControllerProfile`も有効化、Validateは「どちらか一方が有効」を合格条件に | 実機(Quest3接続)でのみ最終確認可能。現在Quest3接続不可のため検証が保留になる |
 
 ## 非対象（このDRAFTでも対象外のまま）
 B-8(Build-Demo.ps1の既存Editor起動確認)、B-9(Program.csのチェック件数固定)、A-2〜A-9は別途整理。
 
 ## Sync-PublishedBranch.ps1の既知バグ（このDRAFTとは別件、報告のみ）
+
+**2026-09-24: task008 で修正・受入済み。** 以下は発見時の記録。
 2026-09-22のGit同期作業で判明: Windows PowerShell 5.1で`$ErrorActionPreference='Stop'`と`git ... rev-parse --verify HEAD 2>$null`（9行目、unborn HEAD時に意図的に失敗させる行）の組み合わせが、redirectで抑制されないNativeCommandErrorとして扱われ、スクリプトがunborn HEAD（今回のような初回同期）で必ず終了コード1になる。スクリプト本来の主目的（unborn HEADからの初回同期）が動作しない状態。今回は同じgit手順を手動実行して回避し、スクリプト自体は変更していない（許可範囲外のため）。修正例: 9行目を`try { ... } catch {}`で囲む、または`$ErrorActionPreference`を該当行だけ`'SilentlyContinue'`に切り替える。
 
 ## 次のステップ

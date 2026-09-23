@@ -6,8 +6,15 @@ function Invoke-RepoGit([string[]]$Arguments) {
 }
 $remote = & git -C $PSScriptRoot remote get-url origin
 if($LASTEXITCODE -ne 0 -or $remote -ne 'https://github.com/ruyachann/deathback-exp.git') { throw 'Unexpected repository origin.' }
-& git -C $PSScriptRoot rev-parse --verify HEAD 2>$null
-if($LASTEXITCODE -eq 0) { throw 'Local history already exists; inspect it before synchronization. No changes made.' }
+$savedErrorActionPreference = $ErrorActionPreference
+try {
+    $ErrorActionPreference = 'Continue'
+    & git -C $PSScriptRoot rev-parse --verify --quiet HEAD >$null 2>$null
+    $headExitCode = $LASTEXITCODE
+} finally {
+    $ErrorActionPreference = $savedErrorActionPreference
+}
+if($headExitCode -eq 0) { throw 'Local history already exists; inspect it before synchronization. No changes made.' }
 $staged = & git -C $PSScriptRoot ls-files --cached
 if($LASTEXITCODE -ne 0 -or $staged) { throw 'Index is not empty; protect staged user changes before synchronization.' }
 Invoke-RepoGit -Arguments @('fetch','origin')

@@ -1,0 +1,26 @@
+{
+  "reviewer": "codex",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/008-fix-sync-published-branch.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "be53f607d20e3503473a167b094d52e1ac454328b09b0c7e64a3df382ae1ebd5"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "5e88123462781bc38ff4f6e797d6da67afe5d832a5abc9959b6c6ed4065e50f6"
+    },
+    {
+      "path": "Collaboration/tasks/008-fix-sync-published-branch.md",
+      "sha256": "1e66e29e234a3cf75bbed47c593f0691190b0d05d907a0442fda3a4acffd03c9"
+    },
+    {
+      "path": "Sync-PublishedBranch.ps1",
+      "sha256": "82b58822b14b1fde0acdedd05cc4be58794313e03a314daa26ec4ca3a5ef9884"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260923T163600300510Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}
