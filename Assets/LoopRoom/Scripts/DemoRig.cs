@@ -199,6 +199,24 @@ namespace LoopRoom
             return displays.Exists(d => d.running);
         }
 
+        // Frame-time target for FrameStats (task026): the running XR display's reported
+        // refresh rate in VR, the desktop monitor's refresh rate otherwise. Falls back to a
+        // sane default (matches the design's 72/60 Hz) when the rate cannot be read.
+        public double GetTargetHz()
+        {
+            if (IsVR)
+            {
+                SubsystemManager.GetSubsystems(displays);
+                foreach (var display in displays)
+                    if (display.running && display.TryGetDisplayRefreshRate(out float hz) &&
+                        !float.IsNaN(hz) && !float.IsInfinity(hz) && hz >= 1 && hz <= 1000)
+                        return hz;
+                return 72;
+            }
+            var rate = Screen.currentResolution.refreshRateRatio.value;
+            return !double.IsNaN(rate) && !double.IsInfinity(rate) && rate >= 1 && rate <= 1000 ? rate : 60;
+        }
+
         // Guardian/play-area boundary, if the running Floor-mode input subsystem can report one
         // (task021 calibration screen). Points come back in world space: XRInputSubsystem returns
         // them relative to the tracking origin, which for this rig is the "XR Origin" GameObject's

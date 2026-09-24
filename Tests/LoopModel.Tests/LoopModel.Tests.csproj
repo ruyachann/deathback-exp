@@ -11,5 +11,7 @@
     <Compile Include="../../Assets/LoopRoom/Scripts/RoomAnchor.cs" Link="RoomAnchor.cs" />
     <Compile Include="../../Assets/LoopRoom/Editor/RoomAnchorChecks.cs" Link="RoomAnchorChecks.cs" />
     <Compile Include="../../Assets/LoopRoom/Scripts/PlayAreaSettings.cs" Link="PlayAreaSettings.cs" />
+    <Compile Include="../../Assets/LoopRoom/Scripts/FrameStats.cs" Link="FrameStats.cs" />
+    <Compile Include="../../Assets/LoopRoom/Editor/FrameStatsChecks.cs" Link="FrameStatsChecks.cs" />
   </ItemGroup>
 </Project>

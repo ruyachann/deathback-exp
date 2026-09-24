@@ -61,13 +61,14 @@ Quest が手元に来たら、この1枚だけで最初の確認を始められ�
 | 15 | 机・時計・取っ手が見やすい（視野の端で切れない、ぼやけない） | 第2章 手順5 | ☐ |
 | 16 | **Quest 3S**: 暗い部屋で明るい文字（パネル・時計・壁の看板）の周りに光の筋（フレネルレンズのゴッドレイ）が強く出ないか。視野の端（3S は Quest 3 より狭い）で取っ手や時計が切れないか | 第2章 手順5 | ☐ |
 | 17 | 部屋の明るさ・霧・光のにじみ（ブルーム）が暗すぎ・明るすぎでない。首を振ってもカクつかない | 本書 | ☐ |
+| 17b | **F2** の運営表示の「フレーム 平均 / P95 ms・落ち n・目標 Hz」を記録する（周回を数回した後）。セッションログの `frames` にも残る。落ちが多い・P95 が目標のフレーム時間（72Hz なら約13.9ms）を超える場合は、Air Link と USB の両方で比べる | 本書 | ☐ |
 | 18 | 音量のバランス（環境音が効果音をじゃましない、不快な音・プツッという音がない） | 本書 | ☐ |
 
 ## 5. 証拠の残し方
 
 - **HMD の画面**: Quest のスクリーンショット（Meta ボタン＋トリガー）、または Link の画面キャプチャ。
 - **PC 画面**: `Win + Shift + S`。観客用の画面は F2 を OFF にしてから撮る。
-- **セッションログ**: `%USERPROFILE%\AppData\LocalLow\LoopRoomDemo\The Room Before\Sessions\*.json`（起動スクリプトが開く）。`outcome`、`elapsed`、`timings.enforcePlayLimit=false` を確認する（第8・9章）。
+- **セッションログ**: `%USERPROFILE%\AppData\LocalLow\LoopRoomDemo\The Room Before\Sessions\*.json`（起動スクリプトが開く）。`outcome`、`elapsed`、`timings.enforcePlayLimit=false`、`frames`（平均・P95・最大・落ち）を確認する（第8・9章）。
 - 撮ったファイルとこの表の結果は、起動スクリプトが作る `Collaboration/evidence/<日付>-device-check/` に置く（AI が記録と共有をする）。
 
 ## 困ったとき

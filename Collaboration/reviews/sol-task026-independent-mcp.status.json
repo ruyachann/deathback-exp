@@ -1,0 +1,47 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local/OpenAI/Codex/bin/d375f7df50d3b421/codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/026-frame-stats.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/026-frame-stats.md",
+      "sha256": "1ac2e8d620d72afd02cd10e3fcd1c70b406a36d69d60ca7bb2b445a9431d142c"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/FrameStats.cs",
+      "sha256": "49718dcd70affc8e1be663e42a998a25dab3e7335a48c631ed65c48b0a57e8e6"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/FrameStatsChecks.cs",
+      "sha256": "ecdd3d561d472da355b8f39abaaec34df819d03329424ff7bddf180f6fc83abb"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/Program.cs",
+      "sha256": "38c18123e002366e116ce8324187c57570dab37f6b057843643c66d06c0f9060"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/LoopModel.Tests.csproj",
+      "sha256": "2b1531f45af36eb4cdcd5e1061fff33610eb1c596cc774f800dabc6b52752db7"
+    },
+    {
+      "path": "Collaboration/reviews/task026-diff.md",
+      "sha256": "a8465af736dca3b1512f2721d7f59a07c1be901a85d947b6cc59ca37165d40ab"
+    },
+    {
+      "path": "Collaboration/evidence/20260925-frame-stats/session-frames.txt",
+      "sha256": "8d6ca21303b3ebaf8324bb3380e6b0b7bee0ffcc462b7e09d5fc7ab433082039"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T222648902943Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

@@ -26,7 +26,11 @@ internal static class Program
             var roomAnchor = RoomAnchorChecks.Run();
             Require(roomAnchor.Count == 12, "Expected 12 room anchor checks.");
             foreach (var result in roomAnchor) Console.WriteLine(result);
-            Console.WriteLine("PASS: 12 room anchor checks"); return 0;
+            Console.WriteLine("PASS: 12 room anchor checks");
+            var frameStats = FrameStatsChecks.Run();
+            Require(frameStats.Count == 12, "Expected 12 frame stats checks.");
+            foreach (var result in frameStats) Console.WriteLine(result);
+            Console.WriteLine("PASS: 12 frame stats checks"); return 0;
         }
         catch (Exception error) { Console.Error.WriteLine("FAIL: " + error); return 1; }
     }
