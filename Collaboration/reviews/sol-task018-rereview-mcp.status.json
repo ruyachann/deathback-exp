@@ -1,0 +1,35 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local\\OpenAI\\Codex\\bin\\d375f7df50d3b421\\codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/018-room-anchor-integration.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/018-room-anchor-integration.md",
+      "sha256": "0317c1cb272bcc26627952974af463ff3431e1e733afa5e1fe3698c242c4a3cc"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopDemo.cs",
+      "sha256": "f06bf6dae7f469118a6b349dc2e54834b80f22c0244858a5cde39bbd327975cd"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/DemoRig.cs",
+      "sha256": "a111a68c8cdb10d969cff70aada005ca691ae2297d4e015c5a62d4cbea5882d5"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomAnchor.cs",
+      "sha256": "510674914e8105600e0c800c826b2f2a9828d6cdc8e90207675c2bb5aee998e0"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T080005501727Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

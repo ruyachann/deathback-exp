@@ -52,10 +52,13 @@ public static class RoomAnchorChecks
         {
             double areaYaw = 30;
             double angle = areaYaw * Math.PI / 180.0;
-            double x = Math.Sin(angle) * 0.7;
-            double z = Math.Cos(angle) * 0.7;
-            Need(!RoomAnchor.ForwardRegionFits(x, z, areaYaw, 0, 0, areaYaw), "rotated outward yaw fits");
-            Need(RoomAnchor.ForwardRegionFits(x, z, areaYaw + 180, 0, 0, areaYaw), "rotated inward yaw rejected");
+            double localX = 0.7;
+            double localZ = 0.7;
+            double x = localX * Math.Cos(angle) + localZ * Math.Sin(angle);
+            double z = -localX * Math.Sin(angle) + localZ * Math.Cos(angle);
+            double centerYaw = Math.Atan2(-x, -z) * 180.0 / Math.PI;
+            Need(RoomAnchor.ForwardRegionFits(x, z, centerYaw, 0, 0, areaYaw),
+                "rotated non-symmetric corner rejected");
         });
 
         Check(passed, "Position outside the safety area returns the head yaw", () =>
@@ -64,6 +67,14 @@ public static class RoomAnchorChecks
             double chosen = RoomAnchor.ChooseFrontYaw(1.0, 0, 123, 0, 0, 0, out fits);
             Need(!fits, "outside position found a fitting direction");
             Near(chosen, 123);
+
+            chosen = RoomAnchor.ChooseFrontYaw(1.0, 0, -30, 0, 0, 0, out fits);
+            Need(!fits, "outside position with negative yaw found a fitting direction");
+            Near(chosen, 330);
+
+            chosen = RoomAnchor.ChooseFrontYaw(1.0, 0, 750, 0, 0, 0, out fits);
+            Need(!fits, "outside position with large yaw found a fitting direction");
+            Near(chosen, 30);
         });
 
         Check(passed, "Chosen yaw is normalized into zero through 360", () =>
@@ -87,7 +98,79 @@ public static class RoomAnchorChecks
             }
         });
 
+        Check(passed, "Non-finite public inputs throw ArgumentException", () =>
+        {
+            double[] invalidValues =
+            {
+                double.NaN,
+                double.PositiveInfinity,
+                double.NegativeInfinity
+            };
+
+            foreach (double invalid in invalidValues)
+            {
+                ForwardRejects(invalid, 0, 0, 0, 0, 0, "px");
+                ForwardRejects(0, invalid, 0, 0, 0, 0, "pz");
+                ForwardRejects(0, 0, invalid, 0, 0, 0, "yaw");
+                ForwardRejects(0, 0, 0, invalid, 0, 0, "cx");
+                ForwardRejects(0, 0, 0, 0, invalid, 0, "cz");
+                ForwardRejects(0, 0, 0, 0, 0, invalid, "area yaw");
+
+                ChooseRejects(invalid, 0, 0, 0, 0, 0, "px");
+                ChooseRejects(0, invalid, 0, 0, 0, 0, "pz");
+                ChooseRejects(0, 0, invalid, 0, 0, 0, "head yaw");
+                ChooseRejects(0, 0, 0, invalid, 0, 0, "cx");
+                ChooseRejects(0, 0, 0, 0, invalid, 0, "cz");
+                ChooseRejects(0, 0, 0, 0, 0, invalid, "area yaw");
+            }
+        });
+
+        Check(passed, "Unsampled arc bulge outside the boundary is rejected", () =>
+        {
+            double halfStep = RoomAnchor.SearchStepDeg * 0.5;
+            double pz = RoomAnchor.SafeHalfSize - RoomAnchor.Margin -
+                RoomAnchor.Reach * Math.Cos(halfStep * Math.PI / 180.0);
+            Need(!RoomAnchor.ForwardRegionFits(0, pz, -halfStep, 0, 0, 0),
+                "arc between sampled points crossed the boundary without rejection");
+        });
+
         return passed;
+    }
+
+    static void ForwardRejects(
+        double px, double pz, double yaw,
+        double cx, double cz, double areaYaw,
+        string label)
+    {
+        ThrowsArgumentException(
+            () => RoomAnchor.ForwardRegionFits(px, pz, yaw, cx, cz, areaYaw),
+            "ForwardRegionFits accepted non-finite " + label);
+    }
+
+    static void ChooseRejects(
+        double px, double pz, double yaw,
+        double cx, double cz, double areaYaw,
+        string label)
+    {
+        ThrowsArgumentException(() =>
+        {
+            bool fits;
+            RoomAnchor.ChooseFrontYaw(px, pz, yaw, cx, cz, areaYaw, out fits);
+        }, "ChooseFrontYaw accepted non-finite " + label);
+    }
+
+    static void ThrowsArgumentException(Action action, string message)
+    {
+        try
+        {
+            action();
+        }
+        catch (ArgumentException)
+        {
+            return;
+        }
+
+        throw new Exception(message);
     }
 
     static double NormalizeYaw(double yaw)

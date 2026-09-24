@@ -31,6 +31,8 @@ namespace LoopRoom
         // Left at (0,0,0) until the operator aligns once; RoomAnchor then just uses the head yaw as-is.
         double alignCx, alignCz, alignAreaYaw;
         bool aligned;
+        // Limits the "reach doesn't fit" warning to once per alignment (task018 追修正2-3).
+        bool fitsWarned;
 
         [Serializable] sealed class SessionLog
         {
@@ -149,18 +151,26 @@ namespace LoopRoom
         {
             if (Model == null) return;
             bool idle=Model.Phase==SessionPhase.Ready || Model.Phase==SessionPhase.Finished;
+            // Detect desktop<->VR switches around PollMode (which is what actually flips rig.IsVR)
+            // so a stale alignment taken in the other mode can't silently carry over (task018 追修正2-1).
+            bool wasVR=rig.IsVR;
             rig.PollMode(idle);
+            if(rig.IsVR!=wasVR) ResetAlignment();
             var keyboard=Keyboard.current;
-            bool enter=keyboard!=null && keyboard.enterKey.wasPressedThisFrame;
-            bool autoTrigger = autostart && !autostartUsed && !rig.IsVR;
-            if (idle && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed) || autoTrigger)) { if(autoTrigger) autostartUsed=true; Begin(); }
-            else if (idle && keyboard!=null && keyboard.rKey.wasPressedThisFrame && rig.CanRetryPreparation) rig.RetryPreparation();
-            if (idle && keyboard!=null && keyboard.cKey.wasPressedThisFrame)
+            // Checked before Enter/Start so a same-frame Enter+C press cannot slip past idle
+            // (Begin() would already have advanced Phase) and still commit an alignment (task018 追修正3-2).
+            // Tracking must be live and VR (when applicable) fully ready before C can commit an
+            // alignment, otherwise it could capture a meaningless head pose (task018 追修正2-1).
+            if (idle && rig.CanStart && keyboard!=null && keyboard.cKey.wasPressedThisFrame)
             {
                 var head=rig.View.transform;
                 alignCx=head.position.x; alignCz=head.position.z; alignAreaYaw=head.eulerAngles.y;
-                aligned=true;
+                aligned=true; fitsWarned=false;
             }
+            bool enter=keyboard!=null && keyboard.enterKey.wasPressedThisFrame;
+            bool autoTrigger = autostart && !autostartUsed && !rig.IsVR;
+            if (idle && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed) || autoTrigger)) { if(autoTrigger) autostartUsed=true; Begin(); }
+            else if (idle && keyboard!=null && keyboard.rKey.wasPressedThisFrame && rig.CanRetryPreparation) { rig.RetryPreparation(); ResetAlignment(); }
             if (keyboard!=null && keyboard.escapeKey.wasPressedThisFrame) Model.Interrupt();
             if (keyboard!=null && keyboard.f2Key.wasPressedThisFrame) privateOverlay=!privateOverlay;
             // Focus loss ends only the desktop check mode; in VR the HMD keeps running (runInBackground) while the operator uses other windows.
@@ -219,6 +229,10 @@ namespace LoopRoom
             RefreshWorld();
         }
 
+        // Clears the alignment flag together with the 3 stored values so PlaceRoom can never
+        // reuse a stale center/orientation after the operator's alignment is invalidated (task018 追修正3-1).
+        void ResetAlignment() { aligned=false; alignCx=0; alignCz=0; alignAreaYaw=0; }
+
         void Begin()
         {
             if(!rig.CanStart) return;
@@ -242,7 +256,7 @@ namespace LoopRoom
             bool corrected=Math.Abs(yawDiff)>0.001;
             Debug.Log("LoopRoom: PlaceRoom pos=("+px.ToString("F2")+","+pz.ToString("F2")+") headYaw="+headYaw.ToString("F1")+
                 " frontYaw="+frontYaw.ToString("F1")+" corrected="+corrected+" diff="+yawDiff.ToString("F1")+" fits="+fits);
-            if(!fits) Debug.LogWarning("LoopRoom: no orientation keeps the forward reach inside the safe area; using head yaw as-is.");
+            if(!fits && !fitsWarned) { fitsWarned=true; Debug.LogWarning("LoopRoom: no orientation keeps the forward reach inside the safe area; using head yaw as-is."); }
         }
 
         void RaiseShield()

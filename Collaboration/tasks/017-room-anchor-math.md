@@ -1,6 +1,6 @@
 # 017 — 部屋の置き直しの計算（企画 v0.2 第2節）
 
-状態: 計画確定（2026-09-24）。計画 Claude Opus 5.5。実装 GPT-5.6 Sol（`codex exec` 別セッション）。レビュー 実装とは別セッションの Sol と Claude Sonnet 5。task018（組み込み、Sonnet）と並行。
+状態: **受入済み（2026-09-24、実機の実験は未実施）**。結果は `reviews/tasks017-018-exchange-20260924.md`。計画確定（2026-09-24）。計画 Claude Opus 5.5。実装 GPT-5.6 Sol（`codex exec` 別セッション）。レビュー 実装とは別セッションの Sol と Claude Sonnet 5。task018（組み込み、Sonnet）と並行。
 
 ## 目的
 
@@ -46,6 +46,14 @@ public static class RoomAnchor
 7. 決定的（同じ入力で同じ出力）。
 
 `Tests/LoopModel.Tests/LoopModel.Tests.csproj` に RoomAnchor.cs と RoomAnchorChecks.cs を Compile で加え、`Program.cs` で RoomAnchorChecks も実行して件数を表示する（GitHub CI の dotnet でも回る）。
+
+### 追修正（2026-09-24、独立レビュー指摘。計画担当 Opus 5.5）
+
+Sonnet approve、Sol request_changes（`sol-task017-independent-mcp.md`）。すべて採用:
+1. テスト4がエリアの回転の符号の誤りを検出できない → エリア座標の非対称な点（例 (0.7,0.7)）を areaYaw=30 でワールドへ変換し、中心向きで収まることを検証する。
+2. fits=false の経路の正規化がテストされていない → 安全範囲外の位置で headYaw=−30・750 を与え、fits=false かつ 330・30 を返すことを検証する。
+3. 非有限の headYaw（NaN・±∞）→ 公開メソッドで ArgumentException（位置・中心・エリアの向きも非有限なら同様）。テストを追加する。
+4. （task018 のレビューで Sol が指摘、task017 の範囲）7点だけの判定では、点と点のあいだの円弧が最大 R(1−cos 7.5°) ≈ 3.85mm はみ出しうる → 判定に使う境界をこの値（刻み角から計算）だけ内側に寄せて、保守的に判定する。
 
 ## 許可ファイル
 
