@@ -21,7 +21,11 @@ namespace LoopRoom
         bool saved, privateOverlay;
         float trackingLost;
         string sessionId, logMessage = "";
-        AudioSource enemyAudio;
+        AudioSource enemyAudio, ambience;
+        bool desktopArg, autostart, autoescape, autostartUsed, autoShieldDone, autoExitDone;
+        bool messageSized;
+        int messageMeasureAttempts;
+        Color messageColor;
 
         [Serializable] sealed class SessionLog
         {
@@ -38,10 +42,18 @@ namespace LoopRoom
         void Start()
         {
             Application.runInBackground = true;
+            var args = Environment.GetCommandLineArgs();
+            // Match DemoRig's own --desktop reading: --autostart/--autoescape must never fire on a
+            // desktop *fallback* (failed XR init without --desktop), only on an explicit --desktop launch.
+            desktopArg = Array.IndexOf(args, "--desktop") >= 0;
+            autostart = desktopArg && Array.IndexOf(args, "--autostart") >= 0;
+            autoescape = autostart && Array.IndexOf(args, "--autoescape") >= 0;
             Model = new LoopModel(timings);
             rig = new GameObject("XR Origin").AddComponent<DemoRig>(); rig.transform.SetParent(transform,false);
             rig.Initialize();
             room = new RoomVisuals(); room.Build(transform,rig);
+            room.Chime=ProceduralAudio.Chime(); room.Shot=ProceduralAudio.Shot();
+            room.Latch=ProceduralAudio.Latch(); room.Open=ProceduralAudio.Open();
             controls = new[]{room.ShieldHandle,room.ExitHandle};
             room.ShieldHandle.selectEntered.AddListener(_ => RaiseShield());
             room.ExitHandle.selectEntered.AddListener(_ => TryExit());
@@ -52,6 +64,11 @@ namespace LoopRoom
             enemyAudio.spatialBlend=1; enemyAudio.minDistance=.5f; enemyAudio.maxDistance=10; enemyAudio.volume=.22f;
             room.Sound.transform.position = new Vector3(0,1.4f,.7f);
             room.Sound.spatialBlend=1; room.Sound.minDistance=.4f; room.Sound.maxDistance=8;
+            // Separate source so the per-loop "room.Sound.Stop(); enemyAudio.Stop();" in Update() never cuts the ambience.
+            ambience = new GameObject("Room tone").AddComponent<AudioSource>();
+            ambience.transform.SetParent(room.Root,false); ambience.playOnAwake=false;
+            ambience.loop=true; ambience.spatialBlend=0; ambience.volume=.12f;
+            ambience.clip=ProceduralAudio.RoomTone(); ambience.Play();
             BuildMessage();
             RefreshWorld();
         }
@@ -62,15 +79,62 @@ namespace LoopRoom
             messagePanel=GameObject.CreatePrimitive(PrimitiveType.Quad);
             messagePanel.name="Ready and ending panel"; messagePanel.layer=RoomVisuals.PrivateLayer;
             messagePanel.transform.SetParent(rig.View.transform,false);
-            messagePanel.transform.localPosition=new Vector3(0,.02f,.82f);
-            messagePanel.transform.localScale=new Vector3(1.18f,.48f,1);
             Destroy(messagePanel.GetComponent<Collider>());
             messagePanel.GetComponent<Renderer>().material=RoomVisuals.Material(new Color(.02f,.035f,.045f),true);
+            messagePanel.SetActive(false);
             var text=new GameObject("Session instructions"); text.layer=RoomVisuals.PrivateLayer;
-            text.transform.SetParent(rig.View.transform,false); text.transform.localPosition=new Vector3(0,.02f,.80f);
+            text.transform.SetParent(rig.View.transform,false);
             message=text.AddComponent<TextMesh>(); message.font=font; message.fontSize=64;
-            message.characterSize=.020f; message.anchor=TextAnchor.MiddleCenter; message.alignment=TextAlignment.Center;
-            message.color=new Color(.88f,.88f,.77f); text.GetComponent<MeshRenderer>().material=font.material;
+            message.characterSize=.0145f; message.anchor=TextAnchor.MiddleCenter; message.alignment=TextAlignment.Center;
+            messageColor=new Color(.88f,.88f,.77f);
+            message.color=Color.clear; text.GetComponent<MeshRenderer>().material=RoomVisuals.TextMaterial(font);
+            // Size the panel from the actual worst-case guidance text instead of a guessed
+            // constant: among every Ready/Finished message (RefreshWorld, DemoRig.PreparationMessage)
+            // the widest single line has 20 full-width characters and the tallest message has 4
+            // lines. TextMesh has no MeshFilter (only a MeshRenderer), so keep this probe text
+            // invisible and measure it from LateUpdate via MeshRenderer.localBounds.
+            string probeLine=new string('国',20);
+            message.text=probeLine+"\n"+probeLine+"\n"+probeLine+"\n"+probeLine;
+        }
+
+        void LateUpdate()
+        {
+            if(messageSized || message==null) return;
+            messageMeasureAttempts++;
+            var renderer=message.GetComponent<MeshRenderer>();
+            var size=renderer!=null ? renderer.localBounds.size : Vector3.zero;
+            if(size.x>0 && size.y>0) { ApplyMessageSize(size,false); return; }
+            if(messageMeasureAttempts>=30) ApplyMessageSize(new Vector3(.62f,.26f,0),true);
+        }
+
+        void ApplyMessageSize(Vector3 bounds, bool fixedFallback)
+        {
+            float z=.82f;
+            float shrink=1;
+            if(!fixedFallback)
+            {
+                // Worst-case line must fit within ~0.56m at 0.82m distance (comfortable reading arc).
+                const float maxLineWidth=.56f;
+                shrink=Mathf.Min(1f,maxLineWidth/bounds.x);
+                message.characterSize*=shrink;
+                bounds=new Vector3(bounds.x*shrink,bounds.y*shrink,bounds.z);
+            }
+            else
+            {
+                // Fixed fallback text is never measured, so it would otherwise overflow the
+                // .62x.26 panel; use the shrink measured on a dev machine (追修正5).
+                const float fixedCharacterSize=.0044f;
+                shrink=fixedCharacterSize/message.characterSize;
+                message.characterSize=fixedCharacterSize;
+            }
+            messagePanel.transform.localPosition=new Vector3(0,.02f,z);
+            // Padding only applies to a measured size; the fixed fallback (.62x.26) is used as-is.
+            messagePanel.transform.localScale=fixedFallback?bounds:new Vector3(bounds.x+.05f,bounds.y+.05f,1);
+            message.transform.localPosition=new Vector3(0,.02f,z-.02f);
+            messageSized=true;
+            // Color/text stay deferred to the next RefreshWorld (see there) so the probe glyphs
+            // never flash on screen once sizing is decided.
+            Debug.Log("LoopDemo: message panel sized "+(fixedFallback?"(fixed fallback)":"(measured)")+" bounds="+bounds+" shrink="+shrink);
         }
 
         void Update()
@@ -80,7 +144,8 @@ namespace LoopRoom
             rig.PollMode(idle);
             var keyboard=Keyboard.current;
             bool enter=keyboard!=null && keyboard.enterKey.wasPressedThisFrame;
-            if (idle && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed))) Begin();
+            bool autoTrigger = autostart && !autostartUsed && !rig.IsVR;
+            if (idle && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed) || autoTrigger)) { if(autoTrigger) autostartUsed=true; Begin(); }
             else if (idle && keyboard!=null && keyboard.rKey.wasPressedThisFrame && rig.CanRetryPreparation) rig.RetryPreparation();
             if (keyboard!=null && keyboard.escapeKey.wasPressedThisFrame) Model.Interrupt();
             if (keyboard!=null && keyboard.f2Key.wasPressedThisFrame) privateOverlay=!privateOverlay;
@@ -102,6 +167,7 @@ namespace LoopRoom
             {
                 rig.ClearSelection(); room.Sound.Stop(); enemyAudio.Stop();
                 room.Sound.PlayOneShot(room.Chime); lastLoop=Model.LoopId; lastLoopTime=0;
+                autoShieldDone=false; autoExitDone=false;
             }
             // Damage/time boundaries are resolved before this frame's fresh input.
             rig.Operate(controls,Model.Phase==SessionPhase.Playing);
@@ -109,6 +175,11 @@ namespace LoopRoom
             {
                 if(keyboard.spaceKey.wasPressedThisFrame) RaiseShield();
                 if(keyboard.eKey.wasPressedThisFrame) TryExit();
+            }
+            if(autoescape && !rig.IsVR && Model.Phase==SessionPhase.Playing && Model.LoopId==2)
+            {
+                if(!autoShieldDone && Model.LoopTime>=1) { autoShieldDone=true; RaiseShield(); }
+                if(!autoExitDone && Model.ExitAvailable) { autoExitDone=true; TryExit(); }
             }
             // A long frame can cross t=3 and the shot together; LoopTime is frozen in Blackout, so the latch still plays.
             if((Model.Phase==SessionPhase.Playing || Model.Phase==SessionPhase.Blackout) && lastLoopTime<3 && Model.LoopTime>=3)
@@ -173,12 +244,20 @@ namespace LoopRoom
             room.Blackout.SetActive(Model.Phase==SessionPhase.Blackout || trackingLost>0);
             room.UpdatePublic(rig.IsVR,playing);
             bool show=Model.Phase!=SessionPhase.Playing && Model.Phase!=SessionPhase.Blackout;
-            messagePanel.SetActive(show); message.gameObject.SetActive(show);
-            if(Model.Phase==SessionPhase.Ready || Model.Phase==SessionPhase.Finished)
-                message.text=!rig.CanStart ? rig.PreparationMessage : rig.IsVR ? "第零室\n手元の取っ手に手を近づけ、グリップで操作\nA または X ボタンで開始" : "第零室  /  操作確認\nEnter：開始　Space：遮蔽　E：出口\n右ドラッグ：見回す";
-            else if(Model.Phase==SessionPhase.Escaped) message.text="脱出した。\n今度は、時間が進んでいる。";
-            else if(Model.Phase==SessionPhase.TimedOut) message.text="今回は、脱出できなかった。\n見つけた手がかりは、あなたの記憶に。";
-            else if(Model.Phase==SessionPhase.Interrupted) message.text="体験を中断しました。\n接続と周囲を確認してください。";
+            messagePanel.SetActive(show && messageSized); message.gameObject.SetActive(show);
+            // Keep the probe text (see BuildMessage) until LateUpdate has measured and sized the
+            // panel; otherwise the real, shorter guidance text would be measured instead of the
+            // intended worst case. Text and color are restored together here (the frame after
+            // sizing) so the probe glyphs never render with real color.
+            if(messageSized)
+            {
+                message.color=messageColor;
+                if(Model.Phase==SessionPhase.Ready || Model.Phase==SessionPhase.Finished)
+                    message.text=!rig.CanStart ? rig.PreparationMessage : rig.IsVR ? "第零室\n手元の取っ手に手を近づけ、グリップで操作\nA または X ボタンで開始" : "第零室  /  操作確認\nEnter：開始　Space：遮蔽　E：出口\n右ドラッグ：見回す";
+                else if(Model.Phase==SessionPhase.Escaped) message.text="脱出した。\n今度は、時間が進んでいる。";
+                else if(Model.Phase==SessionPhase.TimedOut) message.text="今回は、脱出できなかった。\n見つけた手がかりは、あなたの記憶に。";
+                else if(Model.Phase==SessionPhase.Interrupted) message.text="体験を中断しました。\n接続と周囲を確認してください。";
+            }
         }
 
         void SaveLog()

@@ -41,7 +41,7 @@ public static class DemoSetup
         // Preserve dynamically requested shaders in player builds.
         var graphics=new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset")[0]);
         var shaders=graphics.FindProperty("m_AlwaysIncludedShaders");
-        foreach(var name in new[]{"Universal Render Pipeline/Lit","Universal Render Pipeline/Unlit"})
+        foreach(var name in new[]{"Universal Render Pipeline/Lit","Universal Render Pipeline/Unlit","LoopRoom/Text"})
         {
             var shader=Shader.Find(name);
             if(shader==null) throw new InvalidOperationException("Missing shader: "+name);
