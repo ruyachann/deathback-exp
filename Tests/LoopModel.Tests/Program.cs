@@ -22,7 +22,11 @@ internal static class Program
             Near(model.TotalTime, 180);
             Require(model.Records.Count == records, "Finished stops recording.");
             Console.WriteLine("PASS: No-action deadline and retained outcome at 180 seconds");
-            Console.WriteLine("PASS: 19 model checks"); return 0;
+            Console.WriteLine("PASS: 19 model checks");
+            var roomAnchor = RoomAnchorChecks.Run();
+            Require(roomAnchor.Count == 7, "Expected 7 room anchor checks.");
+            foreach (var result in roomAnchor) Console.WriteLine(result);
+            Console.WriteLine("PASS: 7 room anchor checks"); return 0;
         }
         catch (Exception error) { Console.Error.WriteLine("FAIL: " + error); return 1; }
     }

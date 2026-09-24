@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+using LoopRoom;
+
+public static class RoomAnchorChecks
+{
+    public static List<string> Run()
+    {
+        var passed = new List<string>();
+
+        Check(passed, "Center fits without correction for every sampled yaw", () =>
+        {
+            for (double yaw = 0; yaw < 360; yaw += RoomAnchor.SearchStepDeg)
+            {
+                Need(RoomAnchor.ForwardRegionFits(0, 0, yaw, 0, 0, 0), "center rejected at " + yaw);
+                bool fits;
+                double chosen = RoomAnchor.ChooseFrontYaw(0, 0, yaw, 0, 0, 0, out fits);
+                Need(fits, "center choice failed at " + yaw);
+                Near(chosen, yaw);
+            }
+        });
+
+        Check(passed, "Boundary outward yaw is corrected by the minimum search step", () =>
+        {
+            bool fits;
+            double chosen = RoomAnchor.ChooseFrontYaw(0, 0.7, 0, 0, 0, 0, out fits);
+            Need(fits, "no boundary direction found");
+            Near(chosen, 135);
+            Need(RoomAnchor.ForwardRegionFits(0, 0.7, chosen, 0, 0, 0), "chosen direction does not fit");
+            Need(!RoomAnchor.ForwardRegionFits(0, 0.7, chosen - RoomAnchor.SearchStepDeg, 0, 0, 0),
+                "one closer step unexpectedly fits");
+        });
+
+        Check(passed, "All four corners fit in a center-facing direction", () =>
+        {
+            double[] signs = { -1, 1 };
+            foreach (double xSign in signs)
+            foreach (double zSign in signs)
+            {
+                double x = xSign * 0.7;
+                double z = zSign * 0.7;
+                double centerYaw = NormalizeYaw(Math.Atan2(-x, -z) * 180.0 / Math.PI);
+                bool fits;
+                double chosen = RoomAnchor.ChooseFrontYaw(x, z, 0, 0, 0, 0, out fits);
+                Need(fits, "corner direction not found at " + x + ", " + z);
+                Need(RoomAnchor.ForwardRegionFits(x, z, chosen, 0, 0, 0), "corner choice does not fit");
+                Near(AngularDistance(chosen, centerYaw), 0);
+            }
+        });
+
+        Check(passed, "Rotated safety area is evaluated in area coordinates", () =>
+        {
+            double areaYaw = 30;
+            double angle = areaYaw * Math.PI / 180.0;
+            double x = Math.Sin(angle) * 0.7;
+            double z = Math.Cos(angle) * 0.7;
+            Need(!RoomAnchor.ForwardRegionFits(x, z, areaYaw, 0, 0, areaYaw), "rotated outward yaw fits");
+            Need(RoomAnchor.ForwardRegionFits(x, z, areaYaw + 180, 0, 0, areaYaw), "rotated inward yaw rejected");
+        });
+
+        Check(passed, "Position outside the safety area returns the head yaw", () =>
+        {
+            bool fits;
+            double chosen = RoomAnchor.ChooseFrontYaw(1.0, 0, 123, 0, 0, 0, out fits);
+            Need(!fits, "outside position found a fitting direction");
+            Near(chosen, 123);
+        });
+
+        Check(passed, "Chosen yaw is normalized into zero through 360", () =>
+        {
+            bool fits;
+            Near(RoomAnchor.ChooseFrontYaw(0, 0, -30, 0, 0, 0, out fits), 330);
+            Need(fits, "negative center yaw did not fit");
+            Near(RoomAnchor.ChooseFrontYaw(0, 0, 750, 0, 0, 0, out fits), 30);
+            Need(fits, "large center yaw did not fit");
+        });
+
+        Check(passed, "Choosing a front yaw is deterministic", () =>
+        {
+            bool expectedFits;
+            double expected = RoomAnchor.ChooseFrontYaw(0.7, 0.7, 0, 0, 0, 0, out expectedFits);
+            for (int i = 0; i < 20; i++)
+            {
+                bool actualFits;
+                double actual = RoomAnchor.ChooseFrontYaw(0.7, 0.7, 0, 0, 0, 0, out actualFits);
+                Need(actual == expected && actualFits == expectedFits, "result changed on repetition " + i);
+            }
+        });
+
+        return passed;
+    }
+
+    static double NormalizeYaw(double yaw)
+    {
+        double normalized = yaw % 360.0;
+        return normalized < 0 ? normalized + 360.0 : normalized;
+    }
+
+    static double AngularDistance(double a, double b)
+    {
+        double difference = Math.Abs(NormalizeYaw(a) - NormalizeYaw(b));
+        return Math.Min(difference, 360.0 - difference);
+    }
+
+    static void Check(List<string> list, string name, Action test)
+    {
+        test();
+        list.Add("PASS: " + name);
+    }
+
+    static void Need(bool condition, string message)
+    {
+        if (!condition) throw new Exception(message);
+    }
+
+    static void Near(double actual, double expected)
+    {
+        Need(Math.Abs(actual - expected) < 0.00001, "Expected " + actual + " ~ " + expected);
+    }
+}

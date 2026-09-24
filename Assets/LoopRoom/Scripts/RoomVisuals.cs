@@ -97,6 +97,7 @@ namespace LoopRoom
             Shape("Right wall",PrimitiveType.Cube,new Vector3(2.5f,1.6f,1),new Vector3(.15f,3.2f,4),stone,smoothness:.06f);
             for (int i=-2;i<=2;i++) Shape("Wall seam",PrimitiveType.Cube,new Vector3(i,1.55f,2.90f),new Vector3(.025f,3.1f,.03f),ink);
             for (int i=0;i<8;i++) Shape("Floor inlay",PrimitiveType.Cube,new Vector3(0,.006f,-.9f+i*.52f),new Vector3(4.8f,.009f,.014f),stone);
+            Detail("Reach rug",PrimitiveType.Cube,new Vector3(0,.007f,.3f),new Vector3(1.0f,.014f,.6f),new Color(.33f,.27f,.22f),smoothness:.08f);
             Detail("Ceiling",PrimitiveType.Cube,new Vector3(0,3.22f,1),new Vector3(5,.12f,4),plaster,smoothness:.05f);
             Detail("Back wainscot",PrimitiveType.Cube,new Vector3(0,.72f,2.90f),new Vector3(4.78f,1.25f,.035f),panel,smoothness:.10f);
             Detail("Left wainscot",PrimitiveType.Cube,new Vector3(-2.40f,.72f,1),new Vector3(.035f,1.25f,3.8f),panel,smoothness:.10f);

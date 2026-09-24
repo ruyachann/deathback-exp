@@ -1,0 +1,6 @@
+﻿LoopRoom: PlaceRoom pos=(0.00,0.00) headYaw=0.0 frontYaw=0.0 corrected=False diff=0.0 fits=True
+LoopRoom: PlaceRoom pos=(0.15,0.10) headYaw=20.0 frontYaw=20.0 corrected=False diff=0.0 fits=True
+LoopRoom: PlaceRoom pos=(0.55,0.35) headYaw=40.0 frontYaw=265.0 corrected=True diff=-135.0 fits=True
+LoopRoom: PlaceRoom pos=(-0.20,-0.05) headYaw=330.0 frontYaw=330.0 corrected=False diff=0.0 fits=True
+LoopRoom: PlaceRoom pos=(-0.60,-0.40) headYaw=240.0 frontYaw=45.0 corrected=True diff=165.0 fits=True
+LoopRoom: PlaceRoom pos=(0.15,0.10) headYaw=20.0 frontYaw=20.0 corrected=False diff=0.0 fits=True

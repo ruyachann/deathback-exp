@@ -23,9 +23,14 @@ namespace LoopRoom
         string sessionId, logMessage = "";
         AudioSource enemyAudio, ambience;
         bool desktopArg, autostart, autoescape, autostartUsed, autoShieldDone, autoExitDone;
+        bool simulateDrift;
         bool messageSized;
         int messageMeasureAttempts;
         Color messageColor;
+        // Operator alignment (key C): head floor position -> area center, head yaw -> area orientation.
+        // Left at (0,0,0) until the operator aligns once; RoomAnchor then just uses the head yaw as-is.
+        double alignCx, alignCz, alignAreaYaw;
+        bool aligned;
 
         [Serializable] sealed class SessionLog
         {
@@ -48,6 +53,7 @@ namespace LoopRoom
             desktopArg = Array.IndexOf(args, "--desktop") >= 0;
             autostart = desktopArg && Array.IndexOf(args, "--autostart") >= 0;
             autoescape = autostart && Array.IndexOf(args, "--autoescape") >= 0;
+            simulateDrift = desktopArg && Array.IndexOf(args, "--simulate-drift") >= 0;
             Model = new LoopModel(timings);
             rig = new GameObject("XR Origin").AddComponent<DemoRig>(); rig.transform.SetParent(transform,false);
             rig.Initialize();
@@ -62,7 +68,9 @@ namespace LoopRoom
             enemyAudio = new GameObject("Enemy audio").AddComponent<AudioSource>();
             enemyAudio.transform.SetParent(room.Root,false); enemyAudio.playOnAwake=false;
             enemyAudio.spatialBlend=1; enemyAudio.minDistance=.5f; enemyAudio.maxDistance=10; enemyAudio.volume=.22f;
-            room.Sound.transform.position = new Vector3(0,1.4f,.7f);
+            // Local, not world, position: room.Sound is a child of room.Root, so this keeps the
+            // chime coming from the room's front after Begin()/loop-change repositions Root.
+            room.Sound.transform.localPosition = new Vector3(0,1.4f,.7f);
             room.Sound.spatialBlend=1; room.Sound.minDistance=.4f; room.Sound.maxDistance=8;
             // Separate source so the per-loop "room.Sound.Stop(); enemyAudio.Stop();" in Update() never cuts the ambience.
             ambience = new GameObject("Room tone").AddComponent<AudioSource>();
@@ -147,6 +155,12 @@ namespace LoopRoom
             bool autoTrigger = autostart && !autostartUsed && !rig.IsVR;
             if (idle && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed) || autoTrigger)) { if(autoTrigger) autostartUsed=true; Begin(); }
             else if (idle && keyboard!=null && keyboard.rKey.wasPressedThisFrame && rig.CanRetryPreparation) rig.RetryPreparation();
+            if (idle && keyboard!=null && keyboard.cKey.wasPressedThisFrame)
+            {
+                var head=rig.View.transform;
+                alignCx=head.position.x; alignCz=head.position.z; alignAreaYaw=head.eulerAngles.y;
+                aligned=true;
+            }
             if (keyboard!=null && keyboard.escapeKey.wasPressedThisFrame) Model.Interrupt();
             if (keyboard!=null && keyboard.f2Key.wasPressedThisFrame) privateOverlay=!privateOverlay;
             // Focus loss ends only the desktop check mode; in VR the HMD keeps running (runInBackground) while the operator uses other windows.
@@ -165,6 +179,10 @@ namespace LoopRoom
             Model.Advance(Time.unscaledDeltaTime);
             if(Model.LoopId!=lastLoop)
             {
+                // Reposition happens before RefreshWorld() below turns the blackout off this same
+                // frame, so the move itself is never seen (see task018 design note 3).
+                if(simulateDrift) rig.SimulateDesktopDrift(Model.LoopId);
+                PlaceRoom();
                 rig.ClearSelection(); room.Sound.Stop(); enemyAudio.Stop();
                 room.Sound.PlayOneShot(room.Chime); lastLoop=Model.LoopId; lastLoopTime=0;
                 autoShieldDone=false; autoExitDone=false;
@@ -206,14 +224,25 @@ namespace LoopRoom
             if(!rig.CanStart) return;
             // Do not re-center tracking: the user's real position remains unchanged.
             rig.ClearSelection(); trackingLost=0;
-            if(rig.IsVR)
-            {
-                var p=rig.View.transform.position;
-                room.Root.position=new Vector3(p.x,0,p.z);
-                room.Root.rotation=Quaternion.Euler(0,rig.View.transform.eulerAngles.y,0);
-            }
+            PlaceRoom();
             sessionId=Guid.NewGuid().ToString("N"); saved=false; lastLoop=0; lastRecords=0;
             Model.Start();
+        }
+
+        // Places room.Root at the player's current head-floor position, with the front (RoomAnchor's
+        // yaw) chosen so the forward reach fits the aligned safe area. Same call for VR and desktop.
+        void PlaceRoom()
+        {
+            var head=rig.View.transform;
+            double px=head.position.x, pz=head.position.z, headYaw=head.eulerAngles.y;
+            double frontYaw=RoomAnchor.ChooseFrontYaw(px,pz,headYaw,alignCx,alignCz,alignAreaYaw,out bool fits);
+            room.Root.position=new Vector3((float)px,0,(float)pz);
+            room.Root.rotation=Quaternion.Euler(0,(float)frontYaw,0);
+            double yawDiff=((frontYaw-headYaw)%360+540)%360-180;
+            bool corrected=Math.Abs(yawDiff)>0.001;
+            Debug.Log("LoopRoom: PlaceRoom pos=("+px.ToString("F2")+","+pz.ToString("F2")+") headYaw="+headYaw.ToString("F1")+
+                " frontYaw="+frontYaw.ToString("F1")+" corrected="+corrected+" diff="+yawDiff.ToString("F1")+" fits="+fits);
+            if(!fits) Debug.LogWarning("LoopRoom: no orientation keeps the forward reach inside the safe area; using head yaw as-is.");
         }
 
         void RaiseShield()
@@ -288,7 +317,7 @@ namespace LoopRoom
                 body=new GUIStyle(title){fontSize=18}; small=new GUIStyle(title){fontSize=13};
             }
             bool showRetryHint=(!rig.IsVR || privateOverlay) && rig.CanRetryPreparation;
-            float boxHeight=rig.IsVR&&!privateOverlay?112:showRetryHint?206:182;
+            float boxHeight=rig.IsVR&&!privateOverlay?112:showRetryHint?230:206;
             GUI.Box(new Rect(16,16,360,boxHeight),GUIContent.none);
             GUI.Label(new Rect(32,28,340,40),"第零室 / THE ROOM BEFORE",title);
             GUI.Label(new Rect(32,72,340,28),"LOOP "+Model.LoopId.ToString("00")+"  ·  "+PublicState(),body);
@@ -296,6 +325,8 @@ namespace LoopRoom
             {
                 float y=107;
                 GUI.Label(new Rect(32,y,340,26),rig.CanStart ? "Enter 開始 / Space 遮蔽 / E 出口" : "開始前の接続と追跡を確認中",small);
+                y+=24;
+                GUI.Label(new Rect(32,y,340,26),"C: 位置合わせ（"+(aligned?"済":"未")+"）",small);
                 y+=24;
                 if(rig.CanRetryPreparation) { GUI.Label(new Rect(32,y,340,26),"R: VR 再準備（運営）",small); y+=24; }
                 GUI.Label(new Rect(32,y,340,26),"右ドラッグ 視点 / Esc 中断 / F2 運営表示",small);

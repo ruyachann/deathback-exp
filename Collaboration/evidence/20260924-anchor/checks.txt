@@ -1,0 +1,42 @@
+﻿task017: LoopModel + RoomAnchor checks
+2026-09-24 13:40:40 +09:00  commit 0d444ac  cwd C:\deathback\deathback-exp
+
+PS> & 'C:\Users\PC_User\AppData\Local\Temp\claude\C--deathback\7f63be92-85c0-4090-b2b9-0a7c57106cd3\scratchpad\model_tests.ps1'
+Compile: Unity 6000.3.15f1 Roslyn (DotNetSdkRoslyn\csc.dll), C# 9
+sha256 a95cfd677fd4dd34dfe3e33f159207c9366de71e26f1ac91f43a68f7dfd578b0  LoopModel.cs
+sha256 a9dc8f1d5baba9476bffa03d4b4e1b9d1d3aab6957a4375f3e4a4510f4077b7d  LoopModelChecks.cs
+sha256 3e7ad288c8f5ca83b53311cc012e961ad86471e02b4cae368ee8457dcf769bb1  RoomAnchor.cs
+sha256 620cf7e172847b694484bc18e5f1d7d7747b23b824ed20ae640a63e2ea80f5be  RoomAnchorChecks.cs
+sha256 98ffef6894adf25ca1dcfea8bd10b079097358b82e2c552f9a73cfa663cdbe4f  Program.cs
+csc exit=0
+PASS: Unprotected attack returns immediately and resets only world state
+PASS: Shield grants a real escape window
+PASS: No escape before unlocking or with a stale loop id
+PASS: Repeated death callbacks produce only one reset
+PASS: Deadline includes blackouts and ends within 180 seconds
+PASS: Default rules keep looping without a session deadline
+PASS: Model owns a copy of its loop rules
+PASS: Minimum interval boundaries are enforced
+PASS: Extremely small loop timings are rejected
+PASS: Minimum intervals remain bounded at MaxStep
+PASS: Advance accepts MaxStep and rejects larger finite deltas without mutation
+PASS: Session deadline validation is conditional
+PASS: Missing escape window allows the enemy to flank
+PASS: Large and small time steps yield the same no-input outcome
+PASS: 100 resets reject old events and clear shield state
+PASS: Stop is distinct from death and does not resume the same session
+PASS: Invalid timing and non-finite delta are rejected
+PASS: All seven timings reject NaN and both infinities
+PASS: No-action deadline and retained outcome at 180 seconds
+PASS: 19 model checks
+PASS: Center fits without correction for every sampled yaw
+PASS: Boundary outward yaw is corrected by the minimum search step
+PASS: All four corners fit in a center-facing direction
+PASS: Rotated safety area is evaluated in area coordinates
+PASS: Position outside the safety area returns the head yaw
+PASS: Chosen yaw is normalized into zero through 360
+PASS: Choosing a front yaw is deterministic
+PASS: 7 room anchor checks
+test exit=0
+
+[exit code: 0]

@@ -48,6 +48,13 @@ namespace LoopRoom
         bool ownsXR;
         bool xrInitializing, desktopFallback, floorPrepared, preparationReported;
         float yaw, pitch;
+        Vector3 driftOffset;
+        // Fixed, deterministic per-loop offsets/yaws for --simulate-drift evidence screenshots (desktop only).
+        // Alternating "no correction" (small drift, stays inside the safe area) and
+        // "correction" (large drift, forces RoomAnchor to pick a different front yaw) entries,
+        // per task018's 追修正 (the first, all-large-drift list always triggered correction).
+        static readonly Vector3[] DriftOffsets = { new Vector3(.15f,0,.10f), new Vector3(.55f,0,.35f), new Vector3(-.20f,0,-.05f), new Vector3(-.60f,0,-.40f) };
+        static readonly float[] DriftYaws = { 20f, 40f, -30f, -120f };
 
         bool FloorReady
         {
@@ -146,7 +153,7 @@ namespace LoopRoom
             if (allowSwitch && available != IsVR) SetVR(available);
             if(!IsVR)
             {
-                View.transform.parent.localPosition=Vector3.zero;
+                View.transform.parent.localPosition=driftOffset;
                 View.transform.localPosition=new Vector3(0,1.65f,0);
             }
             if (!IsVR && Mouse.current != null && Mouse.current.rightButton.isPressed)
@@ -155,6 +162,19 @@ namespace LoopRoom
                 yaw += delta.x * .10f; pitch = Mathf.Clamp(pitch - delta.y * .10f, -70,70);
                 View.transform.localRotation = Quaternion.Euler(pitch,yaw,0);
             }
+        }
+
+        // --simulate-drift evidence aid: before each loop's reposition, nudge the desktop
+        // "head" by a fixed, deterministic offset/yaw so screenshots prove the room follows.
+        public void SimulateDesktopDrift(int loopId)
+        {
+            if (IsVR) return;
+            int i = (loopId - 1) % DriftOffsets.Length;
+            if (i < 0) i += DriftOffsets.Length;
+            driftOffset = DriftOffsets[i]; yaw = DriftYaws[i];
+            View.transform.parent.localPosition = driftOffset;
+            View.transform.localPosition = new Vector3(0,1.65f,0);
+            View.transform.localRotation = Quaternion.Euler(pitch,yaw,0);
         }
 
         public bool RuntimePresent()
