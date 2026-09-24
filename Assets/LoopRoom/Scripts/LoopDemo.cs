@@ -31,7 +31,13 @@ namespace LoopRoom
         CalibrationView calibration;
         bool calibrating = true;
         float calibrationHold;
-        bool calibrationVisible, wasCalibrationVisible, lastBoundaryAvailable;
+        bool calibrationVisible, wasCalibrationVisible, wasRoomHidden, lastBoundaryAvailable;
+        // Set by CommitCalibration() so the operator overlay can keep showing "境界外で決定"
+        // until the *next* commit, even after the calibration screen itself closes (task021 追修正3-1).
+        bool calibrationOutside;
+        // Reset at the top of every Update(); true once this frame has processed C or R, so the
+        // same frame's Enter/A-X/auto-trigger can never also start the session (task021 追修正3-4).
+        bool operatorCommandConsumed;
         // Renderers under room.Root (追修正 2026-09-24: the desk was hiding the calibration outline).
         // Only Renderer.enabled is toggled, never room.Root.SetActive/its children's active state,
         // so the spectator camera and every audio source parented under Root (Sound/ambience) keep
@@ -177,6 +183,7 @@ namespace LoopRoom
             rig.PollMode(idle);
             if(rig.IsVR!=wasVR) ResetAlignment();
             var keyboard=Keyboard.current;
+            operatorCommandConsumed = false;
             // Checked before Enter/Start so a same-frame Enter+C press cannot slip past idle
             // (Begin() would already have advanced Phase) and still commit an alignment (task018 追修正3-2).
             // Tracking must be live and VR (when applicable) fully ready before C can commit an
@@ -186,12 +193,27 @@ namespace LoopRoom
             if (idle && rig.CanStart && keyboard!=null && keyboard.cKey.wasPressedThisFrame)
             {
                 if (calibrating) CommitCalibration(); else calibrating = true;
+                operatorCommandConsumed = true;
             }
+            // Moved ahead of the Enter/Start check below (task021 追修正4-2): R used to be an
+            // "else if" hanging off that check, so a same-frame R+Enter/StartPressed/autoTrigger
+            // let Begin() run first and skipped R's RetryPreparation/ResetAlignment entirely. C and
+            // R are now both resolved (exclusively, via operatorCommandConsumed) before Begin() is
+            // even considered.
+            else if (idle && !operatorCommandConsumed && keyboard!=null && keyboard.rKey.wasPressedThisFrame && rig.CanRetryPreparation)
+            {
+                rig.RetryPreparation(); ResetAlignment(); operatorCommandConsumed = true;
+            }
+            // Hides the room whenever calibration is the active idle screen, regardless of
+            // rig.CanStart: if tracking/Floor drops out mid-calibration the room must stay hidden
+            // too, not reappear just because the floor overlay itself can no longer be shown
+            // (task021 追修正3-3). The floor overlay's own visibility keeps requiring CanStart below.
+            bool roomHidden = calibrating && idle;
+            if (roomHidden != wasRoomHidden) { SetRoomVisible(!roomHidden); wasRoomHidden = roomHidden; }
             calibrationVisible = calibrating && idle && rig.CanStart;
             if (calibrationVisible != wasCalibrationVisible)
             {
                 rig.LookAtFloorForCalibration(calibrationVisible);
-                SetRoomVisible(!calibrationVisible);
                 wasCalibrationVisible = calibrationVisible;
             }
             if (calibrationVisible)
@@ -208,8 +230,10 @@ namespace LoopRoom
             else calibrationHold = 0f;
             bool enter=keyboard!=null && keyboard.enterKey.wasPressedThisFrame;
             bool autoTrigger = autostart && !autostartUsed && !rig.IsVR;
-            if (idle && !calibrating && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed) || autoTrigger)) { if(autoTrigger) autostartUsed=true; Begin(); }
-            else if (idle && keyboard!=null && keyboard.rKey.wasPressedThisFrame && rig.CanRetryPreparation) { rig.RetryPreparation(); ResetAlignment(); }
+            // operatorCommandConsumed (set by C or R above, or inside CommitCalibration for the 1s
+            // hold/--auto-calibrate paths) blocks this same frame from also starting the session
+            // (task021 追修正3-4, 追修正4-2).
+            if (idle && !calibrating && !operatorCommandConsumed && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed) || autoTrigger)) { if(autoTrigger) autostartUsed=true; Begin(); }
             if (keyboard!=null && keyboard.escapeKey.wasPressedThisFrame) Model.Interrupt();
             if (keyboard!=null && keyboard.f2Key.wasPressedThisFrame) privateOverlay=!privateOverlay;
             // Focus loss ends only the desktop check mode; in VR the HMD keeps running (runInBackground) while the operator uses other windows.
@@ -279,7 +303,10 @@ namespace LoopRoom
         // Clears the alignment flag together with the 3 stored values so PlaceRoom can never
         // reuse a stale center/orientation after the operator's alignment is invalidated (task018 追修正3-1).
         // task021: also sends idle back to the calibration screen, since a mode switch or VR
-        // re-preparation makes the previous head pose meaningless.
+        // re-preparation makes the previous head pose meaningless. calibrationOutside is left
+        // untouched here (task021 追修正4-3): the "境界外で決定" warning must persist until the
+        // next CommitCalibration() actually determines a fresh Fit, not disappear just because a
+        // retry/reset happened before the operator has re-decided.
         void ResetAlignment() { aligned=false; alignCx=0; alignCz=0; alignAreaYaw=0; calibrating=true; calibrationHold=0; }
 
         // Commits the calibration: the current head floor position/yaw become the alignment
@@ -287,8 +314,17 @@ namespace LoopRoom
         void CommitCalibration()
         {
             var head=rig.View.transform;
+            var headFloor=new Vector3(head.position.x,0,head.position.z);
+            // Re-checked against the boundary right now, at the exact head pose being committed,
+            // instead of reusing calibration.Fit from the last RefreshWorld() frame: a commit can
+            // happen earlier in this same Update() than RefreshWorld() runs (task021 追修正3-1).
+            lastBoundaryAvailable = rig.TryGetBoundaryPoints(boundaryPoints) && boundaryPoints.Count >= 3;
+            calibration.Refresh(headFloor, head.eulerAngles.y, boundaryPoints, lastBoundaryAvailable);
+            calibrationOutside = calibration.Fit == CalibrationView.BoundaryFit.Outside;
+            if(calibrationOutside) Debug.LogWarning("LoopRoom: calibration committed outside the reported guardian boundary.");
             alignCx=head.position.x; alignCz=head.position.z; alignAreaYaw=head.eulerAngles.y;
             aligned=true; fitsWarned=false; calibrating=false; calibrationHold=0;
+            operatorCommandConsumed = true;
         }
 
         void Begin()
@@ -348,7 +384,7 @@ namespace LoopRoom
             if(calibrationVisible)
             {
                 var head=rig.View.transform;
-                lastBoundaryAvailable=rig.TryGetBoundaryPoints(boundaryPoints);
+                lastBoundaryAvailable=rig.TryGetBoundaryPoints(boundaryPoints) && boundaryPoints.Count>=3;
                 calibration.Refresh(new Vector3(head.position.x,0,head.position.z),head.eulerAngles.y,boundaryPoints,lastBoundaryAvailable);
             }
             bool show=Model.Phase!=SessionPhase.Playing && Model.Phase!=SessionPhase.Blackout;
@@ -399,7 +435,10 @@ namespace LoopRoom
             }
             bool showRetryHint=(!rig.IsVR || privateOverlay) && rig.CanRetryPreparation;
             bool showBoundaryHint=(!rig.IsVR || privateOverlay) && calibrationVisible && !lastBoundaryAvailable;
-            float boxHeight=(rig.IsVR&&!privateOverlay?112:showRetryHint?230:206)+(showBoundaryHint?24:0);
+            // Stays visible from the moment of commit until the *next* commit, even once the
+            // calibration screen itself has closed (task021 追修正3-1).
+            bool showOutsideWarning=(!rig.IsVR || privateOverlay) && calibrationOutside;
+            float boxHeight=(rig.IsVR&&!privateOverlay?112:showRetryHint?230:206)+(showBoundaryHint?24:0)+(showOutsideWarning?24:0);
             GUI.Box(new Rect(16,16,360,boxHeight),GUIContent.none);
             GUI.Label(new Rect(32,28,340,40),"第零室 / THE ROOM BEFORE",title);
             GUI.Label(new Rect(32,72,340,28),"LOOP "+Model.LoopId.ToString("00")+"  ·  "+PublicState(),body);
@@ -410,6 +449,7 @@ namespace LoopRoom
                 y+=24;
                 GUI.Label(new Rect(32,y,340,26),calibrating ? "C: キャリブレーションを決定" : "C: キャリブレーションをやり直す（"+(aligned?"済":"未")+"）",small);
                 y+=24;
+                if(showOutsideWarning) { GUI.Label(new Rect(32,y,340,26),"境界外で決定（要確認）",small); y+=24; }
                 if(showBoundaryHint) { GUI.Label(new Rect(32,y,340,26),"境界情報なし（目視で確認）",small); y+=24; }
                 if(rig.CanRetryPreparation) { GUI.Label(new Rect(32,y,340,26),"R: VR 再準備（運営）",small); y+=24; }
                 GUI.Label(new Rect(32,y,340,26),"右ドラッグ 視点 / Esc 中断 / F2 運営表示",small);

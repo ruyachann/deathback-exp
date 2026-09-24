@@ -12,7 +12,14 @@ namespace LoopRoom
     // while visible; the geometry itself is built once from PlayAreaSettings at Build().
     public sealed class CalibrationView
     {
+        // Outcome of the last Refresh() against the reported guardian boundary. LoopDemo reads
+        // this right after calling Refresh() (including its own re-check inside
+        // CommitCalibration()) to decide whether a commit needs the "境界外で決定" warning
+        // (task021 追修正3-1).
+        public enum BoundaryFit { Unknown, Fits, Outside }
+
         public Transform Root;
+        public BoundaryFit Fit { get; private set; } = BoundaryFit.Unknown;
         PlayAreaSettings settings;
         Renderer outerRenderer;
         LineRenderer boundaryLine;
@@ -140,8 +147,13 @@ namespace LoopRoom
         {
             Root.position=headFloor;
             Root.rotation=Quaternion.Euler(0,headYawDeg,0);
+            // A polygon needs >=3 points; treat fewer (including an empty list from a caller that
+            // reports success with no points) as "no boundary" rather than indexing into it below
+            // (task021 追修正5-2).
+            boundaryAvailable = boundaryAvailable && boundaryWorldPoints.Count>=3;
             bool fits=boundaryAvailable && FitsBoundary(headFloor,headYawDeg,boundaryWorldPoints);
-            outerRenderer.material.color = !boundaryAvailable ? UnknownColor : fits ? FitColor : NoFitColor;
+            Fit = !boundaryAvailable ? BoundaryFit.Unknown : fits ? BoundaryFit.Fits : BoundaryFit.Outside;
+            outerRenderer.material.color = Fit==BoundaryFit.Unknown ? UnknownColor : Fit==BoundaryFit.Fits ? FitColor : NoFitColor;
             boundaryLine.gameObject.SetActive(boundaryAvailable);
             if(boundaryAvailable)
             {
@@ -152,20 +164,32 @@ namespace LoopRoom
             }
         }
 
-        // Conservative visual check: the area square's 4 corners must all lie inside the reported
-        // boundary polygon. This is independent of RoomAnchor (which checks the forward reach
-        // against the aligned safe area, not the headset's guardian) and is deliberately simple
-        // since it is only a display aid, not a safety gate.
+        // Visual check: the area square's 4 corners must all lie inside the reported boundary
+        // polygon, AND none of the square's 4 edges may cross (or touch) any boundary edge. The
+        // corners-only check alone passes a concave boundary whose notch cuts across an edge/the
+        // interior while all 4 corners stay inside it, which would wrongly show green (task021
+        // 追修正3-2). Still independent of RoomAnchor (which checks the forward reach against the
+        // aligned safe area, not the headset's guardian) and deliberately simple/conservative
+        // since it is only a display aid, not a safety gate — any touching counts as Outside.
         bool FitsBoundary(Vector3 center, float yawDeg, List<Vector3> poly)
         {
             if(poly.Count<3) return false;
             float half=(float)(settings.areaSize*0.5);
             var rotation=Quaternion.Euler(0,yawDeg,0);
-            var corners=new[]{ new Vector3(-half,0,-half), new Vector3(half,0,-half), new Vector3(half,0,half), new Vector3(-half,0,half) };
+            var localCorners=new[]{ new Vector3(-half,0,-half), new Vector3(half,0,-half), new Vector3(half,0,half), new Vector3(-half,0,half) };
+            var corners=new Vector3[4];
+            for(int i=0;i<4;i++) corners[i]=center+rotation*localCorners[i];
             foreach(var corner in corners)
+                if(!PointInPolygon(corner.x,corner.z,poly)) return false;
+            int n=poly.Count;
+            for(int i=0;i<4;i++)
             {
-                var world=center+rotation*corner;
-                if(!PointInPolygon(world.x,world.z,poly)) return false;
+                var a1=corners[i]; var a2=corners[(i+1)%4];
+                for(int j=0;j<n;j++)
+                {
+                    var b1=poly[j]; var b2=poly[(j+1)%n];
+                    if(SegmentsIntersect(a1.x,a1.z,a2.x,a2.z,b1.x,b1.z,b2.x,b2.z)) return false;
+                }
             }
             return true;
         }
@@ -181,6 +205,48 @@ namespace LoopRoom
                 if(intersect) inside=!inside;
             }
             return inside;
+        }
+
+        // Standard orientation-based segment intersection for the proper-crossing case, plus an
+        // explicit point-to-segment distance check (double, in meters) for the touching/near-
+        // touching case (task021 追修正5-1): the previous version applied Epsilon directly to the
+        // cross product, whose magnitude is in m² and scales with segment length, so "within 1e-4m"
+        // was not actually what it tested (a long boundary edge could pass 0.00005m away from a
+        // square edge with a cross product well outside Epsilon and wrongly read as Fits/green).
+        // Checking the actual distance from each endpoint to the opposite segment is exact
+        // regardless of segment length and also covers zero-length (degenerate) edges, which
+        // PointSegmentDistance treats as a single point.
+        const double Epsilon = 1e-4;
+
+        static bool SegmentsIntersect(float ax1,float az1,float ax2,float az2,float bx1,float bz1,float bx2,float bz2)
+        {
+            double Ax1=ax1,Az1=az1,Ax2=ax2,Az2=az2,Bx1=bx1,Bz1=bz1,Bx2=bx2,Bz2=bz2;
+            if(PointSegmentDistance(Ax1,Az1,Bx1,Bz1,Bx2,Bz2)<=Epsilon) return true;
+            if(PointSegmentDistance(Ax2,Az2,Bx1,Bz1,Bx2,Bz2)<=Epsilon) return true;
+            if(PointSegmentDistance(Bx1,Bz1,Ax1,Az1,Ax2,Az2)<=Epsilon) return true;
+            if(PointSegmentDistance(Bx2,Bz2,Ax1,Az1,Ax2,Az2)<=Epsilon) return true;
+
+            double d1=Cross(Bx1,Bz1,Bx2,Bz2,Ax1,Az1);
+            double d2=Cross(Bx1,Bz1,Bx2,Bz2,Ax2,Az2);
+            double d3=Cross(Ax1,Az1,Ax2,Az2,Bx1,Bz1);
+            double d4=Cross(Ax1,Az1,Ax2,Az2,Bx2,Bz2);
+            int s1=Math.Sign(d1), s2=Math.Sign(d2), s3=Math.Sign(d3), s4=Math.Sign(d4);
+            return s1!=0 && s2!=0 && s3!=0 && s4!=0 && s1!=s2 && s3!=s4;
+        }
+
+        static double Cross(double ox,double oz,double ax,double az,double px,double pz) => (ax-ox)*(pz-oz)-(az-oz)*(px-ox);
+
+        // Distance from point p to segment [a,b], all in double. lenSq==0 collapses to a
+        // point-to-point distance, covering degenerate (zero-length) edges.
+        static double PointSegmentDistance(double px,double pz,double ax,double az,double bx,double bz)
+        {
+            double dx=bx-ax, dz=bz-az;
+            double lenSq=dx*dx+dz*dz;
+            double t = lenSq<=0 ? 0 : ((px-ax)*dx+(pz-az)*dz)/lenSq;
+            t = Math.Max(0,Math.Min(1,t));
+            double cx=ax+t*dx, cz=az+t*dz;
+            double ex=px-cx, ez=pz-cz;
+            return Math.Sqrt(ex*ex+ez*ez);
         }
     }
 }

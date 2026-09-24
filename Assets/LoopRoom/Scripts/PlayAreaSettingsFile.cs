@@ -24,7 +24,22 @@ namespace LoopRoom
                 settings.Validate();
                 string directory = Path.GetDirectoryName(path);
                 if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
-                File.WriteAllText(path, JsonUtility.ToJson(settings, true));
+                try
+                {
+                    using (var stream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        writer.Write(JsonUtility.ToJson(settings, true));
+                    }
+                }
+                catch (IOException) when (File.Exists(path))
+                {
+                    var loaded = JsonUtility.FromJson<PlayAreaSettings>(File.ReadAllText(path));
+                    if (loaded == null)
+                        throw new ArgumentException("The play-area settings file is empty or invalid.", nameof(path));
+                    loaded.Validate();
+                    return loaded;
+                }
                 return settings;
             }
             catch (Exception error) when (

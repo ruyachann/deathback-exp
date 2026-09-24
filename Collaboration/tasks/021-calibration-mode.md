@@ -1,6 +1,6 @@
 # 021 — キャリブレーション画面（足元に体験空間を表示して決定する）
 
-状態: 計画確定（2026-09-24）。計画 Claude Opus 5.5。実装 Claude Sonnet 5。レビュー 実装とは別セッションの Sonnet と GPT-5.6 Sol。task020（設定、Sol）と並行。task020 の API（`PlayAreaSettings`、`RoomAnchor` の設定オーバーロード）を使う。
+状態: **受入（2026-09-25、Sol・Sonnet 最終 approve、reviews/tasks020-021-exchange-20260924.md）**。計画 Claude Opus 5.5。実装 Claude Sonnet 5。レビュー 実装とは別セッションの Sonnet と GPT-5.6 Sol。task020（設定、Sol）と並行。task020 の API（`PlayAreaSettings`、`RoomAnchor` の設定オーバーロード）を使う。
 
 ## 目的（ユーザー指定 2026-09-24）
 
@@ -40,6 +40,25 @@ Sol・Sonnet とも request_changes（`sol-task021-independent-mcp.md`、`sonnet
 3. （中、Sol）キャリブレーション中に追跡不能になると部屋が再表示される → 部屋を隠す条件を `calibrating && idle` にする（枠の表示は従来どおり CanStart が条件でよい）。
 4. （中、両方）C と開始入力（Enter・A/X・autoTrigger）が同じフレームだと決定から開始まで進む → C または R を処理したフレームでは開始の判定をしない（1フレーム単位の消費フラグ）。
 5. 見送り（Sonnet 低）: desktop の右ドラッグでキャリブレーション中の下向きが解除される件（desktop 専用で動作に支障なし）。
+
+### 追修正4（2026-09-24、再レビュー指摘。計画担当 Opus 5.5）
+
+Sol・Sonnet とも request_changes（`sol-task021-rereview-mcp.md`、`sonnet-task021-rereview-mcp.md`）。採用:
+1. （高、Sol）境界への接触を浮動小数の誤差で緑と判定しうる → 向き判定と接触判定を許容誤差 epsilon（例 1e-4 m）付きにし、誤差内はすべて交差（Outside）扱い。可能なら double で計算する。
+2. （中、両方）R の処理が開始判定より後にあり、同じフレームの開始を止められない → C と R をどちらも開始判定より前に処理し、処理したら operatorCommandConsumed を立て、未消費のときだけ開始判定する。
+3. （中、Sol）「境界外で決定」の表示が ResetAlignment で消える → calibrationOutside は次の CommitCalibration で新しい判定を確定したときだけ更新する。
+
+### 追修正5（2026-09-24、再レビュー指摘。計画担当 Opus 5.5）
+
+Sol・Sonnet とも request_changes（`sol-task021-final-mcp.md`、`sonnet-task021-final-mcp.md`）。採用:
+1. （高、Sol）epsilon を外積（m²、長さに比例）に直接当てており「1e-4 m 以内は接触」になっていない → 各端点と相手の線分との距離（点と線分の距離、double）で判定し、`<= 1e-4 m` なら交差（Outside）。それ以外は通常の交差判定。長さ0の辺も点として扱う。
+2. （中、Sonnet）TryGetBoundaryPoints が成功しても点が0個だと `boundaryWorldPoints[0]` で例外 → 点が3個未満なら「境界情報なし（白）」として扱う。
+
+### 追修正6（2026-09-24、再レビュー指摘。計画担当 Opus 5.5）
+
+Sonnet approve、Sol request_changes（`sol-task021-final2-mcp.md`）。
+1. 採用（中）: 境界点が3個未満のとき、枠は白になるが運営表示の「境界情報なし（目視で確認）」が出ない → LoopDemo の境界取得の2か所で `lastBoundaryAvailable = rig.TryGetBoundaryPoints(boundaryPoints) && boundaryPoints.Count >= 3;` に正規化する。
+2. 見送り（低）: 案内が目線の少し上（開始待ち・終了のパネルと共用しているため）。見え方は実機で確認して決める。
 
 ## 許可ファイル
 

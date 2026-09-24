@@ -1,6 +1,6 @@
 # 020 — 体験空間の設定ファイルと RoomAnchor の設定化（キャリブレーションの土台）
 
-状態: 計画確定（2026-09-24）。計画 Claude Opus 5.5。実装 GPT-5.6 Sol。レビュー 実装とは別セッションの Sol と Claude Sonnet 5。task021（キャリブレーション画面、Sonnet）と並行。
+状態: **受入（2026-09-25、Sol・Sonnet 最終 approve、reviews/tasks020-021-exchange-20260924.md）**。計画 Claude Opus 5.5。実装 GPT-5.6 Sol。レビュー 実装とは別セッションの Sol と Claude Sonnet 5。task021（キャリブレーション画面、Sonnet）と並行。
 
 ## 目的（ユーザー指定 2026-09-24）
 
