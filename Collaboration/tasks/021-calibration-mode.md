@@ -32,6 +32,15 @@ VR ゴーグルをつけると、足元に必要な広さ（自分を初期位�
 - 線（体験空間の正方形、余裕の正方形、境界線）は `LineAlignment.View`（カメラの方を向く）で描く。線の太さは 2〜3cm 程度。
 - desktop のキャリブレーション中の下向きを 45° → 60° にし、足元の枠全体が画面に入るようにする。
 
+### 追修正3（2026-09-24、独立レビュー指摘。計画担当 Opus 5.5）
+
+Sol・Sonnet とも request_changes（`sol-task021-independent-mcp.md`、`sonnet-task021-independent-mcp.md`）。採用:
+1. （高、両方）赤（境界外）で決定しても警告が出ない → CalibrationView が `Unknown / Fits / Outside` を公開し、決定時に Outside なら Debug.LogWarning、決定後も運営表示に「境界外で決定」を残す（次の決定まで）。判定は決定する瞬間の頭の位置と yaw で更新する。
+2. （高、Sol）凹形の境界で四隅だけの判定だと、辺がはみ出しても緑になる → 四隅の内包に加えて、正方形の各辺と境界の各辺の交差を調べ、交差や境界上は安全側（Outside＝赤）とする。
+3. （中、Sol）キャリブレーション中に追跡不能になると部屋が再表示される → 部屋を隠す条件を `calibrating && idle` にする（枠の表示は従来どおり CanStart が条件でよい）。
+4. （中、両方）C と開始入力（Enter・A/X・autoTrigger）が同じフレームだと決定から開始まで進む → C または R を処理したフレームでは開始の判定をしない（1フレーム単位の消費フラグ）。
+5. 見送り（Sonnet 低）: desktop の右ドラッグでキャリブレーション中の下向きが解除される件（desktop 専用で動作に支障なし）。
+
 ## 許可ファイル
 
 - `Assets/LoopRoom/Scripts/LoopDemo.cs`

@@ -26,6 +26,10 @@
 3. Validate が範囲外・非有限を拒否する。
 csproj に PlayAreaSettings.cs の純粋部分を含める（LoadOrCreate を別ファイルにした場合はそのファイルは含めない）。
 
+### 追修正（2026-09-24、独立レビュー指摘。計画担当 Opus 5.5）
+
+Sonnet approve、Sol request_changes（`sol-task020-independent-mcp.md`）。採用: 設定ファイルを新規作成するときに既存ファイルを上書きしない保証がない（Exists と書き込みの間の競合など）→ `FileMode.CreateNew` で作成し、既に存在して失敗した場合は読み込み直して検証、それも失敗したら既定値と警告（上書きしない）。
+
 ## 許可ファイル
 
 - `Assets/LoopRoom/Scripts/PlayAreaSettings.cs`（新規、必要なら `PlayAreaSettingsFile.cs` として LoadOrCreate を分ける）
