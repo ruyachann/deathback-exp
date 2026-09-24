@@ -279,7 +279,7 @@ namespace LoopRoom
             // A long frame can cross t=3 and the shot together; LoopTime is frozen in Blackout, so the latch still plays.
             if((Model.Phase==SessionPhase.Playing || Model.Phase==SessionPhase.Blackout) && lastLoopTime<3 && Model.LoopTime>=3)
                 enemyAudio.PlayOneShot(room.Latch);
-            if(Model.Phase==SessionPhase.Playing && lastLoopTime<Model.Rules.exitOpens && Model.LoopTime>=Model.Rules.exitOpens)
+            if(Model.Phase==SessionPhase.Playing && lastLoopTime<Model.ExitOpens && Model.LoopTime>=Model.ExitOpens)
                 room.Sound.PlayOneShot(room.Open,.6f);
             if(lastRecords<Model.Records.Count)
             {
@@ -383,7 +383,7 @@ namespace LoopRoom
             room.ExitLamp.material.color=lamp;
             room.ExitLabel.text=Model.ExitAvailable?"脱出可能":"施錠中";
             room.Blackout.SetActive(Model.Phase==SessionPhase.Blackout || trackingLost>0);
-            room.UpdatePublic(rig.IsVR,playing);
+            room.UpdatePublic(rig.IsVR);
             calibration.SetVisible(calibrationVisible);
             if(calibrationVisible)
             {

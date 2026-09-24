@@ -1,0 +1,49 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/024-deferred-cleanup.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/024-deferred-cleanup.md",
+      "sha256": "9b2c5375667a5803d1e25fbcdcd927973db5b5505f4ea32c78cc6f8ca012f28b"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopModel.cs",
+      "sha256": "fddd6568ac4bed02fdaf0a1c50f60183d80e3249bb9bbe064d41eb6cf4f9f4f0"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/DemoRig.cs",
+      "sha256": "120db643cea494fa1819c1e6bbabe2574fd8d89efe98273a977978d923865cfe"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs",
+      "sha256": "a146e206f96a4befea18897759f46bdabc74f51b3f73e7562f511703cd033f30"
+    },
+    {
+      "path": "Collaboration/reviews/task024-loopdemo-diff.md",
+      "sha256": "64dec8321510065461c6ada6016ff40b093bd86e3b7540463e27e24cbd3b3481"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task024-independent-mcp.md",
+      "sha256": "964d20fe3c50f767626ec0f6dc6ec877bf49ebae7aa51d387bcdc243f0c8fbc7"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-task024-independent-mcp.md",
+      "sha256": "e9ca9964e0c4a00e3bd5c3711b48537e84044df22f14e6b609937ecfd687de4f"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T213506182730Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

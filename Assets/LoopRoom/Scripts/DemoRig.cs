@@ -35,7 +35,10 @@ namespace LoopRoom
         public bool NeedsRelease => needsRelease[0] || needsRelease[1];
         readonly List<InputAction> actions = new List<InputAction>();
         readonly List<XRDisplaySubsystem> displays = new List<XRDisplaySubsystem>();
-        readonly List<XRInputSubsystem> inputs = new List<XRInputSubsystem>();
+        // Separate lists for FloorReady's per-frame poll and StartXR's coroutine poll (task024-b):
+        // both used to share `inputs`, risking a same-frame mix-up between the two call sites.
+        readonly List<XRInputSubsystem> pollInputs = new List<XRInputSubsystem>();
+        readonly List<XRInputSubsystem> xrPrepInputs = new List<XRInputSubsystem>();
         readonly List<XRInputSubsystem> floorInputs = new List<XRInputSubsystem>();
         readonly bool[] wasGrip = new bool[2];
         readonly bool[] needsRelease = new bool[2];
@@ -66,8 +69,8 @@ namespace LoopRoom
                 if (!floorPrepared || floorInputs.Count == 0) return false;
                 foreach (var input in floorInputs)
                     if (!input.running || input.GetTrackingOriginMode() != TrackingOriginModeFlags.Floor) return false;
-                SubsystemManager.GetSubsystems(inputs);
-                foreach (var input in inputs)
+                SubsystemManager.GetSubsystems(pollInputs);
+                foreach (var input in pollInputs)
                     if (input.running && input.GetTrackingOriginMode() != TrackingOriginModeFlags.Floor) return false;
                 return true;
             }
@@ -299,9 +302,9 @@ namespace LoopRoom
             {
                 if(!requested)
                 {
-                    SubsystemManager.GetSubsystems(inputs);
+                    SubsystemManager.GetSubsystems(xrPrepInputs);
                     floorInputs.Clear();
-                    foreach(var input in inputs) if(input.running) floorInputs.Add(input);
+                    foreach(var input in xrPrepInputs) if(input.running) floorInputs.Add(input);
                     if(!RuntimePresent() || floorInputs.Count==0) { yield return null; continue; }
                     bool known=true;
                     foreach(var input in floorInputs)

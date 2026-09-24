@@ -263,7 +263,7 @@ namespace LoopRoom
             Spectator.GetUniversalAdditionalCameraData().renderPostProcessing=true;
         }
 
-        public void UpdatePublic(bool vr, bool active)
+        public void UpdatePublic(bool vr)
         {
             Spectator.enabled=vr;
             publicHead.SetActive(vr); publicLeft.SetActive(vr); publicRight.SetActive(vr);

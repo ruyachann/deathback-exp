@@ -59,7 +59,8 @@ namespace LoopRoom
     public sealed class LoopModel
     {
         public const double MaxStep = 3600.0;
-        public readonly LoopRules Rules;
+        readonly LoopRules rules;
+        public LoopRules Rules => rules.Clone();
         public readonly List<LoopRecord> Records = new List<LoopRecord>();
         public SessionPhase Phase { get; private set; } = SessionPhase.Ready;
         public SessionPhase Outcome { get; private set; } = SessionPhase.Ready;
@@ -69,14 +70,15 @@ namespace LoopRoom
         public bool ShieldRaised { get; private set; }
         public bool ShotResolved { get; private set; }
         public bool ExitAvailable => Phase == SessionPhase.Playing && ShotResolved &&
-            LoopTime >= Rules.exitOpens && LoopTime < Rules.exitCloses;
+            LoopTime >= rules.exitOpens && LoopTime < rules.exitCloses;
+        public double ExitOpens => rules.exitOpens;
         public double BlackoutRemaining { get; private set; }
         double endingRemaining;
 
         public LoopModel(LoopRules rules = null)
         {
-            Rules = (rules ?? new LoopRules()).Clone();
-            Rules.Validate();
+            this.rules = (rules ?? new LoopRules()).Clone();
+            this.rules.Validate();
         }
 
         public void Start()
@@ -109,7 +111,7 @@ namespace LoopRoom
         public bool Kill(int expectedLoop, string cause)
         {
             if (Phase != SessionPhase.Playing || expectedLoop != LoopId) return false;
-            Record(cause); Phase = SessionPhase.Blackout; BlackoutRemaining = Rules.blackout;
+            Record(cause); Phase = SessionPhase.Blackout; BlackoutRemaining = rules.blackout;
             return true;
         }
 
@@ -121,7 +123,7 @@ namespace LoopRoom
 
         void End(SessionPhase outcome)
         {
-            Phase = Outcome = outcome; endingRemaining = Rules.endingLength;
+            Phase = Outcome = outcome; endingRemaining = rules.endingLength;
             Record(outcome.ToString());
         }
 
@@ -143,20 +145,20 @@ namespace LoopRoom
                     if (endingRemaining < 0.0000001) Phase = SessionPhase.Finished;
                     continue;
                 }
-                double untilLimit = Rules.enforcePlayLimit ? Rules.playLimit - TotalTime : double.PositiveInfinity;
+                double untilLimit = rules.enforcePlayLimit ? rules.playLimit - TotalTime : double.PositiveInfinity;
                 if (untilLimit < 0.0000001) { End(SessionPhase.TimedOut); continue; }
                 if (Phase == SessionPhase.Blackout)
                 {
                     double step = Math.Min(delta, Math.Min(BlackoutRemaining, untilLimit));
                     TotalTime += step; BlackoutRemaining -= step; delta -= step;
-                    if (Rules.enforcePlayLimit && TotalTime >= Rules.playLimit - 0.0000001) End(SessionPhase.TimedOut);
+                    if (rules.enforcePlayLimit && TotalTime >= rules.playLimit - 0.0000001) End(SessionPhase.TimedOut);
                     else if (BlackoutRemaining < 0.0000001) BeginLoop();
                     continue;
                 }
-                double next = ShotResolved ? Rules.searchShot : Rules.firstShot;
+                double next = ShotResolved ? rules.searchShot : rules.firstShot;
                 double slice = Math.Min(delta, Math.Min(next - LoopTime, untilLimit));
                 LoopTime += slice; TotalTime += slice; delta -= slice;
-                if (Rules.enforcePlayLimit && TotalTime >= Rules.playLimit - 0.0000001) { End(SessionPhase.TimedOut); continue; }
+                if (rules.enforcePlayLimit && TotalTime >= rules.playLimit - 0.0000001) { End(SessionPhase.TimedOut); continue; }
                 if (LoopTime >= next - 0.0000001)
                 {
                     if (!ShotResolved)

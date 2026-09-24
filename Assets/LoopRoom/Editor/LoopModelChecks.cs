@@ -45,6 +45,15 @@ public static class LoopModelChecks
             Need(!ReferenceEquals(rules,m.Rules),"rules shared with caller");
             Near(m.Rules.firstShot,6);
         });
+        Check(passed,"Changing returned rules cannot alter model behavior",()=>{
+            var m=new LoopModel();var exposed=m.Rules;exposed.firstShot=1;
+            Need(!ReferenceEquals(exposed,m.Rules),"same rules copy returned twice");
+            Near(m.Rules.firstShot,6);
+            m.Start();m.Advance(1);
+            Need(m.Phase==SessionPhase.Playing && !m.ShotResolved,"returned rules changed first shot");
+            m.Advance(5);
+            Need(m.Phase==SessionPhase.Blackout,"first shot did not occur at original time");
+        });
         Check(passed,"Minimum interval boundaries are enforced",()=>{
             var boundary=new LoopRules{
                 firstShot=LoopRules.MinInterval,searchShot=LoopRules.MinInterval*2,
