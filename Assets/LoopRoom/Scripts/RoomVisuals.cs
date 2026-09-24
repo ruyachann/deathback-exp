@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -18,16 +19,66 @@ namespace LoopRoom
         public const int PrivateLayer = 8;
         const int PublicLayer = 9;
         static bool textShaderWarningLogged;
+        static readonly Dictionary<MaterialKey, Material> materialCache = new Dictionary<MaterialKey, Material>();
         Font font;
         Transform head, left, right;
         GameObject publicHead, publicLeft, publicRight;
 
-        public static Material Material(Color color, bool unlit = false, float smoothness = .23f, float metallic = 0, float emission = 0)
+        readonly struct MaterialKey : System.IEquatable<MaterialKey>
+        {
+            readonly int shaderId;
+            readonly Color color;
+            readonly float smoothness, metallic, emission;
+            readonly int textureId;
+            readonly Vector2 textureScale;
+
+            public MaterialKey(Shader shader, Color color, float smoothness, float metallic, float emission, Texture texture, Vector2 textureScale)
+            {
+                shaderId=shader!=null ? shader.GetInstanceID() : 0;
+                this.color=color; this.smoothness=smoothness; this.metallic=metallic; this.emission=emission;
+                textureId=texture!=null ? texture.GetInstanceID() : 0;
+                this.textureScale=textureScale;
+            }
+
+            public bool Equals(MaterialKey other)
+            {
+                return shaderId==other.shaderId && color.Equals(other.color) &&
+                    smoothness.Equals(other.smoothness) && metallic.Equals(other.metallic) &&
+                    emission.Equals(other.emission) && textureId==other.textureId &&
+                    textureScale.Equals(other.textureScale);
+            }
+
+            public override bool Equals(object obj) => obj is MaterialKey other && Equals(other);
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    int hash=shaderId;
+                    hash=hash*397^color.GetHashCode();
+                    hash=hash*397^smoothness.GetHashCode();
+                    hash=hash*397^metallic.GetHashCode();
+                    hash=hash*397^emission.GetHashCode();
+                    hash=hash*397^textureId;
+                    return hash*397^textureScale.GetHashCode();
+                }
+            }
+        }
+
+        public static Material Material(Color color, bool unlit = false, float smoothness = .23f, float metallic = 0, float emission = 0, Texture texture = null, Vector2? textureScale = null)
         {
             var shader = Shader.Find(unlit ? "Universal Render Pipeline/Unlit" : "Universal Render Pipeline/Lit");
             if (shader == null) shader = Shader.Find(unlit ? "Unlit/Color" : "Standard");
+            var scale=textureScale ?? Vector2.one;
+            var key=new MaterialKey(shader,color,smoothness,metallic,emission,texture,scale);
+            if(materialCache.TryGetValue(key,out var cached) && cached!=null) return cached;
             var m = new Material(shader); m.color = color;
             if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", color);
+            if (texture != null)
+            {
+                if (m.HasProperty("_BaseMap")) { m.SetTexture("_BaseMap",texture); m.SetTextureScale("_BaseMap",scale); }
+                if (m.HasProperty("_MainTex")) { m.SetTexture("_MainTex",texture); m.SetTextureScale("_MainTex",scale); }
+            }
             if (m.HasProperty("_Smoothness")) m.SetFloat("_Smoothness", smoothness);
             if (m.HasProperty("_Metallic")) m.SetFloat("_Metallic", metallic);
             if (emission>0 && m.HasProperty("_EmissionColor"))
@@ -35,7 +86,109 @@ namespace LoopRoom
                 var glow=color*emission; glow.a=1;
                 m.SetColor("_EmissionColor",glow); m.EnableKeyword("_EMISSION");
             }
+            materialCache[key]=m;
             return m;
+        }
+
+        static Texture2D Texture(string name, int size, Color32[] pixels)
+        {
+            // linear:false makes these neutral-valued maps sRGB, matching ordinary albedo textures.
+            var texture=new Texture2D(size,size,TextureFormat.RGB24,true,false);
+            texture.name=name; texture.wrapMode=TextureWrapMode.Repeat;
+            texture.filterMode=FilterMode.Trilinear; texture.anisoLevel=6;
+            texture.SetPixels32(pixels); texture.Apply(true,true);
+            return texture;
+        }
+
+        static float Noise(int x, int y, uint seed)
+        {
+            uint value=(uint)x*374761393u+(uint)y*668265263u+seed*2246822519u;
+            value=(value^(value>>13))*1274126177u;
+            return ((value^(value>>16))&65535u)/65535f;
+        }
+
+        static float PeriodicNoise(int x, int y, int size, int cellSize, uint seed)
+        {
+            int cells=size/cellSize;
+            int x0=(x/cellSize)%cells, y0=(y/cellSize)%cells;
+            int x1=(x0+1)%cells, y1=(y0+1)%cells;
+            float tx=(x%cellSize)/(float)cellSize, ty=(y%cellSize)/(float)cellSize;
+            tx=tx*tx*(3f-2f*tx); ty=ty*ty*(3f-2f*ty);
+            float bottom=Mathf.Lerp(Noise(x0,y0,seed),Noise(x1,y0,seed),tx);
+            float top=Mathf.Lerp(Noise(x0,y1,seed),Noise(x1,y1,seed),tx);
+            return Mathf.Lerp(bottom,top,ty);
+        }
+
+        static Color32 Gray(float value)
+        {
+            byte channel=(byte)Mathf.Clamp(Mathf.RoundToInt(value),0,255);
+            return new Color32(channel,channel,channel,255);
+        }
+
+        static Texture2D FloorTexture()
+        {
+            const int size=512, boardWidth=128, plankLength=256;
+            var pixels=new Color32[size*size];
+            for(int y=0;y<size;y++) for(int x=0;x<size;x++)
+            {
+                int wrappedY=y%size;
+                int board=wrappedY/boardWidth;
+                int across=wrappedY%boardWidth;
+                int wrappedX=(x+(board&1)*(plankLength/2))%size;
+                int along=wrappedX%plankLength;
+                int plank=wrappedX/plankLength;
+                float variation=(Noise(board,plank,17u)-.5f)*5f;
+                float px=2f*Mathf.PI*x/size, py=2f*Mathf.PI*y/size;
+                float grain=Mathf.Sin(px*15f+Mathf.Sin(py*4f)*1.6f)*1.6f;
+                float value=251f+variation+grain+(PeriodicNoise(x,y,size,8,29u)-.5f)*1.5f;
+                if(across<3 || across>=boardWidth-3) value=216f;
+                else if(along<3) value=222f;
+                pixels[y*size+x]=Gray(value);
+            }
+            return Texture("Floor boards",size,pixels);
+        }
+
+        static Texture2D WoodTexture()
+        {
+            const int size=256;
+            var pixels=new Color32[size*size];
+            for(int y=0;y<size;y++) for(int x=0;x<size;x++)
+            {
+                float px=2f*Mathf.PI*x/size, py=2f*Mathf.PI*y/size;
+                float bend=Mathf.Sin(px*2f)*5f+Mathf.Sin(px+1.3f)*9f;
+                float grain=Mathf.Sin(py*9f+bend*.23f)*2.4f+Mathf.Sin(py*3f-bend*.071f)*1.4f;
+                float value=250f+grain+(PeriodicNoise(x,y,size,8,43u)-.5f)*2f;
+                pixels[y*size+x]=Gray(value);
+            }
+            return Texture("Fine wood grain",size,pixels);
+        }
+
+        static Texture2D WallTexture()
+        {
+            const int size=256;
+            var pixels=new Color32[size*size];
+            for(int y=0;y<size;y++) for(int x=0;x<size;x++)
+            {
+                float px=2f*Mathf.PI*x/size, py=2f*Mathf.PI*y/size;
+                float plaster=Mathf.Sin(px)*Mathf.Sin(py)*3f+Mathf.Sin(px*3f+py*2f)*1.5f;
+                float value=249f+plaster+(PeriodicNoise(x,y,size,32,71u)-.5f)*2.5f;
+                pixels[y*size+x]=Gray(value);
+            }
+            return Texture("Subtle plaster",size,pixels);
+        }
+
+        static Texture2D FabricTexture()
+        {
+            const int size=256, weave=8;
+            var pixels=new Color32[size*size];
+            for(int y=0;y<size;y++) for(int x=0;x<size;x++)
+            {
+                int warp=x%weave, weft=y%weave;
+                float value=251f+(warp==1 ? -5f : warp==2 ? 2f : 0f)+(weft==5 ? -4f : weft==6 ? 2f : 0f);
+                value+=(PeriodicNoise(x,y,size,8,97u)-.5f)*1.2f;
+                pixels[y*size+x]=Gray(value);
+            }
+            return Texture("Fine fabric weave",size,pixels);
         }
 
         public static Material TextMaterial(Font font)
@@ -51,12 +204,12 @@ namespace LoopRoom
             return material;
         }
 
-        GameObject Shape(string name, PrimitiveType type, Vector3 position, Vector3 scale, Color color, bool hidden = false, Transform parent = null, float smoothness = .23f, float metallic = 0, float emission = 0, bool unlit = false)
+        GameObject Shape(string name, PrimitiveType type, Vector3 position, Vector3 scale, Color color, bool hidden = false, Transform parent = null, float smoothness = .23f, float metallic = 0, float emission = 0, bool unlit = false, Texture texture = null, Vector2? textureScale = null)
         {
             var go = GameObject.CreatePrimitive(type); go.name = name;
             go.transform.SetParent(parent != null ? parent : Root, false);
             go.transform.localPosition = position; go.transform.localScale = scale;
-            go.GetComponent<Renderer>().sharedMaterial = Material(color,unlit,smoothness,metallic,emission);
+            go.GetComponent<Renderer>().sharedMaterial = Material(color,unlit,smoothness,metallic,emission,texture,textureScale);
             if (hidden)
             {
                 go.layer = PrivateLayer;
@@ -65,9 +218,9 @@ namespace LoopRoom
             return go;
         }
 
-        GameObject Detail(string name, PrimitiveType type, Vector3 position, Vector3 scale, Color color, bool hidden = false, Transform parent = null, float smoothness = .23f, float metallic = 0, float emission = 0, bool unlit = false)
+        GameObject Detail(string name, PrimitiveType type, Vector3 position, Vector3 scale, Color color, bool hidden = false, Transform parent = null, float smoothness = .23f, float metallic = 0, float emission = 0, bool unlit = false, Texture texture = null, Vector2? textureScale = null)
         {
-            var go=Shape(name,type,position,scale,color,hidden,parent,smoothness,metallic,emission,unlit);
+            var go=Shape(name,type,position,scale,color,hidden,parent,smoothness,metallic,emission,unlit,texture,textureScale);
             Object.Destroy(go.GetComponent<Collider>()); return go;
         }
 
@@ -86,6 +239,7 @@ namespace LoopRoom
 
         public void Build(Transform owner, DemoRig rig)
         {
+            materialCache.Clear();
             Root = new GameObject("Room").transform; Root.SetParent(owner,false);
             head = rig.View.transform; left = rig.Hands[0]; right = rig.Hands[1];
             font = Font.CreateDynamicFontFromOSFont(new[]{"Yu Gothic", "Meiryo", "Arial"}, 80);
@@ -95,24 +249,26 @@ namespace LoopRoom
             var fabric = new Color(.67f,.70f,.72f); var whiteFabric = new Color(.88f,.87f,.82f);
             var curtain = new Color(.84f,.82f,.76f); var sky = new Color(.64f,.80f,.91f);
             var metal = new Color(.45f,.47f,.48f); var doorWood = new Color(.55f,.38f,.23f);
-            Shape("Floor",PrimitiveType.Cube,new Vector3(0,-.08f,1),new Vector3(5,.16f,6),wood,smoothness:.28f);
-            Shape("Back wall",PrimitiveType.Cube,new Vector3(0,1.6f,3),new Vector3(5,3.2f,.15f),wall,smoothness:.04f);
-            Shape("Left wall",PrimitiveType.Cube,new Vector3(-2.5f,1.6f,1),new Vector3(.15f,3.2f,4),wall,smoothness:.04f);
-            Shape("Right wall",PrimitiveType.Cube,new Vector3(2.5f,1.6f,1),new Vector3(.15f,3.2f,4),wall,smoothness:.04f);
-            for (int i=0;i<8;i++) Detail("Floor board seam",PrimitiveType.Cube,new Vector3(0,.006f,-.9f+i*.52f),new Vector3(4.8f,.009f,.012f),darkWood,smoothness:.06f);
-            Detail("Reach rug",PrimitiveType.Cube,new Vector3(0,.007f,.3f),new Vector3(1.0f,.014f,.6f),new Color(.33f,.27f,.22f),smoothness:.08f);
-            Detail("Ceiling",PrimitiveType.Cube,new Vector3(0,3.22f,1),new Vector3(5,.12f,4),ivory,smoothness:.04f);
+            var floorTexture=FloorTexture(); var woodTexture=WoodTexture();
+            var wallTexture=WallTexture(); var fabricTexture=FabricTexture();
+            // One texture repeat represents 2m of floor, .5m of wood, 1m of plaster, or .25m of fabric.
+            Shape("Floor",PrimitiveType.Cube,new Vector3(0,-.08f,1),new Vector3(5,.16f,6),wood,smoothness:.28f,texture:floorTexture,textureScale:new Vector2(2.5f,3f));
+            Shape("Back wall",PrimitiveType.Cube,new Vector3(0,1.6f,3),new Vector3(5,3.2f,.15f),wall,smoothness:.04f,texture:wallTexture,textureScale:new Vector2(5,3.2f));
+            Shape("Left wall",PrimitiveType.Cube,new Vector3(-2.5f,1.6f,1),new Vector3(.15f,3.2f,4),wall,smoothness:.04f,texture:wallTexture,textureScale:new Vector2(4,3.2f));
+            Shape("Right wall",PrimitiveType.Cube,new Vector3(2.5f,1.6f,1),new Vector3(.15f,3.2f,4),wall,smoothness:.04f,texture:wallTexture,textureScale:new Vector2(4,3.2f));
+            Detail("Reach rug",PrimitiveType.Cube,new Vector3(0,.007f,.3f),new Vector3(1.0f,.014f,.6f),new Color(.33f,.27f,.22f),smoothness:.08f,texture:fabricTexture,textureScale:new Vector2(4,2.4f));
+            Detail("Ceiling",PrimitiveType.Cube,new Vector3(0,3.22f,1),new Vector3(5,.12f,4),ivory,smoothness:.04f,texture:wallTexture,textureScale:new Vector2(5,4));
             Detail("Back baseboard",PrimitiveType.Cube,new Vector3(0,.12f,2.84f),new Vector3(4.86f,.20f,.09f),trim,smoothness:.10f);
             Detail("Left baseboard",PrimitiveType.Cube,new Vector3(-2.34f,.12f,1),new Vector3(.09f,.20f,3.86f),trim,smoothness:.10f);
             Detail("Right baseboard",PrimitiveType.Cube,new Vector3(2.34f,.12f,1),new Vector3(.09f,.20f,3.86f),trim,smoothness:.10f);
 
             // Small desk at the established interaction position. All ordinary furniture is colliderless.
-            Detail("Desk",PrimitiveType.Cube,new Vector3(0,.80f,.52f),new Vector3(1.5f,.10f,.7f),wood,smoothness:.32f);
+            Detail("Desk",PrimitiveType.Cube,new Vector3(0,.80f,.52f),new Vector3(1.5f,.10f,.7f),wood,smoothness:.32f,texture:woodTexture,textureScale:new Vector2(3,1.4f));
             foreach (var x in new[]{-.63f,.63f}) foreach (var z in new[]{.24f,.80f})
-                Detail("Desk leg",PrimitiveType.Cube,new Vector3(x,.40f,z),new Vector3(.09f,.80f,.09f),darkWood,smoothness:.20f);
-            Detail("Clock shelf",PrimitiveType.Cube,new Vector3(0,1.18f,.75f),new Vector3(.52f,.04f,.22f),wood,smoothness:.30f);
-            Detail("Clock shelf L",PrimitiveType.Cube,new Vector3(-.20f,1.01f,.78f),new Vector3(.05f,.34f,.08f),darkWood,smoothness:.18f);
-            Detail("Clock shelf R",PrimitiveType.Cube,new Vector3(.20f,1.01f,.78f),new Vector3(.05f,.34f,.08f),darkWood,smoothness:.18f);
+                Detail("Desk leg",PrimitiveType.Cube,new Vector3(x,.40f,z),new Vector3(.09f,.80f,.09f),darkWood,smoothness:.20f,texture:woodTexture,textureScale:new Vector2(.18f,1.6f));
+            Detail("Clock shelf",PrimitiveType.Cube,new Vector3(0,1.18f,.75f),new Vector3(.52f,.04f,.22f),wood,smoothness:.30f,texture:woodTexture,textureScale:new Vector2(1.04f,.44f));
+            Detail("Clock shelf L",PrimitiveType.Cube,new Vector3(-.20f,1.01f,.78f),new Vector3(.05f,.34f,.08f),darkWood,smoothness:.18f,texture:woodTexture,textureScale:new Vector2(.1f,.68f));
+            Detail("Clock shelf R",PrimitiveType.Cube,new Vector3(.20f,1.01f,.78f),new Vector3(.05f,.34f,.08f),darkWood,smoothness:.18f,texture:woodTexture,textureScale:new Vector2(.1f,.68f));
             Shape("Instruction card",PrimitiveType.Cube,new Vector3(0,1.06f,.67f),new Vector3(.41f,.24f,.024f),ivory,true);
             Card = Text("Instructions","この部屋から\n無事に脱出しろ",new Vector3(0,1.06f,.65f),.017f,ink);
             Detail("Clock body",PrimitiveType.Cube,new Vector3(0,1.41f,.75f),new Vector3(.32f,.20f,.12f),ink,smoothness:.26f,emission:.35f);
@@ -132,9 +288,9 @@ namespace LoopRoom
             // The moving door remains private because its state is an escape clue.
             Door = new GameObject("Entry door").transform; Door.SetParent(Root,false);
             Door.localPosition=new Vector3(.8f,1.18f,2.86f); Door.gameObject.layer=PrivateLayer;
-            Detail("Door slab",PrimitiveType.Cube,Vector3.zero,new Vector3(1,2.36f,.09f),doorWood,true,Door,smoothness:.27f);
-            Detail("Door upper panel",PrimitiveType.Cube,new Vector3(0,.34f,-.055f),new Vector3(.72f,.72f,.025f),darkWood,true,Door,smoothness:.20f);
-            Detail("Door lower panel",PrimitiveType.Cube,new Vector3(0,-.55f,-.055f),new Vector3(.72f,.62f,.025f),darkWood,true,Door,smoothness:.20f);
+            Detail("Door slab",PrimitiveType.Cube,Vector3.zero,new Vector3(1,2.36f,.09f),doorWood,true,Door,smoothness:.27f,texture:woodTexture,textureScale:new Vector2(2,4.72f));
+            Detail("Door upper panel",PrimitiveType.Cube,new Vector3(0,.34f,-.055f),new Vector3(.72f,.72f,.025f),darkWood,true,Door,smoothness:.20f,texture:woodTexture,textureScale:new Vector2(1.44f,1.44f));
+            Detail("Door lower panel",PrimitiveType.Cube,new Vector3(0,-.55f,-.055f),new Vector3(.72f,.62f,.025f),darkWood,true,Door,smoothness:.20f,texture:woodTexture,textureScale:new Vector2(1.44f,1.24f));
             Detail("Door knob",PrimitiveType.Sphere,new Vector3(-.34f,0,-.09f),Vector3.one*.095f,metal,true,Door,smoothness:.55f,metallic:.65f);
             Detail("Door lintel",PrimitiveType.Cube,new Vector3(.8f,2.41f,2.82f),new Vector3(1.18f,.08f,.12f),trim,smoothness:.10f);
             Detail("Door frame L",PrimitiveType.Cube,new Vector3(.24f,1.22f,2.78f),new Vector3(.10f,2.50f,.12f),trim,smoothness:.10f);
@@ -145,9 +301,9 @@ namespace LoopRoom
             publicDoor.localPosition=new Vector3(.8f,1.18f,2.86f); publicDoor.gameObject.layer=PublicLayer;
             var publicDoorParts = new[]
             {
-                Detail("Public door slab",PrimitiveType.Cube,Vector3.zero,new Vector3(1,2.36f,.09f),doorWood,parent:publicDoor,smoothness:.27f),
-                Detail("Public door upper panel",PrimitiveType.Cube,new Vector3(0,.34f,-.055f),new Vector3(.72f,.72f,.025f),darkWood,parent:publicDoor,smoothness:.20f),
-                Detail("Public door lower panel",PrimitiveType.Cube,new Vector3(0,-.55f,-.055f),new Vector3(.72f,.62f,.025f),darkWood,parent:publicDoor,smoothness:.20f),
+                Detail("Public door slab",PrimitiveType.Cube,Vector3.zero,new Vector3(1,2.36f,.09f),doorWood,parent:publicDoor,smoothness:.27f,texture:woodTexture,textureScale:new Vector2(2,4.72f)),
+                Detail("Public door upper panel",PrimitiveType.Cube,new Vector3(0,.34f,-.055f),new Vector3(.72f,.72f,.025f),darkWood,parent:publicDoor,smoothness:.20f,texture:woodTexture,textureScale:new Vector2(1.44f,1.44f)),
+                Detail("Public door lower panel",PrimitiveType.Cube,new Vector3(0,-.55f,-.055f),new Vector3(.72f,.62f,.025f),darkWood,parent:publicDoor,smoothness:.20f,texture:woodTexture,textureScale:new Vector2(1.44f,1.24f)),
                 Detail("Public door knob",PrimitiveType.Sphere,new Vector3(-.34f,0,-.09f),Vector3.one*.095f,metal,parent:publicDoor,smoothness:.55f,metallic:.65f)
             };
             foreach (var publicDoorPart in publicDoorParts)
@@ -166,25 +322,25 @@ namespace LoopRoom
             Detail("Window back frame",PrimitiveType.Cube,new Vector3(-2.36f,1.88f,2.25f),new Vector3(.08f,1.48f,.10f),ivory,smoothness:.10f);
             Detail("Window mullion",PrimitiveType.Cube,new Vector3(-2.35f,1.88f,1.42f),new Vector3(.09f,1.28f,.055f),ivory,smoothness:.10f);
             Detail("Curtain rod",PrimitiveType.Cube,new Vector3(-2.29f,2.67f,1.42f),new Vector3(.07f,.06f,2.02f),metal,smoothness:.45f,metallic:.45f);
-            Detail("Open curtain front",PrimitiveType.Cube,new Vector3(-2.28f,1.86f,.40f),new Vector3(.09f,1.62f,.28f),curtain,smoothness:.05f);
-            Detail("Open curtain back",PrimitiveType.Cube,new Vector3(-2.28f,1.86f,2.44f),new Vector3(.09f,1.62f,.28f),curtain,smoothness:.05f);
+            Detail("Open curtain front",PrimitiveType.Cube,new Vector3(-2.28f,1.86f,.40f),new Vector3(.09f,1.62f,.28f),curtain,smoothness:.05f,texture:fabricTexture,textureScale:new Vector2(1.12f,6.48f));
+            Detail("Open curtain back",PrimitiveType.Cube,new Vector3(-2.28f,1.86f,2.44f),new Vector3(.09f,1.62f,.28f),curtain,smoothness:.05f,texture:fabricTexture,textureScale:new Vector2(1.12f,6.48f));
 
             var chair = new GameObject("Desk chair").transform; chair.SetParent(Root,false);
             chair.localPosition=new Vector3(-1.15f,0,.64f); chair.localRotation=Quaternion.Euler(0,8,0);
-            Detail("Chair seat",PrimitiveType.Cube,new Vector3(0,.48f,0),new Vector3(.58f,.10f,.56f),wood,parent:chair,smoothness:.25f);
-            Detail("Chair back",PrimitiveType.Cube,new Vector3(0,.86f,.23f),new Vector3(.58f,.68f,.09f),wood,parent:chair,smoothness:.25f);
+            Detail("Chair seat",PrimitiveType.Cube,new Vector3(0,.48f,0),new Vector3(.58f,.10f,.56f),wood,parent:chair,smoothness:.25f,texture:woodTexture,textureScale:new Vector2(1.16f,1.12f));
+            Detail("Chair back",PrimitiveType.Cube,new Vector3(0,.86f,.23f),new Vector3(.58f,.68f,.09f),wood,parent:chair,smoothness:.25f,texture:woodTexture,textureScale:new Vector2(1.16f,1.36f));
             foreach (var x in new[]{-.23f,.23f}) foreach (var z in new[]{-.20f,.20f})
-                Detail("Chair leg",PrimitiveType.Cube,new Vector3(x,.23f,z),new Vector3(.07f,.46f,.07f),darkWood,parent:chair,smoothness:.18f);
+                Detail("Chair leg",PrimitiveType.Cube,new Vector3(x,.23f,z),new Vector3(.07f,.46f,.07f),darkWood,parent:chair,smoothness:.18f,texture:woodTexture,textureScale:new Vector2(.14f,.92f));
 
-            Detail("Bed base",PrimitiveType.Cube,new Vector3(-1.72f,.25f,1.82f),new Vector3(1.12f,.38f,1.78f),wood,smoothness:.20f);
-            Detail("Bed mattress",PrimitiveType.Cube,new Vector3(-1.72f,.49f,1.82f),new Vector3(1.06f,.22f,1.66f),whiteFabric,smoothness:.03f);
-            Detail("Bed blanket",PrimitiveType.Cube,new Vector3(-1.72f,.62f,1.56f),new Vector3(1.08f,.055f,1.02f),fabric,smoothness:.03f);
-            Detail("Bed pillow",PrimitiveType.Cube,new Vector3(-1.72f,.66f,2.42f),new Vector3(.72f,.12f,.34f),ivory,smoothness:.03f);
-            Detail("Bed headboard",PrimitiveType.Cube,new Vector3(-1.72f,.72f,2.72f),new Vector3(1.16f,1.00f,.10f),darkWood,smoothness:.18f);
+            Detail("Bed base",PrimitiveType.Cube,new Vector3(-1.72f,.25f,1.82f),new Vector3(1.12f,.38f,1.78f),wood,smoothness:.20f,texture:woodTexture,textureScale:new Vector2(2.24f,3.56f));
+            Detail("Bed mattress",PrimitiveType.Cube,new Vector3(-1.72f,.49f,1.82f),new Vector3(1.06f,.22f,1.66f),whiteFabric,smoothness:.03f,texture:fabricTexture,textureScale:new Vector2(4.24f,6.64f));
+            Detail("Bed blanket",PrimitiveType.Cube,new Vector3(-1.72f,.62f,1.56f),new Vector3(1.08f,.055f,1.02f),fabric,smoothness:.03f,texture:fabricTexture,textureScale:new Vector2(4.32f,4.08f));
+            Detail("Bed pillow",PrimitiveType.Cube,new Vector3(-1.72f,.66f,2.42f),new Vector3(.72f,.12f,.34f),ivory,smoothness:.03f,texture:fabricTexture,textureScale:new Vector2(2.88f,1.36f));
+            Detail("Bed headboard",PrimitiveType.Cube,new Vector3(-1.72f,.72f,2.72f),new Vector3(1.16f,1.00f,.10f),darkWood,smoothness:.18f,texture:woodTexture,textureScale:new Vector2(2.32f,2));
 
             Detail("Light switch plate",PrimitiveType.Cube,new Vector3(1.61f,1.30f,2.88f),new Vector3(.18f,.26f,.025f),ivory,smoothness:.12f);
             Detail("Light switch",PrimitiveType.Cube,new Vector3(1.61f,1.31f,2.85f),new Vector3(.07f,.12f,.025f),trim,smoothness:.12f);
-            Detail("Picture frame",PrimitiveType.Cube,new Vector3(-.78f,2.06f,2.88f),new Vector3(.82f,.68f,.035f),darkWood,smoothness:.22f);
+            Detail("Picture frame",PrimitiveType.Cube,new Vector3(-.78f,2.06f,2.88f),new Vector3(.82f,.68f,.035f),darkWood,smoothness:.22f,texture:woodTexture,textureScale:new Vector2(1.64f,1.36f));
             Detail("Picture",PrimitiveType.Cube,new Vector3(-.78f,2.06f,2.84f),new Vector3(.68f,.54f,.025f),new Color(.53f,.67f,.61f),smoothness:.06f);
 
             Enemy = new GameObject("Enemy").transform; Enemy.SetParent(Root,false);

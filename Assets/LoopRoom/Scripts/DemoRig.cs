@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
@@ -53,7 +54,7 @@ namespace LoopRoom
         bool forceDesktop;
         bool ownsXR;
         bool xrInitializing, desktopFallback, floorPrepared, preparationReported;
-        float yaw, pitch;
+        float yaw, pitch, desktopPitch;
         Vector3 driftOffset;
         // Fixed, deterministic per-loop offsets/yaws for --simulate-drift evidence screenshots (desktop only).
         // Alternating "no correction" (small drift, stays inside the safe area) and
@@ -78,7 +79,16 @@ namespace LoopRoom
 
         public void Initialize()
         {
-            forceDesktop = Array.IndexOf(Environment.GetCommandLineArgs(), "--desktop") >= 0;
+            var args=Environment.GetCommandLineArgs();
+            forceDesktop = Array.IndexOf(args, "--desktop") >= 0;
+            if(forceDesktop)
+            {
+                int pitchArgument=Array.IndexOf(args,"--desktop-pitch");
+                if(pitchArgument>=0 && pitchArgument+1<args.Length &&
+                    float.TryParse(args[pitchArgument+1],NumberStyles.Float,CultureInfo.InvariantCulture,out var requestedPitch) &&
+                    !float.IsNaN(requestedPitch) && !float.IsInfinity(requestedPitch))
+                    desktopPitch=Mathf.Clamp(requestedPitch,-70f,70f);
+            }
             manager = new GameObject("Interaction Manager").AddComponent<XRInteractionManager>();
             manager.transform.SetParent(transform);
             origin = gameObject.AddComponent<XROrigin>();
@@ -215,7 +225,7 @@ namespace LoopRoom
         public void LookAtFloorForCalibration(bool active)
         {
             if (IsVR) return;
-            pitch = active ? 60f : 0f;
+            pitch = active ? 60f : desktopPitch;
             View.transform.localRotation = Quaternion.Euler(pitch,yaw,0);
         }
 
