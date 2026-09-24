@@ -79,6 +79,9 @@ namespace LoopRoom
             autoescape = autostart && Array.IndexOf(args, "--autoescape") >= 0;
             simulateDrift = desktopArg && Array.IndexOf(args, "--simulate-drift") >= 0;
             autoCalibrate = desktopArg && Array.IndexOf(args, "--auto-calibrate") >= 0;
+            // task022: evidence capture (screenshots, other windows on top) must not interrupt an
+            // --autostart run just because the demo window loses OS focus.
+            if(autostart) Debug.Log("LoopRoom: --autostart is active; ignoring focus loss.");
             Model = new LoopModel(timings);
             rig = new GameObject("XR Origin").AddComponent<DemoRig>(); rig.transform.SetParent(transform,false);
             rig.Initialize();
@@ -237,7 +240,8 @@ namespace LoopRoom
             if (keyboard!=null && keyboard.escapeKey.wasPressedThisFrame) Model.Interrupt();
             if (keyboard!=null && keyboard.f2Key.wasPressedThisFrame) privateOverlay=!privateOverlay;
             // Focus loss ends only the desktop check mode; in VR the HMD keeps running (runInBackground) while the operator uses other windows.
-            if (!rig.IsVR && !Application.isFocused && !Application.isEditor && !idle) Model.Interrupt();
+            // --autostart runs (evidence capture) must survive other windows/scripts stealing focus.
+            if (!autostart && !rig.IsVR && !Application.isFocused && !Application.isEditor && !idle) Model.Interrupt();
             if (rig.IsVR && (Model.Phase==SessionPhase.Playing || Model.Phase==SessionPhase.Blackout))
             {
                 trackingLost = !rig.HeadTracked || !rig.RuntimePresent() ? trackingLost+Time.unscaledDeltaTime : 0;
@@ -422,7 +426,9 @@ namespace LoopRoom
         }
 
         // In VR, only Esc and lost tracking interrupt; runtime pause notices (dashboard, focus) must not end the session.
-        void OnApplicationPause(bool paused) { if(paused && Model!=null && !rig.IsVR) Model.Interrupt(); }
+        // --autostart runs (evidence capture) must also survive this (task022 追修正): minimizing the
+        // window fires OnApplicationPause(true) the same as a focus loss on desktop.
+        void OnApplicationPause(bool paused) { if(paused && Model!=null && !rig.IsVR && !autostart) Model.Interrupt(); }
 
         void OnGUI()
         {

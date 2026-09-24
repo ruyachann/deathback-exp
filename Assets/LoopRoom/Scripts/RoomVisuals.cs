@@ -199,9 +199,14 @@ namespace LoopRoom
             Detail("Ceiling light diffuser",PrimitiveType.Cylinder,new Vector3(0,3.04f,.2f),new Vector3(.29f,.045f,.29f),new Color(1,.93f,.82f),smoothness:.18f,emission:.55f);
             var light = new GameObject("Ceiling light").AddComponent<Light>();
             light.transform.SetParent(Root,false); light.transform.localPosition = new Vector3(0,2.86f,.2f);
-            light.type=LightType.Point;
-            light.range=6; light.intensity=3.2f; light.color=new Color(1,.93f,.82f);
+            light.transform.localRotation=Quaternion.Euler(90,0,0); light.type=LightType.Spot;
+            light.spotAngle=140; light.innerSpotAngle=110;
+            light.range=6; light.intensity=2.6f; light.color=new Color(1,.93f,.82f);
             light.shadows=LightShadows.Soft; light.shadowResolution=LightShadowResolution.Medium;
+            var ceilingFill = new GameObject("Ceiling light fill").AddComponent<Light>();
+            ceilingFill.transform.SetParent(Root,false); ceilingFill.transform.localPosition=new Vector3(0,2.86f,.2f);
+            ceilingFill.type=LightType.Point; ceilingFill.range=6; ceilingFill.intensity=.6f;
+            ceilingFill.color=new Color(1,.93f,.82f); ceilingFill.shadows=LightShadows.None;
             var fill = new GameObject("Window daylight").AddComponent<Light>();
             fill.transform.SetParent(Root,false); fill.transform.localPosition=new Vector3(-2.20f,1.95f,1.42f);
             fill.transform.localRotation=Quaternion.Euler(0,90,0); fill.type=LightType.Spot; fill.spotAngle=105;
