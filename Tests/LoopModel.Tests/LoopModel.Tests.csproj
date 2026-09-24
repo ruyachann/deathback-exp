@@ -10,5 +10,6 @@
     <Compile Include="../../Assets/LoopRoom/Editor/LoopModelChecks.cs" Link="LoopModelChecks.cs" />
     <Compile Include="../../Assets/LoopRoom/Scripts/RoomAnchor.cs" Link="RoomAnchor.cs" />
     <Compile Include="../../Assets/LoopRoom/Editor/RoomAnchorChecks.cs" Link="RoomAnchorChecks.cs" />
+    <Compile Include="../../Assets/LoopRoom/Scripts/PlayAreaSettings.cs" Link="PlayAreaSettings.cs" />
   </ItemGroup>
 </Project>

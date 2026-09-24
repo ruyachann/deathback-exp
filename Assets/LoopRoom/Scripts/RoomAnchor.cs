@@ -12,20 +12,28 @@ namespace LoopRoom
 
         const double BoundaryTolerance = 1e-9;
         const double DegreesToRadians = Math.PI / 180.0;
-        static readonly double ArcBoundaryInset = Reach *
-            (1.0 - Math.Cos(SearchStepDeg * DegreesToRadians * 0.5));
+        static readonly PlayAreaSettings DefaultSettings = new PlayAreaSettings();
 
         public static bool ForwardRegionFits(
             double px, double pz, double yawDeg,
             double cx, double cz, double areaYawDeg)
         {
-            ValidateInputs(px, pz, yawDeg, cx, cz, areaYawDeg);
-            return ForwardRegionFitsCore(px, pz, yawDeg, cx, cz, areaYawDeg);
+            return ForwardRegionFits(px, pz, yawDeg, cx, cz, areaYawDeg, DefaultSettings);
+        }
+
+        public static bool ForwardRegionFits(
+            double px, double pz, double yawDeg,
+            double cx, double cz, double areaYawDeg,
+            PlayAreaSettings s)
+        {
+            ValidateInputs(px, pz, yawDeg, cx, cz, areaYawDeg, s);
+            return ForwardRegionFitsCore(px, pz, yawDeg, cx, cz, areaYawDeg, s);
         }
 
         static bool ForwardRegionFitsCore(
             double px, double pz, double yawDeg,
-            double cx, double cz, double areaYawDeg)
+            double cx, double cz, double areaYawDeg,
+            PlayAreaSettings s)
         {
             double areaAngle = NormalizeYaw(areaYawDeg) * DegreesToRadians;
             double sine = Math.Sin(areaAngle);
@@ -34,25 +42,36 @@ namespace LoopRoom
             double dz = pz - cz;
             double localX = dx * cosine - dz * sine;
             double localZ = dx * sine + dz * cosine;
-            double halfSize = SafeHalfSize - Margin;
+            double halfSize = s.areaSize * 0.5 - s.margin;
             if (!PointFits(localX, localZ, halfSize)) return false;
 
             double localYaw = NormalizeYaw(yawDeg) - NormalizeYaw(areaYawDeg);
-            double insetHalfSize = halfSize - ArcBoundaryInset;
+            double arcBoundaryInset = s.reach *
+                (1.0 - Math.Cos(s.searchStepDeg * DegreesToRadians * 0.5));
+            double insetHalfSize = halfSize - arcBoundaryInset;
             bool insetSamplesFit = true;
 
-            for (double offset = -HalfAngleDeg;
-                offset <= HalfAngleDeg + BoundaryTolerance;
-                offset += SearchStepDeg)
+            double offset;
+            for (offset = -s.halfAngleDeg;
+                offset <= s.halfAngleDeg + BoundaryTolerance;
+                offset += s.searchStepDeg)
             {
                 double angle = (localYaw + offset) * DegreesToRadians;
-                double x = localX + Math.Sin(angle) * Reach;
-                double z = localZ + Math.Cos(angle) * Reach;
+                double x = localX + Math.Sin(angle) * s.reach;
+                double z = localZ + Math.Cos(angle) * s.reach;
                 if (!PointFits(x, z, insetHalfSize))
                 {
                     insetSamplesFit = false;
                     break;
                 }
+            }
+
+            if (insetSamplesFit && offset - s.searchStepDeg < s.halfAngleDeg - BoundaryTolerance)
+            {
+                double endAngle = (localYaw + s.halfAngleDeg) * DegreesToRadians;
+                double endX = localX + Math.Sin(endAngle) * s.reach;
+                double endZ = localZ + Math.Cos(endAngle) * s.reach;
+                insetSamplesFit = PointFits(endX, endZ, insetHalfSize);
             }
 
             if (insetSamplesFit) return true;
@@ -61,7 +80,7 @@ namespace LoopRoom
             // sector can still touch the real boundary at an endpoint (notably at
             // the four corners), so inspect the arc's exact axis extrema before
             // rejecting that case.
-            return ContinuousArcFits(localX, localZ, localYaw, halfSize);
+            return ContinuousArcFits(localX, localZ, localYaw, halfSize, s);
         }
 
         public static double ChooseFrontYaw(
@@ -69,25 +88,35 @@ namespace LoopRoom
             double cx, double cz, double areaYawDeg,
             out bool fits)
         {
-            ValidateInputs(px, pz, headYawDeg, cx, cz, areaYawDeg);
+            return ChooseFrontYaw(
+                px, pz, headYawDeg, cx, cz, areaYawDeg, DefaultSettings, out fits);
+        }
 
-            if (ForwardRegionFitsCore(px, pz, headYawDeg, cx, cz, areaYawDeg))
+        public static double ChooseFrontYaw(
+            double px, double pz, double headYawDeg,
+            double cx, double cz, double areaYawDeg,
+            PlayAreaSettings s,
+            out bool fits)
+        {
+            ValidateInputs(px, pz, headYawDeg, cx, cz, areaYawDeg, s);
+
+            if (ForwardRegionFitsCore(px, pz, headYawDeg, cx, cz, areaYawDeg, s))
             {
                 fits = true;
                 return NormalizeYaw(headYawDeg);
             }
 
-            for (double offset = SearchStepDeg; offset < 180.0; offset += SearchStepDeg)
+            for (double offset = s.searchStepDeg; offset < 180.0; offset += s.searchStepDeg)
             {
                 double positive = headYawDeg + offset;
-                if (ForwardRegionFitsCore(px, pz, positive, cx, cz, areaYawDeg))
+                if (ForwardRegionFitsCore(px, pz, positive, cx, cz, areaYawDeg, s))
                 {
                     fits = true;
                     return NormalizeYaw(positive);
                 }
 
                 double negative = headYawDeg - offset;
-                if (ForwardRegionFitsCore(px, pz, negative, cx, cz, areaYawDeg))
+                if (ForwardRegionFitsCore(px, pz, negative, cx, cz, areaYawDeg, s))
                 {
                     fits = true;
                     return NormalizeYaw(negative);
@@ -95,7 +124,7 @@ namespace LoopRoom
             }
 
             double opposite = headYawDeg + 180.0;
-            if (ForwardRegionFitsCore(px, pz, opposite, cx, cz, areaYawDeg))
+            if (ForwardRegionFitsCore(px, pz, opposite, cx, cz, areaYawDeg, s))
             {
                 fits = true;
                 return NormalizeYaw(opposite);
@@ -106,12 +135,13 @@ namespace LoopRoom
         }
 
         static bool ContinuousArcFits(
-            double localX, double localZ, double localYaw, double halfSize)
+            double localX, double localZ, double localYaw, double halfSize,
+            PlayAreaSettings s)
         {
-            double start = localYaw - HalfAngleDeg;
-            double end = localYaw + HalfAngleDeg;
-            if (!ArcPointFits(localX, localZ, start, halfSize) ||
-                !ArcPointFits(localX, localZ, end, halfSize)) return false;
+            double start = localYaw - s.halfAngleDeg;
+            double end = localYaw + s.halfAngleDeg;
+            if (!ArcPointFits(localX, localZ, start, halfSize, s.reach) ||
+                !ArcPointFits(localX, localZ, end, halfSize, s.reach)) return false;
 
             int firstQuarterTurn = (int)Math.Ceiling(start / 90.0);
             int lastQuarterTurn = (int)Math.Floor(end / 90.0);
@@ -119,7 +149,7 @@ namespace LoopRoom
                 quarterTurn <= lastQuarterTurn;
                 quarterTurn++)
             {
-                if (!ArcPointFits(localX, localZ, quarterTurn * 90.0, halfSize))
+                if (!ArcPointFits(localX, localZ, quarterTurn * 90.0, halfSize, s.reach))
                     return false;
             }
 
@@ -127,11 +157,12 @@ namespace LoopRoom
         }
 
         static bool ArcPointFits(
-            double localX, double localZ, double angleDeg, double halfSize)
+            double localX, double localZ, double angleDeg, double halfSize,
+            double reach)
         {
             double angle = angleDeg * DegreesToRadians;
-            double x = localX + Math.Sin(angle) * Reach;
-            double z = localZ + Math.Cos(angle) * Reach;
+            double x = localX + Math.Sin(angle) * reach;
+            double z = localZ + Math.Cos(angle) * reach;
             return PointFits(x, z, halfSize);
         }
 
@@ -143,7 +174,8 @@ namespace LoopRoom
 
         static void ValidateInputs(
             double px, double pz, double yawDeg,
-            double cx, double cz, double areaYawDeg)
+            double cx, double cz, double areaYawDeg,
+            PlayAreaSettings s)
         {
             RequireFinite(px, nameof(px));
             RequireFinite(pz, nameof(pz));
@@ -151,6 +183,8 @@ namespace LoopRoom
             RequireFinite(cx, nameof(cx));
             RequireFinite(cz, nameof(cz));
             RequireFinite(areaYawDeg, nameof(areaYawDeg));
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            s.Validate();
         }
 
         static void RequireFinite(double value, string parameterName)

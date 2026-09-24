@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -24,6 +25,21 @@ namespace LoopRoom
         AudioSource enemyAudio, ambience;
         bool desktopArg, autostart, autoescape, autostartUsed, autoShieldDone, autoExitDone;
         bool simulateDrift;
+        // Calibration (task021): shown before the first Ready screen and again whenever the
+        // operator asks to redo it. LoopModel.Phase stays Ready throughout; this is LoopDemo-only.
+        PlayAreaSettings settings;
+        CalibrationView calibration;
+        bool calibrating = true;
+        float calibrationHold;
+        bool calibrationVisible, wasCalibrationVisible, lastBoundaryAvailable;
+        // Renderers under room.Root (追修正 2026-09-24: the desk was hiding the calibration outline).
+        // Only Renderer.enabled is toggled, never room.Root.SetActive/its children's active state,
+        // so the spectator camera and every audio source parented under Root (Sound/ambience) keep
+        // working exactly as before while the room is hidden.
+        Renderer[] roomRenderers;
+        bool autoCalibrate, autoCalibrateDone;
+        float autoCalibrateTimer;
+        readonly List<Vector3> boundaryPoints = new List<Vector3>();
         bool messageSized;
         int messageMeasureAttempts;
         Color messageColor;
@@ -56,10 +72,14 @@ namespace LoopRoom
             autostart = desktopArg && Array.IndexOf(args, "--autostart") >= 0;
             autoescape = autostart && Array.IndexOf(args, "--autoescape") >= 0;
             simulateDrift = desktopArg && Array.IndexOf(args, "--simulate-drift") >= 0;
+            autoCalibrate = desktopArg && Array.IndexOf(args, "--auto-calibrate") >= 0;
             Model = new LoopModel(timings);
             rig = new GameObject("XR Origin").AddComponent<DemoRig>(); rig.transform.SetParent(transform,false);
             rig.Initialize();
+            settings = PlayAreaSettings.LoadOrCreate(Path.Combine(Application.persistentDataPath,"play-area.json"));
+            calibration = new CalibrationView(); calibration.Build(transform,settings);
             room = new RoomVisuals(); room.Build(transform,rig);
+            roomRenderers = room.Root.GetComponentsInChildren<Renderer>(true);
             room.Chime=ProceduralAudio.Chime(); room.Shot=ProceduralAudio.Shot();
             room.Latch=ProceduralAudio.Latch(); room.Open=ProceduralAudio.Open();
             controls = new[]{room.ShieldHandle,room.ExitHandle};
@@ -161,15 +181,34 @@ namespace LoopRoom
             // (Begin() would already have advanced Phase) and still commit an alignment (task018 追修正3-2).
             // Tracking must be live and VR (when applicable) fully ready before C can commit an
             // alignment, otherwise it could capture a meaningless head pose (task018 追修正2-1).
+            // C confirms the calibration while it is shown; otherwise it now sends idle back to the
+            // calibration screen instead of aligning immediately (task021 replaces the old behavior).
             if (idle && rig.CanStart && keyboard!=null && keyboard.cKey.wasPressedThisFrame)
             {
-                var head=rig.View.transform;
-                alignCx=head.position.x; alignCz=head.position.z; alignAreaYaw=head.eulerAngles.y;
-                aligned=true; fitsWarned=false;
+                if (calibrating) CommitCalibration(); else calibrating = true;
             }
+            calibrationVisible = calibrating && idle && rig.CanStart;
+            if (calibrationVisible != wasCalibrationVisible)
+            {
+                rig.LookAtFloorForCalibration(calibrationVisible);
+                SetRoomVisible(!calibrationVisible);
+                wasCalibrationVisible = calibrationVisible;
+            }
+            if (calibrationVisible)
+            {
+                // Same input as DemoRig's start button (A/X); a short press must not confirm.
+                calibrationHold = rig.StartHeld ? calibrationHold + Time.unscaledDeltaTime : 0f;
+                if (calibrationHold >= 1f) CommitCalibration();
+                else if (autoCalibrate && !autoCalibrateDone)
+                {
+                    autoCalibrateTimer += Time.unscaledDeltaTime;
+                    if (autoCalibrateTimer >= 2f) { autoCalibrateDone = true; CommitCalibration(); }
+                }
+            }
+            else calibrationHold = 0f;
             bool enter=keyboard!=null && keyboard.enterKey.wasPressedThisFrame;
             bool autoTrigger = autostart && !autostartUsed && !rig.IsVR;
-            if (idle && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed) || autoTrigger)) { if(autoTrigger) autostartUsed=true; Begin(); }
+            if (idle && !calibrating && rig.CanStart && (enter || (rig.IsVR && rig.StartPressed) || autoTrigger)) { if(autoTrigger) autostartUsed=true; Begin(); }
             else if (idle && keyboard!=null && keyboard.rKey.wasPressedThisFrame && rig.CanRetryPreparation) { rig.RetryPreparation(); ResetAlignment(); }
             if (keyboard!=null && keyboard.escapeKey.wasPressedThisFrame) Model.Interrupt();
             if (keyboard!=null && keyboard.f2Key.wasPressedThisFrame) privateOverlay=!privateOverlay;
@@ -229,9 +268,28 @@ namespace LoopRoom
             RefreshWorld();
         }
 
+        // Hides/shows the room's own renderers only (追修正 2026-09-24): room.Root.SetActive would
+        // also disable the spectator camera and every AudioSource parented under Root, so those
+        // must stay untouched and keep being driven by UpdatePublic()/normal playback as before.
+        void SetRoomVisible(bool visible)
+        {
+            foreach(var r in roomRenderers) if(r!=null) r.enabled=visible;
+        }
+
         // Clears the alignment flag together with the 3 stored values so PlaceRoom can never
         // reuse a stale center/orientation after the operator's alignment is invalidated (task018 追修正3-1).
-        void ResetAlignment() { aligned=false; alignCx=0; alignCz=0; alignAreaYaw=0; }
+        // task021: also sends idle back to the calibration screen, since a mode switch or VR
+        // re-preparation makes the previous head pose meaningless.
+        void ResetAlignment() { aligned=false; alignCx=0; alignCz=0; alignAreaYaw=0; calibrating=true; calibrationHold=0; }
+
+        // Commits the calibration: the current head floor position/yaw become the alignment
+        // center/orientation (same 2 values PlaceRoom/RoomAnchor use), and the calibration screen closes.
+        void CommitCalibration()
+        {
+            var head=rig.View.transform;
+            alignCx=head.position.x; alignCz=head.position.z; alignAreaYaw=head.eulerAngles.y;
+            aligned=true; fitsWarned=false; calibrating=false; calibrationHold=0;
+        }
 
         void Begin()
         {
@@ -249,7 +307,7 @@ namespace LoopRoom
         {
             var head=rig.View.transform;
             double px=head.position.x, pz=head.position.z, headYaw=head.eulerAngles.y;
-            double frontYaw=RoomAnchor.ChooseFrontYaw(px,pz,headYaw,alignCx,alignCz,alignAreaYaw,out bool fits);
+            double frontYaw=RoomAnchor.ChooseFrontYaw(px,pz,headYaw,alignCx,alignCz,alignAreaYaw,settings,out bool fits);
             room.Root.position=new Vector3((float)px,0,(float)pz);
             room.Root.rotation=Quaternion.Euler(0,(float)frontYaw,0);
             double yawDiff=((frontYaw-headYaw)%360+540)%360-180;
@@ -286,6 +344,13 @@ namespace LoopRoom
             room.ExitLabel.text=Model.ExitAvailable?"脱出可能":"施錠中";
             room.Blackout.SetActive(Model.Phase==SessionPhase.Blackout || trackingLost>0);
             room.UpdatePublic(rig.IsVR,playing);
+            calibration.SetVisible(calibrationVisible);
+            if(calibrationVisible)
+            {
+                var head=rig.View.transform;
+                lastBoundaryAvailable=rig.TryGetBoundaryPoints(boundaryPoints);
+                calibration.Refresh(new Vector3(head.position.x,0,head.position.z),head.eulerAngles.y,boundaryPoints,lastBoundaryAvailable);
+            }
             bool show=Model.Phase!=SessionPhase.Playing && Model.Phase!=SessionPhase.Blackout;
             messagePanel.SetActive(show && messageSized); message.gameObject.SetActive(show);
             // Keep the probe text (see BuildMessage) until LateUpdate has measured and sized the
@@ -295,7 +360,9 @@ namespace LoopRoom
             if(messageSized)
             {
                 message.color=messageColor;
-                if(Model.Phase==SessionPhase.Ready || Model.Phase==SessionPhase.Finished)
+                if(calibrationVisible)
+                    message.text="足元の枠が体験の空間です\nA か X を長押しで決定（運営: C）";
+                else if(Model.Phase==SessionPhase.Ready || Model.Phase==SessionPhase.Finished)
                     message.text=!rig.CanStart ? rig.PreparationMessage : rig.IsVR ? "第零室\n手元の取っ手に手を近づけ、グリップで操作\nA または X ボタンで開始" : "第零室  /  操作確認\nEnter：開始　Space：遮蔽　E：出口\n右ドラッグ：見回す";
                 else if(Model.Phase==SessionPhase.Escaped) message.text="脱出した。\n今度は、時間が進んでいる。";
                 else if(Model.Phase==SessionPhase.TimedOut) message.text="今回は、脱出できなかった。\n見つけた手がかりは、あなたの記憶に。";
@@ -331,7 +398,8 @@ namespace LoopRoom
                 body=new GUIStyle(title){fontSize=18}; small=new GUIStyle(title){fontSize=13};
             }
             bool showRetryHint=(!rig.IsVR || privateOverlay) && rig.CanRetryPreparation;
-            float boxHeight=rig.IsVR&&!privateOverlay?112:showRetryHint?230:206;
+            bool showBoundaryHint=(!rig.IsVR || privateOverlay) && calibrationVisible && !lastBoundaryAvailable;
+            float boxHeight=(rig.IsVR&&!privateOverlay?112:showRetryHint?230:206)+(showBoundaryHint?24:0);
             GUI.Box(new Rect(16,16,360,boxHeight),GUIContent.none);
             GUI.Label(new Rect(32,28,340,40),"第零室 / THE ROOM BEFORE",title);
             GUI.Label(new Rect(32,72,340,28),"LOOP "+Model.LoopId.ToString("00")+"  ·  "+PublicState(),body);
@@ -340,8 +408,9 @@ namespace LoopRoom
                 float y=107;
                 GUI.Label(new Rect(32,y,340,26),rig.CanStart ? "Enter 開始 / Space 遮蔽 / E 出口" : "開始前の接続と追跡を確認中",small);
                 y+=24;
-                GUI.Label(new Rect(32,y,340,26),"C: 位置合わせ（"+(aligned?"済":"未")+"）",small);
+                GUI.Label(new Rect(32,y,340,26),calibrating ? "C: キャリブレーションを決定" : "C: キャリブレーションをやり直す（"+(aligned?"済":"未")+"）",small);
                 y+=24;
+                if(showBoundaryHint) { GUI.Label(new Rect(32,y,340,26),"境界情報なし（目視で確認）",small); y+=24; }
                 if(rig.CanRetryPreparation) { GUI.Label(new Rect(32,y,340,26),"R: VR 再準備（運営）",small); y+=24; }
                 GUI.Label(new Rect(32,y,340,26),"右ドラッグ 視点 / Esc 中断 / F2 運営表示",small);
                 y+=24;

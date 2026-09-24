@@ -29,6 +29,9 @@ namespace LoopRoom
             "第零室\nVRの準備ができませんでした。\n接続とプレイエリアを確認してください。\nR: 再準備（運営）";
         public Transform[] Hands { get; private set; }
         public bool StartPressed => startAction.WasPressedThisFrame();
+        // Same physical input as StartPressed (A/X on either hand), exposed as a held state so the
+        // calibration screen can require a 1-second hold instead of a tap (task021).
+        public bool StartHeld => startAction.IsPressed();
         public bool NeedsRelease => needsRelease[0] || needsRelease[1];
         readonly List<InputAction> actions = new List<InputAction>();
         readonly List<XRDisplaySubsystem> displays = new List<XRDisplaySubsystem>();
@@ -181,6 +184,36 @@ namespace LoopRoom
         {
             SubsystemManager.GetSubsystems(displays);
             return displays.Exists(d => d.running);
+        }
+
+        // Guardian/play-area boundary, if the running Floor-mode input subsystem can report one
+        // (task021 calibration screen). Points come back in world space: XRInputSubsystem returns
+        // them relative to the tracking origin, which for this rig is the "XR Origin" GameObject's
+        // own transform (Origin defaults to the attached GameObject; this component is on it).
+        public bool TryGetBoundaryPoints(List<Vector3> worldPoints)
+        {
+            worldPoints.Clear();
+            foreach (var input in floorInputs)
+            {
+                var local = new List<Vector3>();
+                if (input.TryGetBoundaryPoints(local) && local.Count >= 3)
+                {
+                    foreach (var point in local) worldPoints.Add(transform.TransformPoint(point));
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Desktop-only: pitches the free-look camera down by default so the calibration floor
+        // overlay is visible without requiring a mouse drag (task021). No effect in VR (the real
+        // head controls the view) and does not lock out the existing right-drag look.
+        // 60° (追修正2, was 45°): the shallower angle left the outline outside the frame.
+        public void LookAtFloorForCalibration(bool active)
+        {
+            if (IsVR) return;
+            pitch = active ? 60f : 0f;
+            View.transform.localRotation = Quaternion.Euler(pitch,yaw,0);
         }
 
         public void Operate(XRSimpleInteractable[] controls, bool enabled)

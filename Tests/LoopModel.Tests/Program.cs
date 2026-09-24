@@ -24,9 +24,9 @@ internal static class Program
             Console.WriteLine("PASS: No-action deadline and retained outcome at 180 seconds");
             Console.WriteLine("PASS: 19 model checks");
             var roomAnchor = RoomAnchorChecks.Run();
-            Require(roomAnchor.Count == 9, "Expected 9 room anchor checks.");
+            Require(roomAnchor.Count == 12, "Expected 12 room anchor checks.");
             foreach (var result in roomAnchor) Console.WriteLine(result);
-            Console.WriteLine("PASS: 9 room anchor checks"); return 0;
+            Console.WriteLine("PASS: 12 room anchor checks"); return 0;
         }
         catch (Exception error) { Console.Error.WriteLine("FAIL: " + error); return 1; }
     }

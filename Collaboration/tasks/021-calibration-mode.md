@@ -19,6 +19,19 @@ VR ゴーグルをつけると、足元に必要な広さ（自分を初期位�
 5. **設定**: 起動時に `PlayAreaSettings.LoadOrCreate(Application.persistentDataPath + "/play-area.json")` を読み、表示と `RoomAnchor.ChooseFrontYaw(..., settings, out fits)` の両方で使う。
 6. **証拠用オプション** `--auto-calibrate`（`--desktop` 併用時のみ）: キャリブレーション画面を2秒表示してから自動で決定する（`--autostart` はその後に動く）。desktop のカメラは床の枠が見えるよう、キャリブレーション中だけ少し下を向ける（例 pitch 45°）。
 
+### 追修正（2026-09-24、計画担当 Opus 5.5。撮影で判明）
+
+`--desktop` のキャリブレーション画面（evidence/20260924-calibration/calibration-screen.png）で、案内と運営表示は出るが、**足元の枠が机（部屋の家具）に隠れて見えない**。VR でも足元を見たときに家具が枠を隠す。
+- キャリブレーションの間は**部屋（room.Root 以下）を表示しない**。代わりに無地の床（中立的な色、既定レイヤーではなく PrivateLayer 8 で観客には見せない）と、枠・扇形・足元の印・案内だけを表示する。決定して Ready に移ったら部屋を表示に戻す（部屋は Begin 時の置き直しで配置される）。
+- 開始前に部屋の中身や仕掛けが見えないので、突発性の点でも望ましい。
+- desktop のキャリブレーション中の下向き（pitch 45°）で、枠が画面に入ることを確認できるようにする。
+
+### 追修正2（2026-09-24、計画担当 Opus 5.5。撮影で判明）
+
+部屋を隠した後の画面でも**枠の線が見えない**（扇形の塗りの端が少し見えるだけ）。LineRenderer の `alignment=TransformZ` で線のオブジェクトを回していないため、帯が床に垂直に立ち、上から見ると厚みがなく見えないと判断する。
+- 線（体験空間の正方形、余裕の正方形、境界線）は `LineAlignment.View`（カメラの方を向く）で描く。線の太さは 2〜3cm 程度。
+- desktop のキャリブレーション中の下向きを 45° → 60° にし、足元の枠全体が画面に入るようにする。
+
 ## 許可ファイル
 
 - `Assets/LoopRoom/Scripts/LoopDemo.cs`

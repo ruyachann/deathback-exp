@@ -134,7 +134,120 @@ public static class RoomAnchorChecks
                 "arc between sampled points crossed the boundary without rejection");
         });
 
+        Check(passed, "Default settings overloads match the constant API", () =>
+        {
+            var settings = new PlayAreaSettings();
+            double[,] cases =
+            {
+                { 0, 0, 0, 0, 0, 0 },
+                { 0, 0.7, 0, 0, 0, 0 },
+                { 0.7, 0.7, 210, 0, 0, 0 },
+                { 1.0, 0, 123, 0, 0, 0 },
+                { 0.2, -0.1, 725, 0.1, -0.2, 30 }
+            };
+
+            for (int i = 0; i < cases.GetLength(0); i++)
+            {
+                double px = cases[i, 0];
+                double pz = cases[i, 1];
+                double yaw = cases[i, 2];
+                double cx = cases[i, 3];
+                double cz = cases[i, 4];
+                double areaYaw = cases[i, 5];
+                bool legacyRegion = RoomAnchor.ForwardRegionFits(px, pz, yaw, cx, cz, areaYaw);
+                bool settingsRegion = RoomAnchor.ForwardRegionFits(
+                    px, pz, yaw, cx, cz, areaYaw, settings);
+                Need(legacyRegion == settingsRegion, "region result changed for case " + i);
+
+                bool legacyFits;
+                bool settingsFits;
+                double legacyYaw = RoomAnchor.ChooseFrontYaw(
+                    px, pz, yaw, cx, cz, areaYaw, out legacyFits);
+                double settingsYaw = RoomAnchor.ChooseFrontYaw(
+                    px, pz, yaw, cx, cz, areaYaw, settings, out settingsFits);
+                Need(legacyFits == settingsFits, "fit result changed for case " + i);
+                Near(settingsYaw, legacyYaw);
+            }
+        });
+
+        Check(passed, "Larger configured area avoids an unnecessary correction", () =>
+        {
+            var larger = new PlayAreaSettings { areaSize = 2.4 };
+            Need(!RoomAnchor.ForwardRegionFits(0, 0.6, 0, 0, 0, 0),
+                "default area unexpectedly accepted the outward direction");
+            Need(RoomAnchor.ForwardRegionFits(0, 0.6, 0, 0, 0, 0, larger),
+                "larger area rejected the outward direction");
+
+            bool defaultFits;
+            bool largerFits;
+            double defaultYaw = RoomAnchor.ChooseFrontYaw(0, 0.6, 0, 0, 0, 0, out defaultFits);
+            double largerYaw = RoomAnchor.ChooseFrontYaw(0, 0.6, 0, 0, 0, 0, larger, out largerFits);
+            Need(defaultFits && largerFits, "a fitting direction was not found");
+            Need(AngularDistance(defaultYaw, 0) > 0, "default area did not require correction");
+            Near(largerYaw, 0);
+        });
+
+        Check(passed, "Play area settings reject invalid ranges and non-finite values", () =>
+        {
+            new PlayAreaSettings
+            {
+                areaSize = 0.5,
+                margin = 0.249,
+                reach = 0.1,
+                halfAngleDeg = 5,
+                searchStepDeg = 1
+            }.Validate();
+            new PlayAreaSettings
+            {
+                areaSize = 4,
+                margin = 1.999,
+                reach = 1,
+                halfAngleDeg = 90,
+                searchStepDeg = 45
+            }.Validate();
+
+            Action<PlayAreaSettings>[] invalidRanges =
+            {
+                s => s.areaSize = 0.499,
+                s => s.areaSize = 4.001,
+                s => s.margin = -0.001,
+                s => s.margin = s.areaSize * 0.5,
+                s => s.reach = 0.099,
+                s => s.halfAngleDeg = 4.999,
+                s => s.halfAngleDeg = 90.001,
+                s => s.searchStepDeg = 0.999,
+                s => s.searchStepDeg = 45.001
+            };
+            foreach (Action<PlayAreaSettings> makeInvalid in invalidRanges)
+                SettingsRejects(makeInvalid, "out-of-range settings were accepted");
+
+            Action<PlayAreaSettings, double>[] setters =
+            {
+                (s, value) => s.areaSize = value,
+                (s, value) => s.margin = value,
+                (s, value) => s.reach = value,
+                (s, value) => s.halfAngleDeg = value,
+                (s, value) => s.searchStepDeg = value
+            };
+            double[] nonFinite =
+            {
+                double.NaN,
+                double.PositiveInfinity,
+                double.NegativeInfinity
+            };
+            foreach (Action<PlayAreaSettings, double> setter in setters)
+            foreach (double value in nonFinite)
+                SettingsRejects(s => setter(s, value), "non-finite settings were accepted");
+        });
+
         return passed;
+    }
+
+    static void SettingsRejects(Action<PlayAreaSettings> makeInvalid, string message)
+    {
+        var settings = new PlayAreaSettings();
+        makeInvalid(settings);
+        ThrowsArgumentException(settings.Validate, message);
     }
 
     static void ForwardRejects(
