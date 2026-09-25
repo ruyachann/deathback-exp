@@ -70,3 +70,27 @@
   - `LoopRoom/Run model checks only`
 - `LoopRoom/1` の実行前に未保存のユーザー編集を保存・保護する。保存確認をキャンセルした場合は準備を中止する。既存の `Assets/LoopRoom/Scenes/LoopRoom.unity` は開かれ、このシーンがない場合だけ新規作成される。
 - `LoopRoom/3` はモデルチェックと OpenXR ローダー設定の検証のみを行い、実機（HMD）挙動は検証しない。実機受入は `Docs/UNITY_ACCEPTANCE.md` の手順に従う。
+
+## 10. 起動オプション（確認・証拠撮影用、2026-09-25 時点）
+
+`Builds/Windows/LoopRoom.exe` に付ける。`--desktop` 以外はすべて **`--desktop` と併用したときだけ**有効（VR では効かない）。
+
+| オプション | 働き | 導入 |
+| --- | --- | --- |
+| `--desktop` | XR を起動せず PC 画面で動かす（頭＝カメラ、右ドラッグで視点） | 初期 |
+| `--auto-calibrate` | キャリブレーション画面で、スプラッシュ終了後3秒待ち、1秒かけて長押しを模擬して決定（リングが伸びる） | task021・027 |
+| `--autostart` | 開始待ちになったら自動で開始。フォーカスを失っても中断しない | 初期・task022 |
+| `--autoescape` | `--autostart` と併用。2周目で遮蔽を上げ、出口が開いたら脱出してセッションを終える | 初期 |
+| `--simulate-drift` | 周回ごとに決まったずれ（位置と向き）を頭に加え、部屋の置き直しと向きの補正を確かめる | task018 |
+| `--desktop-pitch <度>` | キャリブレーション後の desktop カメラの下向き角（-70〜70、既定 0）。床や机を撮るとき | task025 |
+
+撮影の例（PowerShell）:
+
+```powershell
+.\Builds\Windows\LoopRoom.exe --desktop --auto-calibrate --autostart --autoescape -screen-width 1280 -screen-height 720 -screen-fullscreen 0
+```
+
+- セッションの記録: `%USERPROFILE%\AppData\LocalLow\LoopRoomDemo\The Room Before\Sessions\*.json`（`frames` にフレーム時間。task026）。`Player.log` は一つ上のフォルダ。**Player.log には PC 名や IP が入ることがあるので、そのままコミットしない**（必要な行だけ抜き出す）。
+- 体験空間の設定: 同じフォルダの `play-area.json`（task020）。
+- 画面の取り込み: 起動直後（スプラッシュとその後約1.5秒）は取り込みに映らない。ウィンドウが最小化されたら元に戻してから取り込む。
+- ビルド後は設定ファイルの副作用を戻す（`Assets/Settings/*.asset` の3つ、`ProjectSettings/ProjectSettings.asset`・`UnityConnectSettings.asset` を restore、`Assets/XR/Settings/OpenXR Editor Settings.asset(.meta)` を削除）。
