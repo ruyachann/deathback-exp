@@ -1,5 +1,14 @@
 # 現在の状態
 
+## 要約（2026-09-25 更新、Opus 5.5。詳細と履歴は下の表）
+
+- **実装・独立レビュー済み（受入）**: 周回の核（LoopModel）、部屋の置き直し（task017・018）、ワンルーム（019）、キャリブレーション（020・021・027）、自動実行の安定化（022）、天井灯の負荷（023）、細かい整理（024）、部屋の質感（025）、フレーム時間の記録（026）、安全な向きが無いときの運営への警告（028）、ビルドの出どころの記録（029）。
+- **実機受入待ち（ユーザーが Air Link で確認）**: `Docs/DEVICE_QUICKCHECK.md`（★が初回の必須項目）。見るもの: キャリブレーションの見え方と境界、周回ごとの置き直しと向きの補正、操作、フレーム時間、質感のちらつき、音、切断からの復旧。
+- **ユーザー判断待ち**: 問題（謎解き）の中身、体験時間、部屋を傾ける演出、安全な向きが無いときに自動で止めるか、部屋の種類を増やす時期。
+- **方針**: Astra の計画レビュー（reviews/astra-plan-review-20260925.md）に従い、**実機の結果が出るまで機能を積まない**。
+- 廃止済みの案（90°回転、暗い部屋・霧・看板、180秒制限）は下の履歴に残るが現行ではない。
+
+
 2026-09-23 運用更新: 企画・計画・実装・レビューは Codex/Claude の双方が編集可能。計画は GPT-6 Astra または確認済み Claude Opus、実装は GPT-5.6 Sol または Claude Sonnet 5 を優先する。Codex は正本リポジトリの信頼登録後 `peer_claude` が有効。Claude の `peer_codex` は初回承認待ちが解消したが、この Codex シェルからのヘルスチェックは `uv_spawn 'python'` の EPERM で失敗。通常 Claude セッションでの接続と実レビューは未確認。詳細は AGENTS.md と PEER_REVIEW_MCP.md。以下の過去の分担記録は当時の証跡として残す。
 
 2026-09-23 19:50 再開: ユーザーの明示指示（「Codexと作業を進める」）で PAUSE.json を解除し `history/PAUSE-cleared-20260923.json` へ保存。Codex 5時間枠は使用8%（残92%、10:47Z の rollout rate_limits、週枠使用1%）。Claude 枠は機械検証なし。Claude の `peer_codex` MCP は承認済み・Connected。Codex 側 `peer_claude` は未接続（deathback-exp の信頼設定待ち）のため、現状の相互レビューは Claude→Codex 方向の MCP のみ。
@@ -32,6 +41,8 @@
 | 17 | **task026 フレーム時間の記録（2026-09-25）** | 計画 Opus 5.5／実装 Sonnet | **受入（2026-09-25、Sol・Sonnet approve、reviews/task026-exchange-20260925.md）**。平均・P95・最大・落ちたフレーム数（目標の1.5倍超）をセッションログ `frames` と運営表示（desktop は常時、VR は F2）に出す。純粋 C# の FrameStats（固定メモリ）と検査12件。証拠 evidence/20260925-frame-stats/ |
 | 18 | 一時停止（2026-09-25、Codex 5時間枠 残り6%）→ **13:37 再開** | 計画 Opus 5.5 | 回復を確認して再開（Codex 100%、Claude 5時間 残り94%・週次 残り24%） |
 | 19 | **task027 キャリブレーションの長押しの手応え（2026-09-25）** | 計画 Opus 5.5／実装 Sonnet | **受入（2026-09-25、Sol・Sonnet approve、reviews/task027-exchange-20260925.md）**。長押し中に足元の印の周りのリングが伸びる、案内が「そのまま押し続けて…」に変わる、決定時に確認音（時計の音とは別）と両手の振動。`--auto-calibrate` はスプラッシュ後3秒待って1秒かけて長押しを模擬（証拠でキャリブレーション画面が映るように）。証拠 evidence/20260925-calibration-hold/。実機の手応えは未確認 |
+| 20 | **Astra 計画レビュー（2026-09-25）** | 計画 Opus 5.5／レビュー Astra | `reviews/astra-plan-review-20260925.md`。上位3件: 安全な向きが無い場合の扱い、実機手順の更新、基準版の固定。→ task028（運営への警告、Sonnet）∥ task029（ビルドの出どころ、Sol）、手順と企画の記述は計画担当が更新。以後は機能を積まず Air Link の結果を待つ |
+| 21 | **task028・029（Astra の計画レビューを受けて、2026-09-25）** | 計画 Opus 5.5／実装 Sonnet（028）∥ Sol（029） | **受入（両タスクとも Sol・Sonnet approve、reviews/tasks028-029-exchange-20260925.md）**。028: fits=false のとき運営表示に「安全な向きなし: 中央へ / C で再設定」、セッションログに noFitPlacements・maxNoFitDistance、警告ログは変化ごと。029: ビルド時に build-info.json（commit・dirty・時刻）、Start-DeviceCheck.ps1 が記録し警告。計画担当が企画 v0.2 の「収まる向きは必ずある」を訂正し、DEVICE_QUICKCHECK に ★（初回必須）・結果の書き方・置き直しの確認（2b）・build-info の確認を追加、STATE の先頭に要約を追加 |
 | 9 | 後の課題（非ブロッキング） | 計画: Opus 5.5 | (a)(b) task024 で解消、(c) MCP クライアントで一度だけ出た UnicodeDecodeError（review は正常保存。原因未特定）、(d) desktop の案内パネル文字のはみ出し（計画6・8、task015 で対応済み）、(e) task024 で解消（引数を削除、表示は継続）、(f) task022 で `--autostart` 時の中断を解消 |
 | 7 | task006 の正式化（2026-09-24、Opus 5.5） | 計画: Opus 5.5 | DRAFT を分割: **task010** B-6 Rules 複製＋区間の最小値（実装 Sol）→ **task011** B-7 Touch Plus プロファイル（実装 Sol）→ **task012** B-4 XR 再準備キー R（実装 Sonnet）→ **task013** 文書（実装 Sonnet）。確認しやすい順。B-5（机の位置、身体位置の判断）は Quest 3/3S 実機で見え方を確かめてからユーザーと決める |
 | 8 | **今後: 体験のクオリティ向上**（2026-09-24 ユーザー指定） | 計画: Opus 5.5 / Astra | 仮想空間内の見た目（素材・照明・部屋の作り込み、敵の造形とアニメーション）、音（足音・射撃・環境音）、演出（暗転・脱出の余韻）、案内表示の読みやすさ。STAGE_PLAN 段階3と合わせ、task010〜013 と実機受入のあとに計画を立てる |

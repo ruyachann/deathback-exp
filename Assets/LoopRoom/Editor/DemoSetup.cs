@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -17,6 +18,17 @@ using LoopRoom;
 public static class DemoSetup
 {
     const string ScenePath="Assets/LoopRoom/Scenes/LoopRoom.unity";
+    const string BuildInfoPath="Builds/Windows/build-info.json";
+
+    [Serializable]
+    class BuildInfo
+    {
+        public string commit="unknown";
+        public bool dirty;
+        public string[] dirtyFiles=Array.Empty<string>();
+        public string builtAt;
+        public string unityVersion;
+    }
 
     [MenuItem("LoopRoom/1 - Prepare project and scene")]
     public static void Prepare()
@@ -129,13 +141,69 @@ public static class DemoSetup
     [MenuItem("LoopRoom/4 - Build Windows demo")]
     public static void Build()
     {
+        var buildInfo=CaptureBuildInfo();
         Prepare(); ConfigureXR(); Validate();
         Directory.CreateDirectory("Builds/Windows");
         var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{
             scenes=new[]{ScenePath},locationPathName="Builds/Windows/LoopRoom.exe",
             target=BuildTarget.StandaloneWindows64,options=BuildOptions.Development});
         if(report.summary.result!=BuildResult.Succeeded) throw new Exception("Build failed: "+report.summary.result);
+        buildInfo.builtAt=DateTimeOffset.Now.ToString("o");
+        File.WriteAllText(BuildInfoPath,JsonUtility.ToJson(buildInfo,true));
         Debug.Log("LoopRoom: Windows build completed.");
+    }
+
+    static BuildInfo CaptureBuildInfo()
+    {
+        var info=new BuildInfo{unityVersion=Application.unityVersion};
+        string output;
+        bool gitStarted;
+        if(TryRunGit("rev-parse HEAD",out output,out gitStarted)) info.commit=output.Trim();
+        if(gitStarted && TryRunGit("status --porcelain=v1 -z --untracked-files=all -- Assets ProjectSettings Packages",out output,out gitStarted))
+        {
+            info.dirtyFiles=ParseDirtyFiles(output).Take(20).ToArray();
+            info.dirty=info.dirtyFiles.Length>0;
+        }
+        return info;
+    }
+
+    static bool TryRunGit(string arguments,out string output,out bool started)
+    {
+        output=string.Empty;started=false;
+        try
+        {
+            var startInfo=new System.Diagnostics.ProcessStartInfo{
+                FileName="git",Arguments=arguments,WorkingDirectory=Path.GetDirectoryName(Application.dataPath),
+                UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true};
+            using(var process=new System.Diagnostics.Process{StartInfo=startInfo})
+            {
+                if(!process.Start()) return false;
+                started=true;
+                output=process.StandardOutput.ReadToEnd();
+                var error=process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                if(process.ExitCode==0) return true;
+                UnityEngine.Debug.LogWarning("LoopRoom: git "+arguments+" failed; build metadata will be incomplete. "+error.Trim());
+            }
+        }
+        catch(Exception exception)
+        {
+            UnityEngine.Debug.LogWarning("LoopRoom: git is unavailable; build metadata will use commit=unknown. "+exception.Message);
+        }
+        return false;
+    }
+
+    static IEnumerable<string> ParseDirtyFiles(string porcelain)
+    {
+        var fields=porcelain.Split(new[]{'\0'},StringSplitOptions.RemoveEmptyEntries);
+        for(int i=0;i<fields.Length;i++)
+        {
+            var entry=fields[i];
+            if(entry.Length<4) continue;
+            var status=entry.Substring(0,2);
+            yield return entry.Substring(3);
+            if((status.IndexOf('R')>=0 || status.IndexOf('C')>=0) && i+1<fields.Length) i++;
+        }
     }
 
     [MenuItem("LoopRoom/Run model checks only")]
