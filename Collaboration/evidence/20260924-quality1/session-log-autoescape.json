@@ -1,0 +1,56 @@
+{
+    "sessionId": "68f2c46d740647beb4da7e79e6f9bb8c",
+    "scenario": "S01_Shield",
+    "version": "0.1.0-prototype",
+    "mode": "Desktop",
+    "outcome": "Escaped",
+    "elapsed": 12.660142967652064,
+    "timings": {
+        "firstShot": 6.0,
+        "searchShot": 12.0,
+        "exitOpens": 6.5,
+        "exitCloses": 12.0,
+        "blackout": 0.16,
+        "playLimit": 172.0,
+        "endingLength": 8.0,
+        "enforcePlayLimit": false
+    },
+    "events": [
+        {
+            "loop": 1,
+            "sessionTime": 0.0,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 1,
+            "sessionTime": 6.0,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 6.16,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 7.160611470288131,
+            "loopTime": 1.0006114702881313,
+            "kind": "shield_raised"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 12.16,
+            "loopTime": 6.0,
+            "kind": "shot_blocked"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 12.660142967652064,
+            "loopTime": 6.500142967652064,
+            "kind": "Escaped"
+        }
+    ]
+}

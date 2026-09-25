@@ -1,0 +1,13 @@
+{
+  "files": {
+    "Docs/UNITY_ACCEPTANCE.md": "3f35c2567402c7ef6a1e7e41573e04c9f30835988450ea03fd0122aea9b9ac07",
+    "Docs/DEVELOPMENT.md": "0f336019fc8ef6763f453ff2cf7b2dfd7e4e39f6d672fdc11692408525dbf452"
+  },
+  "unverified": [
+    "RoomVisuals.UpdatePublic の実装および観客用カメラの構成（cullingMask、Spectator側の描画対象）は本スナップショットの提供ソースに含まれておらず、観客画面のネタバレマスキングは PlayerOnly/SpectatorOnly レイヤー分離の範囲でのみ確認できる。",
+    "Opus 5 の正確なモデルIDおよび利用権限はCollaboration/STATE.mdの記述時点で未確認であり、本書はその未確認状態をそのまま反映している。",
+    "3回の死亡ループの具体的な死亡条件（LoopModel/LoopRulesの詳細ロジック）は本スナップショットに含まれるLoopModel本体を確認できないため、LoopDemo.cs内のLoopId変化イベントを根拠に手順を記述している。",
+    "本書に記載した受入手順はいずれも実機（Quest 3）またはUnity Editorでの実施結果を含まない。実施・合格の主張は一切含まれない。"
+  ],
+  "role": "implementation not review"
+}

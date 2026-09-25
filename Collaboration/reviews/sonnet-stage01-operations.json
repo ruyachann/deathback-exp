@@ -1,0 +1,50 @@
+{
+  "task": "stage01-operations",
+  "file_hashes": {
+    ".gitignore": "4c7c39305bb0441e0938081929758abe9732456a0c7947e58901f968274c9c0f",
+    "Tools/check_dependencies.py": "64def4e1e6c98e90087e4e1f1d30ed8d4ceb83319509020f8a9ddb81d3f10e98",
+    "Sync-PublishedBranch.ps1": "7275417dbef6076fb61b0dd7cbb0f289acee556343fa6a2092da19d121bd1382",
+    "Start-Opus.ps1": "9001f21c478c40784c1a1ecd2137682e0bff67af1fadd0405faf4db37033ecef"
+  },
+  "verdict": "approve",
+  "findings": [
+    {
+      "file": ".gitignore",
+      "severity": "info",
+      "note": "`*.csproj`/`*.sln`を除外しつつ`!/Tests/LoopModel.Tests/LoopModel.Tests.csproj`でanchored(絶対パス指定)されたnegationを使っている。ディレクトリ自体を除外していないため、Gitのnegationパターンの既知の制約（親ディレクトリ除外時に子ファイルのnegationが効かない）には該当せず、意図通り機能すると判断できる。"
+    },
+    {
+      "file": "Tools/check_dependencies.py",
+      "severity": "info",
+      "note": "パッケージ名を`^com\\.unity\\.[a-z0-9.-]+$`で厳格検証してからURL(`https://packages.unity.com/`固定prefix)を構築しており、SSRF/URLインジェクションを防ぐ設計になっている。read-only（自動アップグレード処理なし）で、`needs_review`は`resolved != pinned`または`listed=False`または例外発生時にTrueとなるfail-safeなロジック。"
+    },
+    {
+      "file": "Sync-PublishedBranch.ps1",
+      "severity": "info",
+      "note": "origin URLの固定値照合、`rev-parse --verify HEAD`によるunborn(履歴なし)確認、`ls-files --cached`によるインデックス空確認の3段階チェックの後にのみfetch/switch/resetを実行している。`reset --mixed`はworking directoryを変更せずindex/HEADのみ更新するため、コメント通り作業ファイルを保護しつつoriginの履歴に同期する設計として妥当。"
+    },
+    {
+      "file": "Sync-PublishedBranch.ps1",
+      "severity": "minor",
+      "note": "ローカルに同名のブランチ`$Branch`が既に存在する場合、`switch -c`はGit自身のエラーで失敗するため破壊的操作には至らないが、スクリプト側で明示的な事前チェック・専用エラーメッセージは用意されていない。"
+    },
+    {
+      "file": "Start-Opus.ps1",
+      "severity": "info",
+      "note": "ModelIdを`^claude-opus-5(-[0-9]{8})?$`で厳格検証しており、環境情報にあるOpus 5の正式モデルID`claude-opus-5`と整合する。エイリアスやフォールバックを拒否する「明示的なOpusゲート」の意図通り。PAUSE.json確認、Decision必須化、`claude`コマンドの終了コード確認も適切。"
+    }
+  ],
+  "evidence": [
+    "Sync-PublishedBranch.ps1: 'git rev-parse --verify HEAD 2>$null' 成功時にthrow — 既存履歴保護",
+    "Sync-PublishedBranch.ps1: 'git reset --mixed origin/$Branch' — indexのみ更新、working directoryは不変",
+    "Tools/check_dependencies.py: re.fullmatch(r'com\\.unity\\.[a-z0-9.-]+', name) によるパッケージ名検証",
+    "Start-Opus.ps1: ModelId正規表現 '^claude-opus-5(-[0-9]{8})?$'"
+  ],
+  "deferred": [
+    "002/003由来の静的スコープおよびハードウェア受け入れ基準は本スナップショットに含まれておらず、対象外として扱った。"
+  ],
+  "unverified": [
+    "runtime_reference_excerptsが空({})のため、ドキュメント記載の期待値とランタイム挙動の突合は実施できていない。",
+    "Gitコマンド・PowerShellスクリプト・ネットワーク呼び出しの実行結果は未実施（静的レビューのみ）。テストの実行は行っていない。"
+  ]
+}

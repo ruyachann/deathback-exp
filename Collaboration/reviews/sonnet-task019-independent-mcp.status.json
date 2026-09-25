@@ -1,0 +1,29 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/019-one-room-apartment.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/019-one-room-apartment.md",
+      "sha256": "7f0557e44e9008f8128f1bef9e2f577789c2e39d1ad75cfbdb1ea672d7d1eeeb"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs",
+      "sha256": "94d1335e055135b192c50faca1377a772324dbb74f6d772c72f363bba0f25132"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T082641402542Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

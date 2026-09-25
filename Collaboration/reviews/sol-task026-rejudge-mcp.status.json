@@ -1,0 +1,39 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local/OpenAI/Codex/bin/d375f7df50d3b421/codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/026-frame-stats.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/026-frame-stats.md",
+      "sha256": "58150af572829a2caed5f8a006c7ca983a94a5945534c9597dff0ade0f4ed5aa"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/FrameStats.cs",
+      "sha256": "59174398010fed949be68cf94145e85a41ac320d6203db248b89a692bb036ce8"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task026-final2-mcp.md",
+      "sha256": "0000430dd1faad2541216c9e6af7c086eb5ab230f15fea9ceb76133d1443e48c"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-task026-final2-mcp.md",
+      "sha256": "a179f770b173a61763e8ff68db5ebb23c850599be21a6454987b7e437a36eb6f"
+    },
+    {
+      "path": "Collaboration/evidence/20260925-frame-stats/session-frames.txt",
+      "sha256": "690aaee07e77aa8f8af62352d591bb8dff982713ee6220235993238d8979f1ba"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T225527582750Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

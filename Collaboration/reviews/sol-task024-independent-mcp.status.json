@@ -1,0 +1,43 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local/OpenAI/Codex/bin/d375f7df50d3b421/codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/024-deferred-cleanup.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/024-deferred-cleanup.md",
+      "sha256": "9b2c5375667a5803d1e25fbcdcd927973db5b5505f4ea32c78cc6f8ca012f28b"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopModel.cs",
+      "sha256": "fddd6568ac4bed02fdaf0a1c50f60183d80e3249bb9bbe064d41eb6cf4f9f4f0"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/LoopModelChecks.cs",
+      "sha256": "444e835391c201b957e9b3a5ac975af762d6799d64e1b18bba46956ea1ab74c2"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/DemoRig.cs",
+      "sha256": "120db643cea494fa1819c1e6bbabe2574fd8d89efe98273a977978d923865cfe"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs",
+      "sha256": "a146e206f96a4befea18897759f46bdabc74f51b3f73e7562f511703cd033f30"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/Program.cs",
+      "sha256": "243897501acf3769e5fb1f1a9780fbc59372669e7ff74d18c0322bf55a5fb9e3"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T213147344344Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

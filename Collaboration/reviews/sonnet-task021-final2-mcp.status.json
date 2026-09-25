@@ -1,0 +1,33 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/021-calibration-mode.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/021-calibration-mode.md",
+      "sha256": "97386da25769aa928770e4124fca2a6b764a3ace2c3a563090f3231fc21b6bfb"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/CalibrationView.cs",
+      "sha256": "43da0c7f41853f277eee6fde8a965acf2ff85ce5668047b54bddb39518dee9b1"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopDemo.cs",
+      "sha256": "66bbc36959c120c5413e1001056ae3062543ce75b7421eafe1ea74cbb07dd8e0"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T100353213739Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

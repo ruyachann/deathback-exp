@@ -1,0 +1,27 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local/OpenAI/Codex/bin/d375f7df50d3b421/codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/025-procedural-textures.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/025-procedural-textures.md",
+      "sha256": "1f75e0ecd6add20ef0334f8fe316d99fb5dfcfc102536aae4c86f7e6bca15d31"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs",
+      "sha256": "f919e050dfc2bc3d229572d87da0f5dcc622211229b34e76bd1206a3a4ff361b"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T214852473753Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

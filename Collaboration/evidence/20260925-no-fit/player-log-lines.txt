@@ -1,0 +1,46 @@
+== 実行1: --desktop --auto-calibrate --autostart --simulate-drift（30秒、areaSize=1.2）
+LoopRoom: PlaceRoom pos=(0.00,0.00) headYaw=0.0 frontYaw=0.0 corrected=False diff=0.0 fits=True
+LoopRoom: PlaceRoom pos=(0.15,0.10) headYaw=20.0 frontYaw=275.0 corrected=True diff=-105.0 fits=True
+LoopRoom: PlaceRoom pos=(0.55,0.35) headYaw=40.0 frontYaw=40.0 corrected=False diff=0.0 fits=False
+LoopRoom: no orientation keeps the forward reach inside the safe area; using head yaw as-is. distance=0.65m
+LoopRoom: PlaceRoom pos=(-0.20,-0.05) headYaw=330.0 frontYaw=15.0 corrected=True diff=45.0 fits=True
+LoopRoom: PlaceRoom pos=(-0.60,-0.40) headYaw=240.0 frontYaw=240.0 corrected=False diff=0.0 fits=False
+LoopRoom: no orientation keeps the forward reach inside the safe area; using head yaw as-is. distance=0.72m
+
+== 実行2: 実行1 に --autoescape を追加（2周目で脱出してセッションを保存）
+LoopRoom: PlaceRoom pos=(0.00,0.00) headYaw=0.0 frontYaw=0.0 corrected=False diff=0.0 fits=True
+LoopRoom: PlaceRoom pos=(0.15,0.10) headYaw=20.0 frontYaw=275.0 corrected=True diff=-105.0 fits=True
+LoopRoom: PlaceRoom pos=(0.55,0.35) headYaw=40.0 frontYaw=40.0 corrected=False diff=0.0 fits=False
+LoopRoom: no orientation keeps the forward reach inside the safe area; using head yaw as-is. distance=0.65m
+LoopRoom: frame stats target=164.9Hz frames=15937 mean=0.79ms p95=1.25ms max=9.05ms dropped=0
+
+== Sessions/bf4f15f2dabd4ebca0d9fc94071de73e.json（全文。events は件数のみに省略）
+{
+ "sessionId": "bf4f15f2dabd4ebca0d9fc94071de73e",
+ "scenario": "S01_Shield",
+ "version": "0.1.0-prototype",
+ "mode": "Desktop",
+ "outcome": "Escaped",
+ "elapsed": 12.660208903893363,
+ "timings": {
+  "firstShot": 6.0,
+  "searchShot": 12.0,
+  "exitOpens": 6.5,
+  "exitCloses": 12.0,
+  "blackout": 0.16,
+  "playLimit": 172.0,
+  "endingLength": 8.0,
+  "enforcePlayLimit": false
+ },
+ "events": "(6 件)",
+ "frames": {
+  "targetHz": 164.917,
+  "frames": 15937,
+  "meanMs": 0.7940856436696253,
+  "p95Ms": 1.25,
+  "maxMs": 9.052501060068607,
+  "dropped": 0
+ },
+ "noFitPlacements": 1,
+ "maxNoFitDistance": 0.6519202473774663
+}

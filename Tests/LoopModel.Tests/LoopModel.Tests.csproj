@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Assets/LoopRoom/Scripts/LoopModel.cs" Link="LoopModel.cs" />
+    <Compile Include="../../Assets/LoopRoom/Editor/LoopModelChecks.cs" Link="LoopModelChecks.cs" />
+    <Compile Include="../../Assets/LoopRoom/Scripts/RoomAnchor.cs" Link="RoomAnchor.cs" />
+    <Compile Include="../../Assets/LoopRoom/Editor/RoomAnchorChecks.cs" Link="RoomAnchorChecks.cs" />
+    <Compile Include="../../Assets/LoopRoom/Scripts/PlayAreaSettings.cs" Link="PlayAreaSettings.cs" />
+    <Compile Include="../../Assets/LoopRoom/Scripts/FrameStats.cs" Link="FrameStats.cs" />
+    <Compile Include="../../Assets/LoopRoom/Editor/FrameStatsChecks.cs" Link="FrameStatsChecks.cs" />
+  </ItemGroup>
+</Project>

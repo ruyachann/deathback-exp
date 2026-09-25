@@ -1,0 +1,33 @@
+﻿task029 build-info and Start-DeviceCheck warnings (scratch copy, launch skipped)
+2026-09-25 14:22:32 +09:00  commit ed08b7c  cwd C:\deathback\deathback-exp
+
+== 1) build-info なし
+警告: build-info なし（古いビルド）
+(検証用コピー: 起動は省略)
+(検証用コピー: フォルダを開くのは省略)
+Started <scratch>\Builds\Windows\LoopRoom.exe (Quest3S). Checklist: Docs/DEVICE_QUICKCHECK.md. Evidence folder: <scratch>\Collaboration\evidence\20260925-device-check
+
+== 2) 実際の build-info（未コミットの変更を含むビルド）
+警告: 未コミットの変更を含むビルドです。build-info.json の dirtyFiles を確認してください。
+(検証用コピー: 起動は省略)
+(検証用コピー: フォルダを開くのは省略)
+Started <scratch>\Builds\Windows\LoopRoom.exe (Quest3S). Checklist: Docs/DEVICE_QUICKCHECK.md. Evidence folder: <scratch>\Collaboration\evidence\20260925-device-check
+
+== 3) HEAD と異なる commit の build-info（dirty=false に書き換えた検証用）
+警告: 現在の HEAD (ed08b7c5dd4cb11333aa2f29355d470e80d0dc09) とビルドの commit
+(0000000000000000000000000000000000000000) が異なります。
+(検証用コピー: 起動は省略)
+(検証用コピー: フォルダを開くのは省略)
+Started <scratch>\Builds\Windows\LoopRoom.exe (Quest3S). Checklist: Docs/DEVICE_QUICKCHECK.md. Evidence folder: <scratch>\Collaboration\evidence\20260925-device-check
+
+== Builds/Windows/build-info.json（実物）
+{
+    "commit": "ed08b7c5dd4cb11333aa2f29355d470e80d0dc09",
+    "dirty": true,
+    "dirtyFiles": [
+        "Assets/LoopRoom/Editor/DemoSetup.cs",
+        "Assets/LoopRoom/Scripts/LoopDemo.cs"
+    ],
+    "builtAt": "2026-09-25T14:21:15.2203507+09:00",
+    "unityVersion": "6000.3.15f1"
+}

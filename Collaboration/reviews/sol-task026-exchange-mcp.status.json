@@ -1,0 +1,51 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local/OpenAI/Codex/bin/d375f7df50d3b421/codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/026-frame-stats.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/026-frame-stats.md",
+      "sha256": "b3e02e1e905a8450539dd5d01852a7afbab4658b4bb9eb28f1f5eeddb67424ae"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/FrameStats.cs",
+      "sha256": "423fbe72fca574d18edcc33ff9869404a6245543688c5e5bf6c017606ec68f63"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/FrameStatsChecks.cs",
+      "sha256": "bdf987d09d54e1f976442928e1f95ecd9df08e63ef45afe339043c202a4fc538"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/Program.cs",
+      "sha256": "942a3c839c96c30f067299722ccc6f5a51654642f829f1c0fabbada02437a877"
+    },
+    {
+      "path": "Collaboration/reviews/task026-diff.md",
+      "sha256": "1e12937a8cc91c5b352e449aa5e0359e49b6f556ff6f5ac0007d991496911231"
+    },
+    {
+      "path": "Collaboration/evidence/20260925-frame-stats/session-frames.txt",
+      "sha256": "8cd5f883290d5215322256f20342bcdbafeb323c142844a2a1196508203a73cf"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task026-independent-mcp.md",
+      "sha256": "94534767fae250ede0613f104a95159d45f200b60b2922cdb69793c426055bff"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-task026-independent-mcp.md",
+      "sha256": "dfc8f4644faf03fa05d400a6438877c61f7a9564c7f2aa7c942c3d76ded67259"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T223757074728Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

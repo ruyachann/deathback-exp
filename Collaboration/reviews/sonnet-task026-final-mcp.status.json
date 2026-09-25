@@ -1,0 +1,49 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/026-frame-stats.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/026-frame-stats.md",
+      "sha256": "4bc5ba1d7379d894e60502e0156e2e2b613afa5088ecf1b5d2f2c30eee53e48d"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/FrameStats.cs",
+      "sha256": "3d306e13107607ad5a8854196e68ce21cb38aaeb000bdfa1cf8093a22dd31aef"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/FrameStatsChecks.cs",
+      "sha256": "b3cb0de16c3497d31f6ab10c659b6aba040c008d85c8ed5bc6cbe5292e2a9b8f"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/Program.cs",
+      "sha256": "5c21c1f54105450bda32790263dd25fef669df22161bf1ca34f0debdbd6418a7"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task026-exchange-mcp.md",
+      "sha256": "61e432e28c0d33b03377d83d42a7a5453c532711b4519f2bc6e290ad76d6f0bb"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-task026-exchange-mcp.md",
+      "sha256": "ff8a67bcbd5099df8fb2b899bdaf90f609a32d23069386bcf3be325f78b696ba"
+    },
+    {
+      "path": "Collaboration/evidence/20260925-frame-stats/tests.txt",
+      "sha256": "6f8f893079efaee58b434cb97086344d2c046da5b50830e9266b067c5978ef5b"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T224431977994Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}
