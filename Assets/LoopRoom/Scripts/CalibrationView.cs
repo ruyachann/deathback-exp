@@ -23,6 +23,7 @@ namespace LoopRoom
         PlayAreaSettings settings;
         Renderer outerRenderer;
         LineRenderer boundaryLine;
+        LineRenderer holdRing;
 
         static readonly Color FitColor = new Color(.25f,1f,.5f);
         static readonly Color NoFitColor = new Color(.9f,.2f,.15f);
@@ -31,6 +32,10 @@ namespace LoopRoom
         static readonly Color BoundaryColor = new Color(.8f,.8f,.85f);
         static readonly Color SectorColor = new Color(.55f,.75f,.82f);
         static readonly Color FootColor = new Color(1f,.82f,.3f);
+        // task027 追修正2-1: was .009f, below the sector (.010f) and thus hidden under it where the
+        // two overlap. Placed above every other private-layer line here (incl. BoundaryHeight, the
+        // highest of the rest) so the ring never sits under the outline/margin/sector/boundary.
+        const float HoldRingHeight=.024f, HoldRingRadius=.10f, HoldRingWidth=.018f;
         // Neutral stand-in for the (hidden) room floor, dark enough that the white/green/red
         // outline stays readable against it (追修正: the desk was hiding the outline).
         static readonly Color FloorColor = new Color(.16f,.17f,.19f);
@@ -50,6 +55,7 @@ namespace LoopRoom
             Square("Area margin",settings.areaSize-2*settings.margin,MarginHeight,MarginColor,.02f);
             BuildSector();
             BuildFootMarker();
+            BuildHoldRing();
             var boundaryGo=new GameObject("Guardian boundary"); boundaryGo.transform.SetParent(Root,false);
             boundaryGo.layer=RoomVisuals.PrivateLayer;
             boundaryLine=boundaryGo.AddComponent<LineRenderer>();
@@ -138,7 +144,41 @@ namespace LoopRoom
             renderer.sharedMaterial=RoomVisuals.Material(FootColor,true);
         }
 
+        void BuildHoldRing()
+        {
+            var go=new GameObject("Hold ring"); go.transform.SetParent(Root,false); go.layer=RoomVisuals.PrivateLayer;
+            holdRing=go.AddComponent<LineRenderer>();
+            SetupLine(holdRing,FootColor,HoldRingWidth,false);
+            // Belt-and-braces alongside HoldRingHeight: draw after the sector even if a future
+            // change narrows the height gap (getter instantiates a per-renderer copy, so this
+            // doesn't affect the shared FootColor material the foot marker also uses).
+            holdRing.material.renderQueue+=1;
+            holdRing.positionCount=0;
+            go.SetActive(false);
+        }
+
         public void SetVisible(bool visible) => Root.gameObject.SetActive(visible);
+
+        // task027: progress of the A/X (or C, or --auto-calibrate) hold, 0..1. Drawn as an arc
+        // around the foot marker that grows clockwise from nothing (t<=0, hidden) to a full ring
+        // (t=1, about to commit), brightening toward FootColor as it fills.
+        public void SetHoldProgress(float t)
+        {
+            t=Mathf.Clamp01(t);
+            holdRing.gameObject.SetActive(t>0f);
+            if(t<=0f) { holdRing.positionCount=0; return; }
+            const int segments=40;
+            int count=Mathf.Max(2,Mathf.RoundToInt(segments*t)+1);
+            holdRing.positionCount=count;
+            float sweep=360f*t;
+            for(int i=0;i<count;i++)
+            {
+                float rad=(-90f+sweep*i/(count-1))*Mathf.Deg2Rad;
+                holdRing.SetPosition(i,new Vector3(Mathf.Cos(rad)*HoldRingRadius,HoldRingHeight,Mathf.Sin(rad)*HoldRingRadius));
+            }
+            var dim=new Color(FootColor.r*.45f,FootColor.g*.45f,FootColor.b*.45f,1f);
+            holdRing.material.color=Color.Lerp(dim,FootColor,t);
+        }
 
         // headFloor/headYawDeg: the head's current floor projection/yaw (the candidate center and
         // orientation if the operator or player decides right now). boundaryWorldPoints/available:

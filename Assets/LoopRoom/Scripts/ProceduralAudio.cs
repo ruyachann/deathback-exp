@@ -82,6 +82,23 @@ namespace LoopRoom
             return Build("Shot", samples, rate);
         }
 
+        // task027: calibration commit confirmation, a short rising two-tone tick. Deliberately
+        // distinct from Chime (the loop-start "death trace" cue, never reused here).
+        public static AudioClip CalibrationConfirm()
+        {
+            const int rate = SampleRate; const float duration = .16f;
+            const float f0 = 520f, f1 = 780f; const float decay = 22f;
+            int n = (int)(duration * rate); var samples = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                float t = (float)i / rate;
+                float freq = Mathf.Lerp(f0, f1, Mathf.Clamp01(t / .08f));
+                samples[i] = Mathf.Sin(2 * Mathf.PI * freq * t) * Mathf.Exp(-decay * t);
+            }
+            Normalize(samples, .5f);
+            return Build("CalibrationConfirm", samples, rate);
+        }
+
         // Exit unlock: two short metallic tones in sequence (click, then a brighter clink).
         public static AudioClip Open()
         {

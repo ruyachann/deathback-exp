@@ -31,6 +31,12 @@ namespace LoopRoom
         CalibrationView calibration;
         bool calibrating = true;
         float calibrationHold;
+        // task027: 0..1 progress shown as the growing ring/guidance text, tracking whichever of
+        // the real hold (calibrationHold) or the --auto-calibrate simulated hold is further along.
+        // Kept separate from calibrationHold itself so its commit-timing logic stays untouched.
+        float calibrationHoldProgress;
+        AudioSource calibrationAudio;
+        AudioClip calibrationConfirm;
         bool calibrationVisible, wasCalibrationVisible, wasRoomHidden, lastBoundaryAvailable;
         // Set by CommitCalibration() so the operator overlay can keep showing "境界外で決定"
         // until the *next* commit, even after the calibration screen itself closes (task021 追修正3-1).
@@ -125,6 +131,12 @@ namespace LoopRoom
             ambience.transform.SetParent(room.Root,false); ambience.playOnAwake=false;
             ambience.loop=true; ambience.spatialBlend=0; ambience.volume=.12f;
             ambience.clip=ProceduralAudio.RoomTone(); ambience.Play();
+            // task027: calibration commit confirmation, played at the head (non-spatial, like a
+            // UI cue) so it is heard the same regardless of the room's/enemy's position.
+            calibrationAudio = new GameObject("Calibration audio").AddComponent<AudioSource>();
+            calibrationAudio.transform.SetParent(rig.View.transform,false);
+            calibrationAudio.playOnAwake=false; calibrationAudio.spatialBlend=0; calibrationAudio.volume=.5f;
+            calibrationConfirm = ProceduralAudio.CalibrationConfirm();
             BuildMessage();
             RefreshWorld();
         }
@@ -238,16 +250,28 @@ namespace LoopRoom
             }
             if (calibrationVisible)
             {
+                // task027 追修正2-2: an unusually long frame (e.g. the first frame after the splash
+                // screen ends) must not jump the hold/auto-calibrate clocks past their 1s feel; cap
+                // the dt fed to both at .1s/frame regardless of the real frame length.
+                float holdDt = Mathf.Min(Time.unscaledDeltaTime, .1f);
                 // Same input as DemoRig's start button (A/X); a short press must not confirm.
-                calibrationHold = rig.StartHeld ? calibrationHold + Time.unscaledDeltaTime : 0f;
-                if (calibrationHold >= 1f) CommitCalibration();
-                else if (autoCalibrate && !autoCalibrateDone)
+                calibrationHold = rig.StartHeld ? calibrationHold + holdDt : 0f;
+                calibrationHoldProgress = Mathf.Clamp01(calibrationHold);
+                if (calibrationHold >= 1f) { calibrationHoldProgress = 1f; CommitCalibration(); }
+                // 追修正 2026-09-25: don't start the auto-calibrate clock until the Unity splash
+                // screen is done, otherwise the timer runs out while the splash still covers
+                // the screen and the calibration view is never actually seen.
+                else if (autoCalibrate && !autoCalibrateDone && UnityEngine.Rendering.SplashScreen.isFinished)
                 {
-                    autoCalibrateTimer += Time.unscaledDeltaTime;
-                    if (autoCalibrateTimer >= 2f) { autoCalibrateDone = true; CommitCalibration(); }
+                    autoCalibrateTimer += holdDt;
+                    // task027 追修正: 3s wait (progress stays 0, so the screen capture has time to
+                    // catch up after the splash) then a 1s simulated hold (progress 0->1), ~4s total.
+                    float simulated = Mathf.Clamp01(autoCalibrateTimer - 3f);
+                    if (simulated > calibrationHoldProgress) calibrationHoldProgress = simulated;
+                    if (autoCalibrateTimer >= 4f) { calibrationHoldProgress = 1f; autoCalibrateDone = true; CommitCalibration(); }
                 }
             }
-            else calibrationHold = 0f;
+            else { calibrationHold = 0f; calibrationHoldProgress = 0f; }
             bool enter=keyboard!=null && keyboard.enterKey.wasPressedThisFrame;
             bool autoTrigger = autostart && !autostartUsed && !rig.IsVR;
             // operatorCommandConsumed (set by C or R above, or inside CommitCalibration for the 1s
@@ -337,7 +361,7 @@ namespace LoopRoom
         // untouched here (task021 追修正4-3): the "境界外で決定" warning must persist until the
         // next CommitCalibration() actually determines a fresh Fit, not disappear just because a
         // retry/reset happened before the operator has re-decided.
-        void ResetAlignment() { aligned=false; alignCx=0; alignCz=0; alignAreaYaw=0; calibrating=true; calibrationHold=0; }
+        void ResetAlignment() { aligned=false; alignCx=0; alignCz=0; alignAreaYaw=0; calibrating=true; calibrationHold=0; calibrationHoldProgress=0; }
 
         // Commits the calibration: the current head floor position/yaw become the alignment
         // center/orientation (same 2 values PlaceRoom/RoomAnchor use), and the calibration screen closes.
@@ -353,8 +377,12 @@ namespace LoopRoom
             calibrationOutside = calibration.Fit == CalibrationView.BoundaryFit.Outside;
             if(calibrationOutside) Debug.LogWarning("LoopRoom: calibration committed outside the reported guardian boundary.");
             alignCx=head.position.x; alignCz=head.position.z; alignAreaYaw=head.eulerAngles.y;
-            aligned=true; fitsWarned=false; calibrating=false; calibrationHold=0;
+            aligned=true; fitsWarned=false; calibrating=false; calibrationHold=0; calibrationHoldProgress=0;
             operatorCommandConsumed = true;
+            // task027: confirmation cue at the moment of commit (not the Chime, which is reserved
+            // for the loop-start "death trace").
+            calibrationAudio.PlayOneShot(calibrationConfirm);
+            rig.Haptic(.12f);
         }
 
         void Begin()
@@ -420,6 +448,7 @@ namespace LoopRoom
                 var head=rig.View.transform;
                 lastBoundaryAvailable=rig.TryGetBoundaryPoints(boundaryPoints) && boundaryPoints.Count>=3;
                 calibration.Refresh(new Vector3(head.position.x,0,head.position.z),head.eulerAngles.y,boundaryPoints,lastBoundaryAvailable);
+                calibration.SetHoldProgress(calibrationHoldProgress);
             }
             bool show=Model.Phase!=SessionPhase.Playing && Model.Phase!=SessionPhase.Blackout;
             messagePanel.SetActive(show && messageSized); message.gameObject.SetActive(show);
@@ -431,7 +460,9 @@ namespace LoopRoom
             {
                 message.color=messageColor;
                 if(calibrationVisible)
-                    message.text="足元の枠が体験の空間です\nA か X を長押しで決定（運営: C）";
+                    message.text=calibrationHoldProgress>0f
+                        ? "足元の枠が体験の空間です\nそのまま押し続けて…"
+                        : "足元の枠が体験の空間です\nA か X を長押しで決定（運営: C）";
                 else if(Model.Phase==SessionPhase.Ready || Model.Phase==SessionPhase.Finished)
                     message.text=!rig.CanStart ? rig.PreparationMessage : rig.IsVR ? "第零室\n手元の取っ手に手を近づけ、グリップで操作\nA または X ボタンで開始" : "第零室  /  操作確認\nEnter：開始　Space：遮蔽　E：出口\n右ドラッグ：見回す";
                 else if(Model.Phase==SessionPhase.Escaped) message.text="脱出した。\n今度は、時間が進んでいる。";
