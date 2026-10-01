@@ -450,10 +450,10 @@ namespace LoopRoom
             float t=(float)Model.LoopTime;
             bool playing=Model.Phase==SessionPhase.Playing;
             room.Barrier.localPosition=new Vector3(0,Model.ShieldRaised?1.65f:.35f,1.08f);
-            room.Door.localPosition=new Vector3(.8f+Mathf.Clamp01((t-3)/.65f)*1.05f,1.18f,2.86f);
+            room.Door.localPosition=new Vector3(.5f+Mathf.Clamp01((t-3)/.65f)*.9f,1.0f,2.86f);
             room.Enemy.gameObject.SetActive(t>=3 && (playing || Model.Phase==SessionPhase.Blackout));
             float move=Mathf.Clamp01((t-8)/3.5f);
-            room.Enemy.localPosition=Vector3.Lerp(new Vector3(.8f,0,2.5f),new Vector3(1.25f,0,.38f),move);
+            room.Enemy.localPosition=Vector3.Lerp(new Vector3(.5f,0,2.5f),new Vector3(1.25f,0,.38f),move);
             room.Enemy.localRotation=Quaternion.Euler(0,move*75,0);
             enemyAudio.transform.localPosition=room.Enemy.localPosition+new Vector3(0,1.4f,0);
             room.Clock.text="00 : "+Mathf.FloorToInt(t).ToString("00");
