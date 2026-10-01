@@ -1,6 +1,6 @@
 # 032 — ドアの開き方
 
-状態: 計画確定（2026-10-01）。計画 Opus 5.5。実装 `implementer`。task030 の後。
+状態: **受入（2026-10-01、code-reviewer approve＝reviews/code-reviewer-task032.md、証拠 evidence/20261001-door-swing/）**。敵が扉の内側に現れ扉板と重なる件（P2）は task031 で解消する（Opus 判断）。計画 Opus 5.5。実装 `implementer`。task030 の後。
 
 ## 目的（ユーザー指定 2026-10-01「ドアの開き方などのクオリティを上げてください」）
 

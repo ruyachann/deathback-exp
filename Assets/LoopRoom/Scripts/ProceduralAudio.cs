@@ -65,6 +65,54 @@ namespace LoopRoom
             return Build("Latch", samples, rate);
         }
 
+        // Entry door at t=3: the lever drops (duller click) and the latch lets go (brighter tick). The first .10s is
+        // silent on purpose so these clicks trail the t=3 Latch thump instead of stacking on it.
+        public static AudioClip DoorLatch()
+        {
+            const int rate = SampleRate; const float duration = .32f; uint seed = 33011;
+            int n = (int)(duration * rate); var samples = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                float t = (float)i / rate; float s = 0f;
+                if (t >= .10f)
+                {
+                    float lt = t - .10f;
+                    s += (NextNoise(ref seed) * .5f + Mathf.Sin(2 * Mathf.PI * 1250f * lt)) * Mathf.Exp(-150f * lt) * .7f;
+                }
+                if (t >= .155f)
+                {
+                    float lt = t - .155f;
+                    s += (NextNoise(ref seed) * .7f + Mathf.Sin(2 * Mathf.PI * 2300f * lt) * .6f) * Mathf.Exp(-260f * lt);
+                }
+                samples[i] = s;
+            }
+            Normalize(samples, .5f);
+            return Build("DoorLatch", samples, rate);
+        }
+
+        // Hinge creak while the door is pushed open: a gliding stick-slip pitch that rises with the push and
+        // dies away as the door slows. Starts at CreakTime, when the main swing begins.
+        public static AudioClip DoorCreak()
+        {
+            const int rate = SampleRate; const float duration = .8f; uint seed = 44017;
+            int n = (int)(duration * rate); var samples = new float[n];
+            float phase = 0f, lowpass = 0f, wobble = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float t = (float)i / rate; float u = t / duration;
+                float freq = 85f + 120f * Mathf.Sin(Mathf.PI * Mathf.Min(1f, u * 1.15f)) + 18f * Mathf.Sin(2 * Mathf.PI * 7f * t);
+                phase += freq / rate; phase -= Mathf.Floor(phase);
+                float saw = phase * 2f - 1f;
+                wobble += (NextNoise(ref seed) - wobble) * .0015f;
+                float raw = saw * (.55f + 1.6f * Mathf.Abs(wobble)) + .12f * NextNoise(ref seed);
+                lowpass += (raw - lowpass) * .22f;
+                float envelope = Mathf.Min(1f, t / .06f) * Mathf.Pow(1f - u, 1.4f);
+                samples[i] = lowpass * envelope;
+            }
+            Normalize(samples, .4f);
+            return Build("DoorCreak", samples, rate);
+        }
+
         // Gunshot: sharp noise attack, a low impact tone, and a short quiet noise tail for reverb.
         public static AudioClip Shot()
         {

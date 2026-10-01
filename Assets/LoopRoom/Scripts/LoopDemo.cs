@@ -22,7 +22,8 @@ namespace LoopRoom
         bool saved, privateOverlay;
         float trackingLost;
         string sessionId, logMessage = "";
-        AudioSource enemyAudio, ambience;
+        AudioSource enemyAudio, ambience, doorAudio;
+        AudioClip doorLatch, doorCreak;
         bool desktopArg, autostart, autoescape, autostartUsed, autoShieldDone, autoExitDone;
         bool simulateDrift;
         // Calibration (task021): shown before the first Ready screen and again whenever the
@@ -133,6 +134,11 @@ namespace LoopRoom
             enemyAudio = new GameObject("Enemy audio").AddComponent<AudioSource>();
             enemyAudio.transform.SetParent(room.Root,false); enemyAudio.playOnAwake=false;
             enemyAudio.spatialBlend=1; enemyAudio.minDistance=.5f; enemyAudio.maxDistance=10; enemyAudio.volume=.22f;
+            // The door's own 3D source sits in the doorway, so lever, latch and creak come from where the door is.
+            doorAudio = new GameObject("Door audio").AddComponent<AudioSource>();
+            doorAudio.transform.SetParent(room.Root,false); doorAudio.transform.localPosition=new Vector3(.5f,1.0f,2.8f);
+            doorAudio.playOnAwake=false; doorAudio.spatialBlend=1; doorAudio.minDistance=.5f; doorAudio.maxDistance=10; doorAudio.volume=.5f;
+            doorLatch=ProceduralAudio.DoorLatch(); doorCreak=ProceduralAudio.DoorCreak();
             // Local, not world, position: room.Sound is a child of room.Root, so this keeps the
             // chime coming from the room's front after Begin()/loop-change repositions Root.
             room.Sound.transform.localPosition = new Vector3(0,1.4f,.7f);
@@ -321,7 +327,7 @@ namespace LoopRoom
                 // frame, so the move itself is never seen (see task018 design note 3).
                 if(simulateDrift) rig.SimulateDesktopDrift(Model.LoopId);
                 PlaceRoom();
-                rig.ClearSelection(); room.Sound.Stop(); enemyAudio.Stop();
+                rig.ClearSelection(); room.Sound.Stop(); enemyAudio.Stop(); doorAudio.Stop();
                 room.Sound.PlayOneShot(room.Chime); lastLoop=Model.LoopId; lastLoopTime=0;
                 autoShieldDone=false; autoExitDone=false;
             }
@@ -340,6 +346,11 @@ namespace LoopRoom
             // A long frame can cross t=3 and the shot together; LoopTime is frozen in Blackout, so the latch still plays.
             if((Model.Phase==SessionPhase.Playing || Model.Phase==SessionPhase.Blackout) && lastLoopTime<3 && Model.LoopTime>=3)
                 enemyAudio.PlayOneShot(room.Latch);
+            // Same crossing as the t=3 cue above; the clip itself starts .1s late so the lever and latch clicks follow the thump.
+            if((Model.Phase==SessionPhase.Playing || Model.Phase==SessionPhase.Blackout) && lastLoopTime<DoorRig.StartTime && Model.LoopTime>=DoorRig.StartTime)
+                doorAudio.PlayOneShot(doorLatch);
+            if(Model.Phase==SessionPhase.Playing && lastLoopTime<DoorRig.CreakTime && Model.LoopTime>=DoorRig.CreakTime)
+                doorAudio.PlayOneShot(doorCreak,.7f);
             if(Model.Phase==SessionPhase.Playing && lastLoopTime<Model.ExitOpens && Model.LoopTime>=Model.ExitOpens)
                 room.Sound.PlayOneShot(room.Open,.6f);
             if(lastRecords<Model.Records.Count)
@@ -450,7 +461,7 @@ namespace LoopRoom
             float t=(float)Model.LoopTime;
             bool playing=Model.Phase==SessionPhase.Playing;
             room.Barrier.localPosition=new Vector3(0,Model.ShieldRaised?1.65f:.35f,1.08f);
-            room.Door.localPosition=new Vector3(.5f+Mathf.Clamp01((t-3)/.65f)*.9f,1.0f,2.86f);
+            room.Door.SetLoopTime(t);
             room.Enemy.gameObject.SetActive(t>=3 && (playing || Model.Phase==SessionPhase.Blackout));
             float move=Mathf.Clamp01((t-8)/3.5f);
             room.Enemy.localPosition=Vector3.Lerp(new Vector3(.5f,0,2.5f),new Vector3(1.25f,0,.38f),move);
