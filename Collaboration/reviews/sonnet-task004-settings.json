@@ -1,0 +1,40 @@
+{
+  "task": "task004-settings",
+  "file_hashes": {
+    "Assets/XR/Settings/OpenXR Package Settings.asset": "86055c0dee66653e9c94935c7c3d38d513dc8e86e3323082a41df4dd4816ebab",
+    "ProjectSettings/EditorBuildSettings.asset": "ce0bbad0cc98d78125c6d56cbb400d5ef2e93927175d59b2bacbda9c426be116",
+    "ProjectSettings/GraphicsSettings.asset": "31523be661354e907224a30e8ddae3a7c9629441e736fdcb41749d9c9955a010",
+    "ProjectSettings/ProjectSettings.asset": "dfd3c18df40e7664ee8db6816a210248842b14ecaa81dbb58b46e1d17ed9bc65",
+    "ProjectSettings/TagManager.asset": "7044e3d1ea29df88cd3e22d80075ca0d9c8838947002868da13e925bdb6119ff"
+  },
+  "verdict": "request_changes",
+  "findings": [
+    "ProjectSettings.asset: fullscreenMode が 1(FullScreenWindow)から 3(Windowed)へ変更。PC単体起動時の画面表示モードに影響する実質的な挙動変更であり、Unityバージョン起因のスキーマ変更とは別種のため、意図的か要確認。",
+    "ProjectSettings.asset: m_BuildTargetGraphicsAPIs に WindowsStandaloneSupport 用のエントリ(m_APIs: 02000000, m_Automatic: 0)が新規追加され、自動API選択から単一API手動指定へ変更。PCVR/OpenXR実行時に使用可能なグラフィックスAPIが制限される可能性があり、意図確認が必要。",
+    "ProjectSettings.asset: runInBackground が 0→1 に変更。ウィンドウ非フォーカス時も実行継続する設定で、PCVR用途としては妥当と考えられるが仕様変更として明記すべき。",
+    "ProjectSettings.asset: AndroidMinSdkVersion が 22→25 に変更。Quest3向けビルド要件（プラットフォーム側の最小SDK要求）との整合性を確認する必要あり。",
+    "GraphicsSettings.asset: m_AlwaysIncludedShaders に未知のGUID(933532a4fcc9baf4fa0491de14d08ed7, 650dd9526735d5b46b79224bc6e94025)を持つシェーダーが2件追加。内容不明なため、常時同梱による不要なビルドサイズ増加やシェーダーストリッピング回避が意図通りか確認が必要。",
+    "OpenXR Package Settings.asset: OculusTouchControllerProfile(Standalone) の m_enabled が 0→1 に変更。PC側でOculus Touchコントローラープロファイルが有効化されており、PCVR対応拡張として妥当と見られるが承認要。",
+    "EditorBuildSettings.asset: com.unity.xr.management.loader_settings への参照が新規追加。XR Plugin Management のローダー設定拡張であり、他の変更と整合的。",
+    "TagManager.asset: レイヤー8/9に PlayerOnly / SpectatorOnly が追加。プロジェクト固有機能(観戦者機能等)としての意図的な追加と推測される。"
+  ],
+  "evidence": [
+    "Assets/XR/Settings/OpenXR Package Settings.asset diff 行: 'm_enabled: 0' → 'm_enabled: 1' (OculusTouchControllerProfile Standalone)",
+    "ProjectSettings/EditorBuildSettings.asset diff: 'com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 4f1bedbad49e1a4419bc7e72b49c2a32, type: 2}' 追加",
+    "ProjectSettings/GraphicsSettings.asset diff: '- {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}' 他1件追加",
+    "ProjectSettings/ProjectSettings.asset diff: 'fullscreenMode: 1' → 'fullscreenMode: 3'",
+    "ProjectSettings/ProjectSettings.asset diff: 'm_BuildTargetGraphicsAPIs' に WindowsStandaloneSupport エントリ追加(m_Automatic: 0)",
+    "ProjectSettings/ProjectSettings.asset diff: 'runInBackground: 0' → 'runInBackground: 1'",
+    "ProjectSettings/ProjectSettings.asset diff: 'AndroidMinSdkVersion: 22' → 'AndroidMinSdkVersion: 25'",
+    "ProjectSettings/TagManager.asset diff: 空欄2件 → 'PlayerOnly' / 'SpectatorOnly'"
+  ],
+  "deferred": [
+    "ProjectSettings.asset の大部分の差分(serializedVersion 24→28に伴うフィールド名変更・新規デフォルト値の大量追加、例: androidResizableWindow→androidResizeableActivity、iOSLaunchScreenCustomXibPath削除、switch系フィールド群等)はUnityエディタバージョンアップグレードに起因するスキーマ変更と推測され、1件ずつの個別評価は本レビュー範囲外として保留。",
+    "TagManager.asset 末尾の空文字列32件の削除(旧ソート/予備レイヤースロット)はシリアライズ形式変更(v2→v3)によるものと推測されるが、詳細な意味論は未検証。"
+  ],
+  "unverified": [
+    "GraphicsSettings.asset に追加された2つのシェーダーGUIDの実体(シェーダー名・用途)は本スナップショットからは特定不能。",
+    "ProjectSettings.asset の m_APIs: 02000000 が具体的にどのGraphicsDeviceType(例: Direct3D11)を指すか、Unityバージョン依存の列挙値であり本レビューでは断定不能。",
+    "AndroidMinSdkVersion 25 がQuest3の実機/ストア要件を満たすかどうかはプラットフォーム側要件文書との照合が必要で未検証。"
+  ]
+}

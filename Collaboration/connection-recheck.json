@@ -1,0 +1,5 @@
+{
+  "status": "connection_check_passed",
+  "requested_model": "claude-sonnet-5",
+  "transport": "new isolated CLI process; not existing Desktop session"
+}

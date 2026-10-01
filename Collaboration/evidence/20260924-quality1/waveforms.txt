@@ -1,0 +1,5 @@
+Chime    44100 Hz  1.300 s  peak 0.500  rms 0.060  clipped 0  seam|last-first| 0.0003
+Latch    44100 Hz  0.130 s  peak 0.600  rms 0.117  clipped 0  seam|last-first| 0.2059
+Shot     44100 Hz  0.320 s  peak 0.650  rms 0.081  clipped 0  seam|last-first| 0.0331
+Open     44100 Hz  0.420 s  peak 0.550  rms 0.117  clipped 0  seam|last-first| 0.0006
+RoomTone 44100 Hz  4.000 s  peak 0.180  rms 0.083  clipped 0  seam|last-first| 0.0015

@@ -1,0 +1,476 @@
+{
+    "sessionId": "eb4e519e3aa7489b95f33139b9177e7b",
+    "scenario": "S01_Shield",
+    "version": "0.1.0-prototype",
+    "mode": "Desktop",
+    "outcome": "Escaped",
+    "elapsed": 228.9573236957658,
+    "timings": {
+        "firstShot": 6.0,
+        "searchShot": 12.0,
+        "exitOpens": 6.5,
+        "exitCloses": 12.0,
+        "blackout": 0.16,
+        "playLimit": 172.0,
+        "endingLength": 8.0,
+        "enforcePlayLimit": false
+    },
+    "events": [
+        {
+            "loop": 1,
+            "sessionTime": 0.0,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 1,
+            "sessionTime": 6.0,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 6.16,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 12.16,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 3,
+            "sessionTime": 12.32,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 3,
+            "sessionTime": 18.32,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 4,
+            "sessionTime": 18.48,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 4,
+            "sessionTime": 24.48,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 5,
+            "sessionTime": 24.64,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 5,
+            "sessionTime": 30.64,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 6,
+            "sessionTime": 30.8,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 6,
+            "sessionTime": 36.8,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 7,
+            "sessionTime": 36.96,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 7,
+            "sessionTime": 42.96,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 8,
+            "sessionTime": 43.12,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 8,
+            "sessionTime": 49.120000000000008,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 9,
+            "sessionTime": 49.28,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 9,
+            "sessionTime": 55.28,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 10,
+            "sessionTime": 55.44,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 10,
+            "sessionTime": 61.44,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 11,
+            "sessionTime": 61.6,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 11,
+            "sessionTime": 67.6,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 12,
+            "sessionTime": 67.76,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 12,
+            "sessionTime": 73.76,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 13,
+            "sessionTime": 73.92,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 13,
+            "sessionTime": 79.92,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 14,
+            "sessionTime": 80.08,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 14,
+            "sessionTime": 86.08,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 15,
+            "sessionTime": 86.24,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 15,
+            "sessionTime": 92.24000000000001,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 16,
+            "sessionTime": 92.4,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 16,
+            "sessionTime": 98.4,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 17,
+            "sessionTime": 98.56,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 17,
+            "sessionTime": 104.56,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 18,
+            "sessionTime": 104.72,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 18,
+            "sessionTime": 110.72,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 19,
+            "sessionTime": 110.88,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 19,
+            "sessionTime": 116.88,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 20,
+            "sessionTime": 117.04,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 20,
+            "sessionTime": 123.04,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 21,
+            "sessionTime": 123.2,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 21,
+            "sessionTime": 129.2,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 22,
+            "sessionTime": 129.36,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 22,
+            "sessionTime": 135.36,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 23,
+            "sessionTime": 135.52,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 23,
+            "sessionTime": 141.52,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 24,
+            "sessionTime": 141.68,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 24,
+            "sessionTime": 147.68,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 25,
+            "sessionTime": 147.84,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 25,
+            "sessionTime": 153.84,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 26,
+            "sessionTime": 154.0,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 26,
+            "sessionTime": 160.0,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 27,
+            "sessionTime": 160.16,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 27,
+            "sessionTime": 166.16,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 28,
+            "sessionTime": 166.32,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 28,
+            "sessionTime": 172.32,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 29,
+            "sessionTime": 172.48,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 29,
+            "sessionTime": 178.48000000000003,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 30,
+            "sessionTime": 178.64000000000002,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 30,
+            "sessionTime": 184.64000000000002,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 31,
+            "sessionTime": 184.8,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 31,
+            "sessionTime": 190.8,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 32,
+            "sessionTime": 190.96,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 32,
+            "sessionTime": 196.96,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 33,
+            "sessionTime": 197.12,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 33,
+            "sessionTime": 203.12,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 34,
+            "sessionTime": 203.28,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 34,
+            "sessionTime": 209.28,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 35,
+            "sessionTime": 209.44,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 35,
+            "sessionTime": 215.44,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 36,
+            "sessionTime": 215.6,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 36,
+            "sessionTime": 221.6,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 37,
+            "sessionTime": 221.76,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 37,
+            "sessionTime": 221.88792859727983,
+            "loopTime": 0.12792859727981935,
+            "kind": "shield_raised"
+        },
+        {
+            "loop": 37,
+            "sessionTime": 227.76,
+            "loopTime": 6.0,
+            "kind": "shot_blocked"
+        },
+        {
+            "loop": 37,
+            "sessionTime": 228.9573236957658,
+            "loopTime": 7.197323695765803,
+            "kind": "Escaped"
+        }
+    ]
+}

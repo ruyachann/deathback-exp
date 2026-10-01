@@ -1,0 +1,37 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/029-build-info.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/029-build-info.md",
+      "sha256": "f56d98a10a395efb958c828a0bdf777bdf2fe64b6500be2f480c21d261167d12"
+    },
+    {
+      "path": "Collaboration/reviews/task029-diff.md",
+      "sha256": "14e942e2f35765768ab3efa7a21745c92e22993dc954d996f560ed972c0eb717"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task029-independent-mcp.md",
+      "sha256": "59726dd305e39230ca08efb10f8531aaa0000aa666f620c3af56aaf2f492ccb0"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-task029-independent-mcp.md",
+      "sha256": "e1a692d7d95ffb03c8389aee40857dbc6c7b4208f74ef6ce30e06c2262ac5685"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260925T052930017306Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

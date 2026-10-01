@@ -1,0 +1,39 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local\\OpenAI\\Codex\\bin\\247581e40ee272fb\\codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/010-rules-copy-and-minimums.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "c7a53997e17be6079c1f3c8f675fbca3ebf74757f14665036a7b019b4656f731"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/010-rules-copy-and-minimums.md",
+      "sha256": "e2e35725ed70e397e5f0e5d757013e6b0f86a1136b0a729155d587e7866b385a"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopModel.cs",
+      "sha256": "ec04e9dca75a15641d0c2d4eec35dff0211f6340ca26e48617819852ffce1d96"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/LoopModelChecks.cs",
+      "sha256": "3cc1aca7db8a5a0d2d331ad82df263dd2e14745dfc929acbfada0e4687450777"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/Program.cs",
+      "sha256": "f59bf9e766f983865f76532ca635d8b2647ddae00df489f078952f81a0733eb3"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopDemo.cs",
+      "sha256": "9d6925b4e3dcd36edeb2d338f1f39bb9c479bebf0a2d2bfb4caa1380d0e39097"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260923T173123510129Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

@@ -1,0 +1,40 @@
+{
+  "reviewer": "claude",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/007-remove-session-time-limit.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "be53f607d20e3503473a167b094d52e1ac454328b09b0c7e64a3df382ae1ebd5"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "5e88123462781bc38ff4f6e797d6da67afe5d832a5abc9959b6c6ed4065e50f6"
+    },
+    {
+      "path": "Collaboration/tasks/007-remove-session-time-limit.md",
+      "sha256": "04098ddac34a66a053489bc1db8a037832e84af16e789ef6eacdce17ec3b2d93"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopModel.cs",
+      "sha256": "dc0d1dc38a90c6fc74c70d4780feb160d2339d261b0d88121a9253f1b4685a30"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/LoopModelChecks.cs",
+      "sha256": "05b8b2fddc3776849ad624858fa4786563d4925bc3cca1089e3f80b17371041d"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/Program.cs",
+      "sha256": "4d01d73bcfb82168332c4aaeadaaa17524d5419d45f4811e92ceedd975534e8d"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopDemo.cs",
+      "sha256": "9d6925b4e3dcd36edeb2d338f1f39bb9c479bebf0a2d2bfb4caa1380d0e39097"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260923T112315625997Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

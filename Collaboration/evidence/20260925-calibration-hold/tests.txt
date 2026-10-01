@@ -1,0 +1,58 @@
+Compile: Unity 6000.3.15f1 Roslyn (DotNetSdkRoslyn\csc.dll), C# 9
+sha256 fddd6568ac4bed02fdaf0a1c50f60183d80e3249bb9bbe064d41eb6cf4f9f4f0  LoopModel.cs
+sha256 444e835391c201b957e9b3a5ac975af762d6799d64e1b18bba46956ea1ab74c2  LoopModelChecks.cs
+sha256 3c13ee4504adc680f6fb52a804709fc2a22d3a52a3faa0e292b02e9c10a9b86a  RoomAnchor.cs
+sha256 9fb475cc77ab33e40448a535d210047e70fb7f6069513a1eff69958eed482217  PlayAreaSettings.cs
+sha256 06912abd957e2d3d0c92199d31859b209d30af88d162af53ebe8149c0cd667ad  RoomAnchorChecks.cs
+sha256 59174398010fed949be68cf94145e85a41ac320d6203db248b89a692bb036ce8  FrameStats.cs
+sha256 aa24ea083167cb1d19bd1c3132b3e9d1dc79ada3b8ba1a2d06dd45ecd0f32f2c  FrameStatsChecks.cs
+sha256 cfe180a6bd5b8721a9dd3f4315c08d09d100a45861eb6c55d61bbe24e5b02d28  Program.cs
+csc exit=0
+PASS: Unprotected attack returns immediately and resets only world state
+PASS: Shield grants a real escape window
+PASS: No escape before unlocking or with a stale loop id
+PASS: Repeated death callbacks produce only one reset
+PASS: Deadline includes blackouts and ends within 180 seconds
+PASS: Default rules keep looping without a session deadline
+PASS: Model owns a copy of its loop rules
+PASS: Changing returned rules cannot alter model behavior
+PASS: Minimum interval boundaries are enforced
+PASS: Extremely small loop timings are rejected
+PASS: Minimum intervals remain bounded at MaxStep
+PASS: Advance accepts MaxStep and rejects larger finite deltas without mutation
+PASS: Session deadline validation is conditional
+PASS: Missing escape window allows the enemy to flank
+PASS: Large and small time steps yield the same no-input outcome
+PASS: 100 resets reject old events and clear shield state
+PASS: Stop is distinct from death and does not resume the same session
+PASS: Invalid timing and non-finite delta are rejected
+PASS: All seven timings reject NaN and both infinities
+PASS: No-action deadline and retained outcome at 180 seconds
+PASS: 20 model checks
+PASS: Center fits without correction for every sampled yaw
+PASS: Boundary outward yaw is corrected by the minimum search step
+PASS: All four corners fit in a center-facing direction
+PASS: Rotated safety area is evaluated in area coordinates
+PASS: Position outside the safety area returns the head yaw
+PASS: Chosen yaw is normalized into zero through 360
+PASS: Choosing a front yaw is deterministic
+PASS: Non-finite public inputs throw ArgumentException
+PASS: Unsampled arc bulge outside the boundary is rejected
+PASS: Default settings overloads match the constant API
+PASS: Larger configured area avoids an unnecessary correction
+PASS: Play area settings reject invalid ranges and non-finite values
+PASS: 12 room anchor checks
+PASS: Constant dt yields correct mean, P95 within one bucket, and max
+PASS: Only dt exceeding 1.5x the target frame time counts as dropped
+PASS: Non-finite and negative dt are ignored
+PASS: Reset returns to an empty state
+PASS: Invalid target Hz throws ArgumentException
+PASS: Target Hz outside [1, 1000] throws ArgumentException
+PASS: Zero frames report zero for every value
+PASS: P95 lands in the extended coarse bucket when >100ms frames exceed 5%
+PASS: A single extreme outlier does not pull P95 toward the max
+PASS: A huge finite dt does not throw and saturates into the last bucket
+PASS: Binary-exact 1.5x boundary: at, just below, and just above are checked separately
+PASS: double.MaxValue keeps MeanMs and MaxMs finite
+PASS: 12 frame stats checks
+test exit=0

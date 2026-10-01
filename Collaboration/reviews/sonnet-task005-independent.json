@@ -1,0 +1,30 @@
+{
+  "reviewer": "Claude Sonnet 5 (claude-sonnet-5), session 2026-09-22, independent of the Fable 5.1 implementer session",
+  "target_task": "Collaboration/tasks/005-stage2-first-fixes.md",
+  "implementation_report_reviewed": "Collaboration/reviews/fable-task005-implementation.md",
+  "verdict": "approve_with_open_items",
+  "file_hashes": {
+    "Assets/LoopRoom/Scripts/LoopDemo.cs": "4554d309f5d7e2817e4bdfd4920eb9a888c754b942a4b3e68f7379dd3e207a96",
+    "Assets/LoopRoom/Scripts/RoomVisuals.cs": "2ba193680da0e7f63893a7c4414579ef6d70a527eaa4761963a037f840a291a3"
+  },
+  "hash_recheck": "Recomputed sha256sum locally on 2026-09-22; both files match the values recorded in fable-task005-implementation.md exactly (no drift since 2026-09-19).",
+  "findings": [
+    "B-2 (LoopDemo.cs:87): 条件が `!rig.IsVR && !Application.isFocused && !Application.isEditor && !idle` に変更されており、desktop確認モードでのみフォーカス喪失でInterruptする。VR中のフォーカス喪失は無視され、Esc(84行目)・追跡喪失0.3秒(88-97行目)・OnApplicationPause(199行目)の3経路のみが中断要因として残る。タスクの意図と一致。",
+    "B-3 (LoopDemo.cs:50-52, 168): enemyAudioがStart()内でroom.Root直下の新規GameObjectとして生成され、playOnAwake=falseの常時アクティブなAudioSource。RefreshWorld()の168行目で毎フレーム`room.Enemy.localPosition+(0,1.4,0)`へ追従しており、この行はEnemy.gameObjectのSetActive状態(164行目)や再生中/非再生中の条件に関わらず無条件で実行される。Latch再生(114行目)は`Model.Phase==Playing`かつ`lastLoopTime<3<=Model.LoopTime`でenemyAudio.PlayOneShotを呼ぶため、Enemyオブジェクト自体の有効化(t>=3)タイミングと独立になり、報告されていた「Enemy無効化中はAudioSourceも無効でPlayOneShotが無音になる」不具合の原因を解消している。",
+    "LoopId変化時(100-104行目)のenemyAudio.Stop()は無変更で、周回切替時のリセット経路は保持されている。Shot音(124行目)もenemyAudioへ移っており、Latchと同じ経路になったため一貫性がある。",
+    "B-1 (RoomVisuals.cs:114-120): `using UnityEngine.Rendering.Universal;`追加とSpectator.GetUniversalAdditionalCameraData().allowXRRendering=falseの追加を確認。stereoTargetEye=Noneは残置されておりBuilt-inフォールバック時の挙動に影響しない。API呼び出し自体は妥当。",
+    "許可範囲(LoopDemo.cs, RoomVisuals.csのみ)を超える変更は見当たらない。LoopModel.cs、DemoRig.csのSHA256は変更前と一致(67599928…, eb753e6b…)、Editorスクリプト・設定ファイルへの変更もなし。"
+  ],
+  "verification_performed_this_session": [
+    "sha256sumで4ファイル(LoopDemo.cs, RoomVisuals.cs, LoopModel.cs, DemoRig.cs)を再計算し、既存記録と一致することを確認。",
+    "Unity 6000.3.15f1でbatchmodeコンパイルを再実行(-batchmode -nographics -quit)。Editor未起動をTemp/UnityLockfile不在で確認してから実行。ログ: Collaboration/local-logs/unity-batchmode-20260922.log。CompileScripts成功、`error CS`0件、`warning CS`0件、終了コード0。task005実装報告時の結果(エラー0・警告0)と一致し、ドリフトなし。",
+    "続けてGUI操作でUnity Editorをインタラクティブに起動(-projectPathのみ、通常起動)。起動前にTemp/UnityLockfile不在・Unityプロセス無しを再確認済み。deathback-exp/LoopRoomシーンを開き、desktopモードでPlayを実行。Console(Error Pause無効、デフォルトフィルタ)は開始時点でerror 0・warning 4・info 1(既知のXR関連警告4件+OpenXRローダー情報1件、STATE.md記載の『警告4件』と一致)。Enterキーでセッション開始し、t=3秒(Latch想定タイミング)を含む約14秒間Playを継続observedしたが、Console件数(0/4/1)に変化なし——新規warning/errorは1件も発生せず、`Can not play a disabled audio source`に該当する警告は出なかった。Playを停止し、Editorも終了(停止状態で完了)。",
+    "音そのものが実際に鳴ったかは画面情報からは確認できないが、B-3が修正しようとしていた具体的な不具合(disabled AudioSourceへのPlayOneShotによる警告)は、そのAudioSourceが常時activeなRoot直下オブジェクトに移されたことでconsole上も再現しないことを実機Play操作で確認した。"
+  ],
+  "unverified": [
+    "Latchの実際の可聴音(音量・定位の主観的な自然さ)はスクリーンショット/コンソールでは確認不可。音声ハードウェアでの試聴が必要。",
+    "Quest 3実機でのB-1(HMD内に俯瞰視点が混入しないこと、PC観客表示が従来通り出ること)、B-2(VR中に別ウィンドウへフォーカスを移してもセッション継続すること)は未確認。Quest 3は引き続き接続不可。",
+    "B-3の足音定位の自然さ(Enemy初期位置(.8,0,2.5)は扉(.8,1.18,2.86)の手前0.36m)は主観評価が必要で、コードレビューの範囲外。",
+    "Sol側の独立レビューは未実施・未交換。本レビューはClaude単独(ユーザー指示により今回はCodex/Sol/Astraを呼び出していない)であり、相互レビュー完了とは扱わない。"
+  ]
+}

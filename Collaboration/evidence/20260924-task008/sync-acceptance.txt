@@ -1,0 +1,26 @@
+﻿task008: Sync-PublishedBranch.ps1 acceptance (PS 5.1, throwaway repos)
+2026-09-24 01:51:50 +09:00  commit c506fd8  cwd C:\deathback\deathback-exp
+
+PS> & 'C:\Users\PC_User\AppData\Local\Temp\claude\C--deathback\7f63be92-85c0-4090-b2b9-0a7c57106cd3\scratchpad\test_sync.ps1'
+original = d24da50:Sync-PublishedBranch.ps1 sha256 7275417dbef6 / fixed = working tree sha256 82b58822b14b
+== 0. original script on unborn repo (expect failure = bug reproduced)
+exit=1
+powershell.exe : git.exe : fatal: Needed a single revision
+At C:\Users\PC_User\AppData\Local\Temp\claude\C--deathback\7f63be92-85c0-4090-b2b9-0a7c57106cd3\scratchpad\test_sync.ps
+1:22 char:12
+
+== 1. fixed script on unborn repo (expect success)
+exit=0
+ D Validation/stage01-model-ci.md
+?? dummy-user-file.txt
+Published history synchronized. Working files were preserved; inspect differences before committing.
+branch=codex/stage-01-looproom
+upstream=origin/codex/stage-01-looproom
+dummy kept=True
+HEAD=c506fd8 origin=c506fd8
+== 2. rerun after sync (expect 'Local history already exists')
+exit=1 refused=True unchanged=True
+== 3. unborn repo with staged file (expect 'Index is not empty')
+exit=1 refused=True still unborn=True
+
+[exit code: 0]

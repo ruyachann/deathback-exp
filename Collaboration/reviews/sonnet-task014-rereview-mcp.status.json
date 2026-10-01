@@ -1,0 +1,37 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/014-quality-visual-atmosphere.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "c7a53997e17be6079c1f3c8f675fbca3ebf74757f14665036a7b019b4656f731"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/014-quality-visual-atmosphere.md",
+      "sha256": "e7579dff4c9adae6c5ec39606d64c5759b6379dc1bc46e7041c5d4d52052545d"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs",
+      "sha256": "5e30a7380ff6a18cd7d88af42c705fb1e0bda24f9a1eefb73c81bd78d1145b5a"
+    },
+    {
+      "path": "Assets/LoopRoom/Shaders/LoopRoomText.shader",
+      "sha256": "ba0b47dba01f227317a2db719f27e700b5ca1b1cda9973d450d0622b9d77c996"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/DemoSetup.cs",
+      "sha256": "cd827835ae28d895813d4d18ae572c57c5fe152c97a6e3b20b5a7bd2f962b2ed"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T022318235730Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

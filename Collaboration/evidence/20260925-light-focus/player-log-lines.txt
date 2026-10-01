@@ -1,0 +1,5 @@
+LoopRoom: --autostart is active; ignoring focus loss.
+LoopRoom: PlaceRoom pos=(0.00,0.00) headYaw=0.0 frontYaw=0.0 corrected=False diff=0.0 fits=True
+LoopRoom: PlaceRoom pos=(0.00,0.00) headYaw=0.0 frontYaw=0.0 corrected=False diff=0.0 fits=True
+LoopRoom: PlaceRoom pos=(0.00,0.00) headYaw=0.0 frontYaw=0.0 corrected=False diff=0.0 fits=True
+LoopRoom: PlaceRoom pos=(0.00,0.00) headYaw=0.0 frontYaw=0.0 corrected=False diff=0.0 fits=True

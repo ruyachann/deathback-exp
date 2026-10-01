@@ -1,0 +1,12 @@
+LoopRoom v0.1: isolated C# model checks (not Unity/XR integration tests)
+PASS: Unprotected attack returns immediately and resets only world state
+PASS: Shield grants a real escape window
+PASS: No escape before unlocking or with a stale loop id
+PASS: Repeated death callbacks produce only one reset
+PASS: Deadline includes blackouts and ends within 180 seconds
+PASS: Missing escape window allows the enemy to flank
+PASS: Large and small time steps yield the same no-input outcome
+PASS: 100 resets reject old events and clear shield state
+PASS: Stop is distinct from death and does not resume the same session
+PASS: Invalid timing and non-finite delta are rejected
+TOTAL: 10 passed

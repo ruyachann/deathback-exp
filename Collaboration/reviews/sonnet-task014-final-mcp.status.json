@@ -1,0 +1,33 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/014-quality-visual-atmosphere.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "c7a53997e17be6079c1f3c8f675fbca3ebf74757f14665036a7b019b4656f731"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/014-quality-visual-atmosphere.md",
+      "sha256": "633dce9e98fb5de70cd7bf457347da63bf3be5b8b479f4baa2283320d49e5236"
+    },
+    {
+      "path": "Assets/LoopRoom/Shaders/LoopRoomText.shader",
+      "sha256": "97edd79e2a9f4db25ed5f48d6d61f9e596c88fd4f74b463d1d93fb79f47fffd2"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs",
+      "sha256": "5e30a7380ff6a18cd7d88af42c705fb1e0bda24f9a1eefb73c81bd78d1145b5a"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T023101751399Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

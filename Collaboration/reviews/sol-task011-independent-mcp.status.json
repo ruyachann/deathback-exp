@@ -1,0 +1,31 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local\\OpenAI\\Codex\\bin\\247581e40ee272fb\\codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/011-touch-plus-profile.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "c7a53997e17be6079c1f3c8f675fbca3ebf74757f14665036a7b019b4656f731"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/011-touch-plus-profile.md",
+      "sha256": "96b18d13157726077c8d564d02533ab044af7db2c6d9d32bbc2d1e22d9e3e41f"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/DemoSetup.cs",
+      "sha256": "b1fcb5abecbd4ca145604c1ad3a2910e1b9d3c1a9268f277cc3f1af3496f07d0"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/DemoRig.cs",
+      "sha256": "eb753e6b0685b92a771918bd7756086a486ea140ecfb3532dd164f666f421474"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260923T174026369760Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

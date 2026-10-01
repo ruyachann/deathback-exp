@@ -1,0 +1,37 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/025-procedural-textures.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/025-procedural-textures.md",
+      "sha256": "029f35e06d4a2748cbbbecfcf60ca1c5ed8a7f00ffb6fdfc817b69b1158a4ea0"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomVisuals.cs",
+      "sha256": "bdc4fd3eb8a7a50a1ab682a405058e3eee549f4a2a3ab05b5f0e040da253e5fb"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task025-exchange-mcp.md",
+      "sha256": "0d970a9d19a1d48f5e36711d6f762da11fb67bef4c3cf60d4806ecca92c44b71"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-task025-exchange-mcp.md",
+      "sha256": "b5ec5405c9df8624d2049034565525dc48630d34aaa253436269f865a1157c61"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T221826825180Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

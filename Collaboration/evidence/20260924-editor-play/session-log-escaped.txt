@@ -1,0 +1,24 @@
+﻿task007/task005: Editor play session log (escaped after 228.96s, no TimedOut)
+2026-09-24 02:08:06 +09:00  commit 68a78f6  cwd C:\deathback\deathback-exp
+
+PS> $j = Get-Content 'Collaboration\evidence\20260924-editor-play\session-log-escaped.json' -Raw | ConvertFrom-Json; 'Session log saved by LoopDemo.SaveLog (Editor desktop play, 2026-09-24 02:03-02:07 JST)'; 'sessionId=' + $j.sessionId + ' mode=' + $j.mode + ' outcome=' + $j.outcome + ' elapsed=' + [Math]::Round($j.elapsed,2) + 's'; 'timings: enforcePlayLimit=' + $j.timings.enforcePlayLimit + ' playLimit=' + $j.timings.playLimit + ' (scene value; not enforced) endingLength=' + $j.timings.endingLength; 'events=' + $j.events.Count + ' loops=' + ($j.events | ? kind -eq 'loop_started').Count + ' TimedOut events=' + ($j.events | ? kind -eq 'TimedOut').Count; '--- first 4 and last 8 events'; $j.events | Select -First 4 | % { 'loop=' + $_.loop + ' loopTime=' + [Math]::Round($_.loopTime,2) + ' sessionTime=' + [Math]::Round($_.sessionTime,2) + ' ' + $_.kind }; '...'; $j.events | Select -Last 8 | % { 'loop=' + $_.loop + ' loopTime=' + [Math]::Round($_.loopTime,2) + ' sessionTime=' + [Math]::Round($_.sessionTime,2) + ' ' + $_.kind }
+Session log saved by LoopDemo.SaveLog (Editor desktop play, 2026-09-24 02:03-02:07 JST)
+sessionId=eb4e519e3aa7489b95f33139b9177e7b mode=Desktop outcome=Escaped elapsed=228.96s
+timings: enforcePlayLimit=False playLimit=172.0 (scene value; not enforced) endingLength=8.0
+events=76 loops=37 TimedOut events=0
+--- first 4 and last 8 events
+loop=1 loopTime=0.0 sessionTime=0.0 loop_started
+loop=1 loopTime=6.0 sessionTime=6.0 first_shot
+loop=2 loopTime=0.0 sessionTime=6.16 loop_started
+loop=2 loopTime=6.0 sessionTime=12.16 first_shot
+...
+loop=35 loopTime=0.0 sessionTime=209.44 loop_started
+loop=35 loopTime=6.0 sessionTime=215.44 first_shot
+loop=36 loopTime=0.0 sessionTime=215.6 loop_started
+loop=36 loopTime=6.0 sessionTime=221.6 first_shot
+loop=37 loopTime=0.0 sessionTime=221.76 loop_started
+loop=37 loopTime=0.13 sessionTime=221.89 shield_raised
+loop=37 loopTime=6.0 sessionTime=227.76 shot_blocked
+loop=37 loopTime=7.20 sessionTime=228.96 Escaped
+
+[exit code: 0]

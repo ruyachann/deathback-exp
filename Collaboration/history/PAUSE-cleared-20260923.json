@@ -1,0 +1,30 @@
+﻿{
+    "status":  "paused",
+    "reason":  "User requested pause immediately before five-hour exhaustion; Codex remaining13%, no new AI calls",
+    "codex_remaining_percent":  13,
+    "checked_at":  "2026-09-17T07:40:36.646066+00:00",
+    "resume_requires":  "Explicit user resume + fresh account limits \u003e=10%, then read RESUME and remove this local pause",
+    "source_hashes":  {
+                          "Assets/LoopRoom/Scripts/LoopModel.cs":  "67599928845de6a3159fcd7ff2688f7ff783dbb5b0653b0d40e4f988e9cad55e",
+                          "Assets/LoopRoom/Scripts/DemoRig.cs":  "eb753e6b0685b92a771918bd7756086a486ea140ecfb3532dd164f666f421474",
+                          "Assets/LoopRoom/Scripts/LoopDemo.cs":  "449b19bd9694afa8cb5eab145a70b46dadbab41a362404900923e893f172d39f",
+                          "Docs/UNITY_ACCEPTANCE.md":  "5553a388f8776ebd4bc8e6800502c1c400c586e818a165eeb321b32e7776b70d",
+                          "Docs/DEVELOPMENT.md":  "de697cc16561cf9631d4a3848b4cfa97339d53bcf80fc2ef085b435f7d12d518"
+                      },
+    "latest_codex_remaining_percent":  11,
+    "latest_checked_at":  "2026-09-17T07:41:10.168084+00:00",
+    "claude_scoped_resume":  {
+                                 "authorized_at":  "2026-09-22",
+                                 "authorized_by":  "user, in-session decision (not a file-based instruction)",
+                                 "scope":  "Claude Sonnet 5 only: independent review of task005, SHA256 drift check, local Unity batchmode compile recheck. No Sol/Astra/Codex calls made.",
+                                 "codex_sol_astra_status":  "Still not invoked; this pause remains in effect for those. Codex\u0027s actual current 5-hour window remaining is unverified by this session (last recorded value above is from 2026-09-17, 5 days stale).",
+                                 "note_for_codex":  "Before resuming Codex/Sol/Astra work, check current account window remaining and update codex_remaining_percent/checked_at above, then confirm with user before clearing status=paused."
+                             },
+    "cleared":  {
+                    "cleared_at":  "2026-09-23T19:50+09:00",
+                    "cleared_by":  "Claude Code (claude-opus-5-5) on explicit user instruction to resume work with Codex",
+                    "codex_primary_used_percent":  8,
+                    "codex_window_checked_at":  "2026-09-23T10:47:27Z (Codex session rollout rate_limits)",
+                    "claude_window":  "not machine-verified"
+                }
+}

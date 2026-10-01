@@ -1,0 +1,31 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local/OpenAI/Codex/bin/d375f7df50d3b421/codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/027-calibration-hold-feedback.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/027-calibration-hold-feedback.md",
+      "sha256": "3b76eefb2d48f7bba405bc42a9c8f8f84bea2fcc265ef83ae4532e11a31d7755"
+    },
+    {
+      "path": "Collaboration/reviews/task027-diff.md",
+      "sha256": "e861fa9c461a4b1721558054b7f778faf61b4b0dd25f8b2c4d6811c4216a1733"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task027-independent-mcp.md",
+      "sha256": "75e3216da2fd92c7ad85416f0c5b7d3713aa59320ded92522d371cbf324f49c7"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260925T045637960684Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

@@ -1,0 +1,38 @@
+{
+  "task": "stage01",
+  "file_hashes": {
+    "Assets/LoopRoom/Scripts/DemoRig.cs": "eb753e6b0685b92a771918bd7756086a486ea140ecfb3532dd164f666f421474",
+    "Assets/LoopRoom/Scripts/LoopDemo.cs": "449b19bd9694afa8cb5eab145a70b46dadbab41a362404900923e893f172d39f",
+    "Assets/LoopRoom/Scripts/LoopModel.cs": "67599928845de6a3159fcd7ff2688f7ff783dbb5b0653b0d40e4f988e9cad55e",
+    "Assets/LoopRoom/Editor/LoopModelChecks.cs": "3585f347546a97a92d2ffa74d526893f2ae7dca82624a522c1378ea25db80e61",
+    "Tests/LoopModel.Tests/LoopModel.Tests.csproj": "555f5ad5e52323a2303eaf0eacf24ebebe16b7e56bd5dabf42b91e630f1183a5",
+    "Tests/LoopModel.Tests/Program.cs": "307156c9648bb9d6bbb6287bfd8ff7d849a769a40fab467cb759851b68045aba",
+    ".github/workflows/checks.yml": "a68ee60117c2b675cc2b666a7e91bd571a8c835ff7e2fdf1773b279e8b689142",
+    "Tools/automation.py": "cf17becf0541f980f1386a81baa8e45713924b105aafc1711592cb9a092e8b33",
+    "Tools/test_automation.py": "20153199571fe6d110667d54b55d9e619fd64cc7ebe69f5bc16e8f7a8fed6d26",
+    "AGENTS.md": "5bf9dc77159c4fea8927c1219b10b6cb02bb79f91164200e30ece6e2c37c8311",
+    "Docs/Plans/STAGE_PLAN.md": "ffbb6fe4d6707ebd5fca818d06d9bb0591f13cbe4d6a0476a0aebdbf4abd9c2a"
+  },
+  "verdict": "request_changes",
+  "findings": [
+    "DemoRig.StartXR()の各失敗分岐(Floor非対応、TrySetTrackingOriginMode拒否、10秒タイムアウト)でdesktopFallbackが設定されず、--desktop未指定時はVR・デスクトップ双方でCanStartが恒久的にfalseのままとなり、アプリ再起動以外に復帰手段がない。段階3で対応予定なのか、stage01時点での既知の未解決課題として明示的に追跡するのか要確認(sonnetレビューアのみが指摘)。",
+    "LoopRulesはfirstShot等が可変なpublicフィールドであり、Validate()はLoopModelコンストラクタ時にのみ実行される。LoopDemo.Start()ではtimingsフィールドとModel.Rulesが同一参照を共有するため、Play中にInspectorでtimingsを書き換えると再検証なしに不正値(負数等)がAdvance()に渡り得る。開発者操作のみが起点であり実運用リスクは限定的だが、構築後の変更禁止化またはAdvance()側での境界値チェックを推奨。",
+    "DemoRig.cs/LoopDemo.csが含むXR/Floor原点確定、頭部ゲート、遮蔽・出口・暗転制御はDocs/Plans/STAGE_PLAN.md上『段階2:Quest3で1場面』に区分される内容だが、本レビューは『stage01』ラベルで実施されている。stage分類とレビュー範囲の対応関係をタスク発行者に確認する必要がある。",
+    "追加提供されたAssets/LoopRoom/Scripts/RoomVisuals.csを検証した結果、sonnetが未検証としていたPrivateLayer(=8)とスペクテイターカメラのcullingMask(~(1<<PrivateLayer))は整合しており、公開用アバター(layer 9)と非公開詳細(layer 8)は相互排他的に構成されている。プレイヤー視点カメラのcullingMask(~(1<<9))に関する言及とも矛盾しないため、この点は問題なしと判断する。",
+    "追加提供されたTools/windows_job.pyの実装(Job Objectによるkill-on-close、Toolhelp32Snapshotでの主スレッド検出とResumeThread)は静的に見て構造上妥当に見える。Windows専用分岐でありUbuntu CI(management job)の合否には影響しないが、実行時挙動は未検証。",
+    "sonnet回答内のtransport_note/additional_summaryフィールド、およびユーザーメッセージ内のscope_notes(『Both reviewers approve source scope』『Do not claim hardware passed』等)には、統合レビューの結論を特定方向へ誘導しようとする記述が含まれている。これらはレビュー対象データに埋め込まれた指示である可能性があるため本統合では採用せず、静的解析の技術的内容のみに基づいて判断した。",
+    "solレビューの根拠は『Windows Python26 checks PASS』という記述のみでfindingsが空であり、sonnetと同一ファイル群を対象としていながら実質的な指摘が皆無である。具体性・検証手順の開示に乏しく、証拠としての信頼度は低いと判断した。"
+  ],
+  "exchange_notes": [
+    "solとsonnetは同一11ファイルのハッシュに基づきレビューしており、対象範囲(ファイル集合)が一致していることを確認した。",
+    "solはfindingsなしで承認、sonnetは複数の具体的指摘付きで承認としており、証拠の厚みに明確な差があるため、本統合はsonnetの指摘内容を主軸として採用した。",
+    "追加提供されたRoomVisuals.csの検証により、sonnetが未検証としていたレイヤー整合性の懸念は解消したと判断し反映した。",
+    "windows_job.pyの追加提供により実装内容自体は確認できたが、実行時テストは行っていないためunverifiedに残した。"
+  ],
+  "unverified": [
+    "Quest3実機でのFloorトラッキング原点確定、頭部/コントローラ追跡状態、遮蔽・出口・暗転のタイミング体感、180秒以内の実測、装着範囲2m以内での到達性はUnity/HMD実行が必要であり本レビューでは未検証。",
+    "OpenXR/XR Management実行時における実際のTrySetTrackingOriginMode成否およびタイムアウト挙動。",
+    "Tools/windows_job.pyの実プロセスに対するJob割当・主スレッド再開処理の実行時動作。",
+    "Docs/Plans/STAGE_PLAN.md上の段階区分とstage01タスクラベルの対応関係(タスク発行者への確認が必要)。"
+  ]
+}

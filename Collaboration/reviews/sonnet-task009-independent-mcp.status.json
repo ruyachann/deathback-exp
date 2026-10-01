@@ -1,0 +1,29 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/009-fix-peer-review-codex-invocation.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "be53f607d20e3503473a167b094d52e1ac454328b09b0c7e64a3df382ae1ebd5"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "5e88123462781bc38ff4f6e797d6da67afe5d832a5abc9959b6c6ed4065e50f6"
+    },
+    {
+      "path": "Collaboration/tasks/009-fix-peer-review-codex-invocation.md",
+      "sha256": "26ea140d0760bf8d22584ff643d73653af661a9db4861d6f6ff5919c47391976"
+    },
+    {
+      "path": "Tools/peer_review_mcp.py",
+      "sha256": "20ecfd09a671f1e9bc90a64f5e216ab1dcd63c71bf5730bcab7784c14c6bbe52"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260923T164432317985Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

@@ -1,0 +1,37 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/022-autostart-focus.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/022-autostart-focus.md",
+      "sha256": "01794814a32c6dbd7d006f5f529fbc2b2497e4398fc0d22c604988245ab55be9"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopDemo.cs",
+      "sha256": "af96c2ff60f25d7573ee8164056ea55e63f2aa1579afb57e348a224d10a8c954"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task022-independent-mcp.md",
+      "sha256": "af70a1cdb0f67ac5cd8009ffe539911553489cd128168616b40c14118643d77b"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-task022-independent-mcp.md",
+      "sha256": "6d1ffe75de0f4a3f5ac0440208ea66fc94bdefa7c0419096c9d65772cb091127"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T210725586137Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

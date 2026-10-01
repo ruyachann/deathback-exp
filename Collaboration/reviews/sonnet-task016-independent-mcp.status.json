@@ -1,0 +1,45 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/016-device-check-readiness.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "c7a53997e17be6079c1f3c8f675fbca3ebf74757f14665036a7b019b4656f731"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/016-device-check-readiness.md",
+      "sha256": "a3006e4adda7d39d7928ee2ec91718ac0936d9818e50af3dcae1291f54754a43"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/LoopDemo.cs",
+      "sha256": "2a85b749348d7cc179bd8602982a52c7bff1f5cc972f086dc6a6c02f9295c516"
+    },
+    {
+      "path": "Docs/DEVICE_QUICKCHECK.md",
+      "sha256": "2f30798e303fabb1ab3f09a9b037d8565f2a33c4bad963d74c4447e755cfae84"
+    },
+    {
+      "path": "Start-DeviceCheck.ps1",
+      "sha256": "fe3e795893136a04430febf8de11a181dc7420365f61b071b30e70227b3ecfb1"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/DemoRig.cs",
+      "sha256": "793caa1e50c3efd52d48f278cc8043598dddb7d68833d395e2e885b737730bbc"
+    },
+    {
+      "path": "Docs/UNITY_ACCEPTANCE.md",
+      "sha256": "b1b1f081ae69374df6eafabccabc8d90b571d03fbfb26d1747bcc4f5cbd7e9e1"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T021327226200Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

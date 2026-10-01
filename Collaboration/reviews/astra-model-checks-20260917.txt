@@ -1,0 +1,37 @@
+Astra independent model execution record
+Execution date: 2026-09-17 JST
+Environment: current Windows PowerShell process, Add-Type C# compiler; no Unity Editor launch.
+This is a .NET model test. It is NOT a Unity integration, rendering, build, input, or HMD test.
+
+Source SHA256:
+LoopModel.cs 741043710EF81DA2120EAE08AE9F8F4D1DC98D4CBF62787B3127DDDC2ACE3224
+LoopModelChecks.cs 943045A198C37B5D9AA4B365BADD9FB8F0C010ECAD9686271715B105A2B4AAD0
+
+Executed command (from the projectless workspace):
+Add-Type -Path @((Resolve-Path -LiteralPath 'outputs/LoopRoomUnity/Assets/LoopRoom/Scripts/LoopModel.cs').Path,(Resolve-Path -LiteralPath 'outputs/LoopRoomUnity/Assets/LoopRoom/Editor/LoopModelChecks.cs').Path)
+[LoopModelChecks]::Run()
+
+Observed output, exit code 0:
+PASS: Unprotected attack returns immediately and resets only world state
+PASS: Shield grants a real escape window
+PASS: No escape before unlocking or with a stale loop id
+PASS: Repeated death callbacks produce only one reset
+PASS: Deadline includes blackouts and ends within 180 seconds
+PASS: Missing escape window allows the enemy to flank
+PASS: Large and small time steps yield the same no-input outcome
+PASS: 100 resets reject old events and clear shield state
+PASS: Stop is distinct from death and does not resume the same session
+PASS: Invalid timing and non-finite delta are rejected
+
+Additional in-memory reproduction (separate PowerShell process; no source edits):
+Add-Type -Path (Resolve-Path -LiteralPath 'outputs/LoopRoomUnity/Assets/LoopRoom/Scripts/LoopModel.cs').Path
+$rules = [LoopRoom.LoopRules]::new()
+$rules.firstShot = [double]::NaN
+$model = [LoopRoom.LoopModel]::new($rules)
+$model.Start()
+$model.Advance(1)
+
+Observed output at 2026-09-17T00:14:26.1030088+09:00, exit code 0:
+NaN timing accepted: TotalTime=NaN, LoopTime=NaN, Phase=Playing
+
+Interpretation: existing tests pass, but they test invalid delta rather than all non-finite rule fields. Task 003 covers this missing validation.

@@ -1,0 +1,51 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local/OpenAI/Codex/bin/d375f7df50d3b421/codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/026-frame-stats.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/026-frame-stats.md",
+      "sha256": "b2c0ab8804d95dacfd7fa522bf8a8a8a4cdcffab4b29ec5380cf2d65c7f4ddd0"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/FrameStats.cs",
+      "sha256": "59174398010fed949be68cf94145e85a41ac320d6203db248b89a692bb036ce8"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/FrameStatsChecks.cs",
+      "sha256": "aa24ea083167cb1d19bd1c3132b3e9d1dc79ada3b8ba1a2d06dd45ecd0f32f2c"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/Program.cs",
+      "sha256": "cfe180a6bd5b8721a9dd3f4315c08d09d100a45861eb6c55d61bbe24e5b02d28"
+    },
+    {
+      "path": "Collaboration/reviews/task026-diff.md",
+      "sha256": "5b36894142c9e74430e13d85bb77adaeba0fda16593800ba313a1729892c1c9a"
+    },
+    {
+      "path": "Collaboration/reviews/sol-task026-final-mcp.md",
+      "sha256": "26bddba81a2fa3c2d19e8c3b9dd80947becda042db93fd32b08f579af652536b"
+    },
+    {
+      "path": "Collaboration/reviews/sonnet-task026-final-mcp.md",
+      "sha256": "f21b7995682298af78c604e9cab45f90d3277524ad3ecaf2731de38dd356e6da"
+    },
+    {
+      "path": "Collaboration/evidence/20260925-frame-stats/session-frames.txt",
+      "sha256": "ba88bc610a296850d29061f387a266123d4be417ca934ef3d62f494ed7ae1c25"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T225140789123Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

@@ -1,0 +1,41 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/017-room-anchor-math.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/017-room-anchor-math.md",
+      "sha256": "dd3fc36b1cb6fadfaf951fda4fd35f14bba20bf2533832b827137042008859f1"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomAnchor.cs",
+      "sha256": "3e7ad288c8f5ca83b53311cc012e961ad86471e02b4cae368ee8457dcf769bb1"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/RoomAnchorChecks.cs",
+      "sha256": "620cf7e172847b694484bc18e5f1d7d7747b23b824ed20ae640a63e2ea80f5be"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/Program.cs",
+      "sha256": "98ffef6894adf25ca1dcfea8bd10b079097358b82e2c552f9a73cfa663cdbe4f"
+    },
+    {
+      "path": "Tests/LoopModel.Tests/LoopModel.Tests.csproj",
+      "sha256": "f1aa05664a61273668ca58dea482cc24e8d03524f29f3e37704693fd9ea6403b"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T074804633742Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

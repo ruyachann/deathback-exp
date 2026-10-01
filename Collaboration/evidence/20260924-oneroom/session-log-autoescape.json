@@ -1,0 +1,50 @@
+{
+    "sessionId": "0b05a54bd62744ad9aea8061f19c5286",
+    "scenario": "S01_Shield",
+    "version": "0.1.0-prototype",
+    "mode": "Desktop",
+    "outcome": "Interrupted",
+    "elapsed": 9.935877848649398,
+    "timings": {
+        "firstShot": 6.0,
+        "searchShot": 12.0,
+        "exitOpens": 6.5,
+        "exitCloses": 12.0,
+        "blackout": 0.16,
+        "playLimit": 172.0,
+        "endingLength": 8.0,
+        "enforcePlayLimit": false
+    },
+    "events": [
+        {
+            "loop": 1,
+            "sessionTime": 0.0,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 1,
+            "sessionTime": 6.0,
+            "loopTime": 6.0,
+            "kind": "first_shot"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 6.16,
+            "loopTime": 0.0,
+            "kind": "loop_started"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 7.160439945408143,
+            "loopTime": 1.000439945408143,
+            "kind": "shield_raised"
+        },
+        {
+            "loop": 2,
+            "sessionTime": 9.934867446194403,
+            "loopTime": 3.7748674461944029,
+            "kind": "Interrupted"
+        }
+    ]
+}

@@ -1,0 +1,28 @@
+﻿task007: LoopModel checks (180s limit off by default, MaxStep)
+2026-09-24 01:51:46 +09:00  commit c506fd8  cwd C:\deathback\deathback-exp
+
+PS> & 'C:\Users\PC_User\AppData\Local\Temp\claude\C--deathback\7f63be92-85c0-4090-b2b9-0a7c57106cd3\scratchpad\model_tests.ps1'
+Compile: Unity 6000.3.15f1 Roslyn (DotNetSdkRoslyn\csc.dll) on LoopModel.cs + LoopModelChecks.cs + Program.cs
+sha256 2aeda54c2b50052761f02cdb842b1c58ed17e0d0dd63af824502245d2a200de7  LoopModel.cs
+sha256 0b9479f224ed6f7f847fcd81885de6d6112aa5a8a0bbc9aea38de991912d55ac  LoopModelChecks.cs
+sha256 012fda101ccd073f63acd99a28b954275ef3c938e6a3e85010237c7c89a45f47  Program.cs
+csc exit=0
+PASS: Unprotected attack returns immediately and resets only world state
+PASS: Shield grants a real escape window
+PASS: No escape before unlocking or with a stale loop id
+PASS: Repeated death callbacks produce only one reset
+PASS: Deadline includes blackouts and ends within 180 seconds
+PASS: Default rules keep looping without a session deadline
+PASS: Advance accepts MaxStep and rejects larger finite deltas without mutation
+PASS: Session deadline validation is conditional
+PASS: Missing escape window allows the enemy to flank
+PASS: Large and small time steps yield the same no-input outcome
+PASS: 100 resets reject old events and clear shield state
+PASS: Stop is distinct from death and does not resume the same session
+PASS: Invalid timing and non-finite delta are rejected
+PASS: All seven timings reject NaN and both infinities
+PASS: No-action deadline and retained outcome at 180 seconds
+PASS: 15 model checks
+test exit=0
+
+[exit code: 0]

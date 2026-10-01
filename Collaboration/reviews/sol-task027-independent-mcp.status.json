@@ -1,0 +1,35 @@
+{
+  "reviewer": "codex",
+  "reviewer_executable": "C:\\Users\\PC_User\\AppData\\Local/OpenAI/Codex/bin/d375f7df50d3b421/codex.exe",
+  "requested_model": "gpt-5.6-sol",
+  "reported_models": [],
+  "task": "Collaboration/tasks/027-calibration-hold-feedback.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/027-calibration-hold-feedback.md",
+      "sha256": "e40997625acb263dc1cfe0e310ccfaa5f7e7193679eed67dd30afbd7005e6ae5"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/CalibrationView.cs",
+      "sha256": "78879d2f4bb2b27b06c05b501cb4cc58b71d8df752d5f9a6ed71bd2895b67076"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/ProceduralAudio.cs",
+      "sha256": "abfa232a09f14b50a85080b7399c2889a55290480ba92cdfdf7642069139be7e"
+    },
+    {
+      "path": "Collaboration/reviews/task027-loopdemo-diff.md",
+      "sha256": "f731b1e402d47f7f80faaaefa6d3f560662c806c80e3127778db5d690b67e91f"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260925T044717115389Z-mcp-codex-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}

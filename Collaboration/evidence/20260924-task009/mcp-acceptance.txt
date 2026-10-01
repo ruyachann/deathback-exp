@@ -1,0 +1,27 @@
+﻿task009: peer_review_mcp.py acceptance over MCP stdio
+2026-09-24 01:51:50 +09:00  commit c506fd8  cwd C:\deathback\deathback-exp
+
+Recorded outputs of the task009 acceptance run (2026-09-24 01:44-01:47 JST), MCP stdio, no caller-side patching
+sha256 Tools/peer_review_mcp.py: 20ecfd09a671f1e9bc90a64f5e216ab1dcd63c71bf5730bcab7784c14c6bbe52
+
+--- [codex] CODEX_CLI_PATH=C:\nope\codex.exe  python call_mcp.py codex <task009 review>
+server: {'name': 'looproom-peer-review', 'version': '1.0.0'}
+tools: ['review_with_codex']
+isError: None
+exit=0
+--- [claude] python call_mcp.py claude <task009 review>
+server: {'name': 'looproom-peer-review', 'version': '1.0.0'}
+tools: ['review_with_claude']
+isError: None
+exit=0
+
+--- Collaboration/runs/20260923T164634634494Z-mcp-codex-review/status.json
+reviewer=codex requested_model=gpt-5.6-sol reported_models=
+reviewer_executable=C:\Users\PC_User\AppData\Local\OpenAI\Codex\bin\247581e40ee272fb\codex.exe
+review.md verdict line: **approve**
+
+--- Collaboration/runs/20260923T164432317985Z-mcp-claude-review/status.json
+reviewer=claude requested_model=claude-sonnet-5 reported_models=claude-sonnet-5
+reviewer_executable=C:\Users\PC_User\.local\bin\claude.EXE
+review.md verdict line: ## Verdict: approve
+

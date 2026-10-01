@@ -1,0 +1,33 @@
+{
+  "reviewer": "claude",
+  "reviewer_executable": "C:\\Users\\PC_User\\.local\\bin\\claude.EXE",
+  "requested_model": "claude-sonnet-5",
+  "reported_models": [
+    "claude-sonnet-5"
+  ],
+  "task": "Collaboration/tasks/017-room-anchor-math.md",
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "17a8b55855402be023072b21e66a2378c980ade41e9b08062e7ec498cd36df84"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "fa38f7c0c30475591ff99b65e2e95c9b39538915fb6bd703a3f3b900c68d2a82"
+    },
+    {
+      "path": "Collaboration/tasks/017-room-anchor-math.md",
+      "sha256": "322eaf428b4dba19dc70d031c0eb006852be65bfd4142d8dd06a7d068c1c3cbc"
+    },
+    {
+      "path": "Assets/LoopRoom/Scripts/RoomAnchor.cs",
+      "sha256": "510674914e8105600e0c800c826b2f2a9828d6cdc8e90207675c2bb5aee998e0"
+    },
+    {
+      "path": "Assets/LoopRoom/Editor/RoomAnchorChecks.cs",
+      "sha256": "5cc0e0d33aea9c5ff4e47cd834a7f4b69d9b14e0ff6e6fc6e3ba6c7220896cf5"
+    }
+  ],
+  "review_path": "C:\\deathback\\deathback-exp\\Collaboration\\runs\\20260924T080818926284Z-mcp-claude-review\\review.md",
+  "note": "Codex model selection is CLI-requested; Claude modelUsage is checked when available."
+}
