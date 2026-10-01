@@ -47,7 +47,8 @@ MonoBehaviour:
   timings:
     firstShot: 6
     searchShot: 12
-    exitOpens: 6.5
+    windowShot: 9
+    exitOpens: 9.5
     exitCloses: 12
     blackout: 0.16
     playLimit: 172

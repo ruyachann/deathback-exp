@@ -25,7 +25,7 @@ namespace LoopRoom
         AudioSource enemyAudio, ambience, doorAudio, stepAudio;
         AudioClip doorLatch, doorCreak, footstep;
         int lastEnemySteps;
-        bool desktopArg, autostart, autoescape, autostartUsed, autoShieldDone, autoExitDone;
+        bool desktopArg, autostart, autoescape, autostartUsed, autoShieldDone, autoBlindsDone, autoExitDone;
         bool simulateDrift;
         // Calibration (task021): shown before the first Ready screen and again whenever the
         // operator asks to redo it. LoopModel.Phase stays Ready throughout; this is LoopDemo-only.
@@ -337,18 +337,20 @@ namespace LoopRoom
                 PlaceRoom();
                 rig.ClearSelection(); room.Sound.Stop(); enemyAudio.Stop(); doorAudio.Stop(); stepAudio.Stop();
                 room.Sound.PlayOneShot(room.Chime); lastLoop=Model.LoopId; lastLoopTime=0;
-                autoShieldDone=false; autoExitDone=false;
+                autoShieldDone=false; autoBlindsDone=false; autoExitDone=false;
             }
             // Damage/time boundaries are resolved before this frame's fresh input.
             rig.Operate(controls,Model.Phase==SessionPhase.Playing);
             if(!rig.IsVR && Model.Phase==SessionPhase.Playing && keyboard!=null)
             {
                 if(keyboard.spaceKey.wasPressedThisFrame) RaiseShield();
+                if(keyboard.bKey.wasPressedThisFrame) CloseBlinds();
                 if(keyboard.eKey.wasPressedThisFrame) TryExit();
             }
             if(autoescape && !rig.IsVR && Model.Phase==SessionPhase.Playing && Model.LoopId==2)
             {
                 if(!autoShieldDone && Model.LoopTime>=1) { autoShieldDone=true; RaiseShield(); }
+                if(!autoBlindsDone && Model.LoopTime>=1) { autoBlindsDone=true; CloseBlinds(); }
                 if(!autoExitDone && Model.ExitAvailable) { autoExitDone=true; TryExit(); }
             }
             // A long frame can cross t=3 and the shot together; LoopTime is frozen in Blackout, so the latch still plays.
@@ -366,7 +368,7 @@ namespace LoopRoom
                 for(int i=lastRecords;i<Model.Records.Count;i++)
                 {
                     var record=Model.Records[i];
-                    if(record.kind=="first_shot" || record.kind=="shot_blocked" || record.kind=="flanked")
+                    if(record.kind=="first_shot" || record.kind=="shot_blocked" || record.kind=="window_shot" || record.kind=="flanked")
                     { enemyAudio.PlayOneShot(room.Shot,.8f); rig.Haptic(.18f); }
                 }
                 lastRecords=Model.Records.Count;
@@ -457,6 +459,11 @@ namespace LoopRoom
         void RaiseShield()
         {
             if(Model.RaiseShield(Model.LoopId)) { room.Sound.PlayOneShot(room.Latch); rig.Haptic(.08f); }
+        }
+
+        void CloseBlinds()
+        {
+            if(Model.CloseBlinds(Model.LoopId)) { room.Sound.PlayOneShot(room.Latch,.5f); rig.Haptic(.06f); }
         }
 
         void TryExit()
@@ -559,14 +566,15 @@ namespace LoopRoom
             // task028: never shown to the HMD wearer (immersion), only the operator overlay.
             bool showNoFitWarning=(!rig.IsVR || privateOverlay) && noFitActive;
             bool showFrameStats=(!rig.IsVR || privateOverlay) && frameStats!=null;
-            float boxHeight=(rig.IsVR&&!privateOverlay?112:showRetryHint?230:206)+(showBoundaryHint?24:0)+(showOutsideWarning?24:0)+(showNoFitWarning?24:0)+(showFrameStats?24:0);
+            bool showCauseStreak=!rig.IsVR || privateOverlay;
+            float boxHeight=(rig.IsVR&&!privateOverlay?112:showRetryHint?230:206)+(showBoundaryHint?24:0)+(showOutsideWarning?24:0)+(showNoFitWarning?24:0)+(showFrameStats?24:0)+(showCauseStreak?24:0);
             GUI.Box(new Rect(16,16,360,boxHeight),GUIContent.none);
             GUI.Label(new Rect(32,28,340,40),"第零室 / THE ROOM BEFORE",title);
             GUI.Label(new Rect(32,72,340,28),"LOOP "+Model.LoopId.ToString("00")+"  ·  "+PublicState(),body);
             if(!rig.IsVR || privateOverlay)
             {
                 float y=107;
-                GUI.Label(new Rect(32,y,340,26),rig.CanStart ? "Enter 開始 / Space 遮蔽 / E 出口" : "開始前の接続と追跡を確認中",small);
+                GUI.Label(new Rect(32,y,340,26),rig.CanStart ? "Enter 開始 / Space 遮蔽 / B 窓 / E 出口" : "開始前の接続と追跡を確認中",small);
                 y+=24;
                 GUI.Label(new Rect(32,y,340,26),calibrating ? "C: キャリブレーションを決定" : "C: キャリブレーションをやり直す（"+(aligned?"済":"未")+"）",small);
                 y+=24;
@@ -589,6 +597,8 @@ namespace LoopRoom
                 // 落ち n（目標 xx Hz）" overflowed the panel's right edge on desktop at high refresh rates.
                 if(showFrameStats) GUI.Label(new Rect(32,y,340,26),"フレーム "+frameStats.MeanMs.ToString("F1")+" / P95 "+
                     frameStats.P95Ms.ToString("F1")+" ms・落ち "+frameStats.Dropped+"・"+frameStats.TargetHz.ToString("F0")+"Hz",small);
+                if(showFrameStats) y+=24;
+                if(showCauseStreak) GUI.Label(new Rect(32,y,340,26),"直前の死因 "+(Model.LastDeathCause??"なし")+" ×"+Model.SameCauseStreak,small);
             }
         }
 

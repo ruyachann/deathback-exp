@@ -1,0 +1,28 @@
+﻿task033 window threat model: tests and session events
+2026-10-01 18:31:23 +09:00  commit ed73b26  cwd C:\deathback\deathback-exp
+
+task033 window threat model: tests and session events
+2026-10-01 18:26:14 +09:00  commit ed73b26  cwd C:\deathback\deathback-exp
+
+== テスト（Unity 付属 Roslyn、追修正後）
+csc exit=0
+PASS: 100 resets reject old events and clear shield state
+PASS: exitOpens before windowShot is rejected so the window threat cannot be skipped
+PASS: 30 model checks
+PASS: 12 room anchor checks
+PASS: 12 frame stats checks
+test exit=0
+
+== desktop --auto-calibrate --autostart --autoescape のセッションログ（ce6b1f7ff7554de4a6d1168c8b7a039a.json）
+outcome Escaped elapsed 15.66
+timings {'firstShot': 6.0, 'windowShot': 9.0, 'searchShot': 12.0, 'exitOpens': 9.5, 'exitCloses': 12.0, 'blackout': 0.16, 'playLimit': 172.0, 'endingLength': 8.0, 'enforcePlayLimit': False}
+ loop 1 t=0.00 loop_started
+ loop 1 t=6.00 first_shot
+ loop 2 t=0.00 loop_started
+ loop 2 t=1.00 shield_raised
+ loop 2 t=1.00 blinds_closed
+ loop 2 t=6.00 shot_blocked
+ loop 2 t=9.00 window_blocked
+ loop 2 t=9.50 Escaped
+
+

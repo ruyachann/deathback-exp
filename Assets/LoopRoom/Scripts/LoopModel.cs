@@ -11,8 +11,9 @@ namespace LoopRoom
         public const double MinInterval = 0.05;
         const double IntervalTolerance = 1e-9;
         public double firstShot = 6.0;
+        public double windowShot = 9.0;
         public double searchShot = 12.0;
-        public double exitOpens = 6.5;
+        public double exitOpens = 9.5;
         public double exitCloses = 12.0;
         public double blackout = 0.16;
         public double playLimit = 172.0;
@@ -24,6 +25,7 @@ namespace LoopRoom
         public void Validate()
         {
             if (double.IsNaN(firstShot) || double.IsInfinity(firstShot) ||
+                double.IsNaN(windowShot) || double.IsInfinity(windowShot) ||
                 double.IsNaN(searchShot) || double.IsInfinity(searchShot) ||
                 double.IsNaN(exitOpens) || double.IsInfinity(exitOpens) ||
                 double.IsNaN(exitCloses) || double.IsInfinity(exitCloses) ||
@@ -38,6 +40,9 @@ namespace LoopRoom
                 throw new ArgumentException("Invalid loop timing rules");
             if (firstShot < MinInterval - IntervalTolerance ||
                 searchShot - firstShot < MinInterval - IntervalTolerance ||
+                windowShot - firstShot < MinInterval - IntervalTolerance ||
+                searchShot - windowShot < MinInterval - IntervalTolerance ||
+                exitOpens < windowShot - IntervalTolerance ||
                 exitCloses - exitOpens < MinInterval - IntervalTolerance ||
                 blackout < MinInterval - IntervalTolerance ||
                 endingLength < MinInterval - IntervalTolerance ||
@@ -69,11 +74,16 @@ namespace LoopRoom
         public double LoopTime { get; private set; }
         public bool ShieldRaised { get; private set; }
         public bool ShotResolved { get; private set; }
+        public bool BlindsClosed { get; private set; }
+        public string LastDeathCause { get; private set; }
+        public int SameCauseStreak { get; private set; }
         public bool ExitAvailable => Phase == SessionPhase.Playing && ShotResolved &&
             LoopTime >= rules.exitOpens && LoopTime < rules.exitCloses;
         public double ExitOpens => rules.exitOpens;
         public double BlackoutRemaining { get; private set; }
         double endingRemaining;
+        bool windowResolved;
+        string pendingDeathCause;
 
         public LoopModel(LoopRules rules = null)
         {
@@ -86,14 +96,27 @@ namespace LoopRoom
             if (Phase != SessionPhase.Ready && Phase != SessionPhase.Finished) return;
             Records.Clear(); TotalTime = 0; LoopId = 0;
             Outcome = SessionPhase.Ready;
+            LastDeathCause = null; SameCauseStreak = 0; pendingDeathCause = null;
             BeginLoop();
         }
 
         void BeginLoop()
         {
+            if (pendingDeathCause != null)
+            {
+                SameCauseStreak = pendingDeathCause == LastDeathCause ? SameCauseStreak + 1 : 1;
+                LastDeathCause = pendingDeathCause; pendingDeathCause = null;
+            }
             LoopId++; LoopTime = 0; ShieldRaised = false; ShotResolved = false;
+            BlindsClosed = false; windowResolved = false;
             BlackoutRemaining = 0; Phase = SessionPhase.Playing;
             Record("loop_started");
+        }
+
+        public bool CloseBlinds(int expectedLoop)
+        {
+            if (Phase != SessionPhase.Playing || expectedLoop != LoopId || BlindsClosed) return false;
+            BlindsClosed = true; Record("blinds_closed"); return true;
         }
 
         public bool RaiseShield(int expectedLoop)
@@ -111,7 +134,9 @@ namespace LoopRoom
         public bool Kill(int expectedLoop, string cause)
         {
             if (Phase != SessionPhase.Playing || expectedLoop != LoopId) return false;
-            Record(cause); Phase = SessionPhase.Blackout; BlackoutRemaining = rules.blackout;
+            cause = cause ?? "unknown";
+            Record(cause); pendingDeathCause = cause;
+            Phase = SessionPhase.Blackout; BlackoutRemaining = rules.blackout;
             return true;
         }
 
@@ -155,7 +180,7 @@ namespace LoopRoom
                     else if (BlackoutRemaining < 0.0000001) BeginLoop();
                     continue;
                 }
-                double next = ShotResolved ? rules.searchShot : rules.firstShot;
+                double next = !ShotResolved ? rules.firstShot : !windowResolved ? rules.windowShot : rules.searchShot;
                 double slice = Math.Min(delta, Math.Min(next - LoopTime, untilLimit));
                 LoopTime += slice; TotalTime += slice; delta -= slice;
                 if (rules.enforcePlayLimit && TotalTime >= rules.playLimit - 0.0000001) { End(SessionPhase.TimedOut); continue; }
@@ -166,6 +191,12 @@ namespace LoopRoom
                         ShotResolved = true;
                         if (ShieldRaised) Record("shot_blocked");
                         else Kill(LoopId, "first_shot");
+                    }
+                    else if (!windowResolved)
+                    {
+                        windowResolved = true;
+                        if (BlindsClosed) Record("window_blocked");
+                        else Kill(LoopId, "window_shot");
                     }
                     else Kill(LoopId, "flanked");
                 }
