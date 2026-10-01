@@ -22,8 +22,9 @@ namespace LoopRoom
         bool saved, privateOverlay;
         float trackingLost;
         string sessionId, logMessage = "";
-        AudioSource enemyAudio, ambience, doorAudio;
-        AudioClip doorLatch, doorCreak;
+        AudioSource enemyAudio, ambience, doorAudio, stepAudio;
+        AudioClip doorLatch, doorCreak, footstep;
+        int lastEnemySteps;
         bool desktopArg, autostart, autoescape, autostartUsed, autoShieldDone, autoExitDone;
         bool simulateDrift;
         // Calibration (task021): shown before the first Ready screen and again whenever the
@@ -139,6 +140,13 @@ namespace LoopRoom
             doorAudio.transform.SetParent(room.Root,false); doorAudio.transform.localPosition=new Vector3(.5f,1.0f,2.8f);
             doorAudio.playOnAwake=false; doorAudio.spatialBlend=1; doorAudio.minDistance=.5f; doorAudio.maxDistance=10; doorAudio.volume=.5f;
             doorLatch=ProceduralAudio.DoorLatch(); doorCreak=ProceduralAudio.DoorCreak();
+            // Footfalls come from the enemy's feet, so the source follows the figure's ground position.
+            stepAudio = new GameObject("Enemy footsteps").AddComponent<AudioSource>();
+            stepAudio.transform.SetParent(room.Root,false); stepAudio.playOnAwake=false;
+            stepAudio.spatialBlend=1; stepAudio.minDistance=.5f; stepAudio.maxDistance=10; stepAudio.volume=.3f;
+            footstep=ProceduralAudio.Footstep();
+            var shotRules=Model.Rules;
+            room.Figure.FirstShot=(float)shotRules.firstShot; room.Figure.SearchShot=(float)shotRules.searchShot;
             // Local, not world, position: room.Sound is a child of room.Root, so this keeps the
             // chime coming from the room's front after Begin()/loop-change repositions Root.
             room.Sound.transform.localPosition = new Vector3(0,1.4f,.7f);
@@ -327,7 +335,7 @@ namespace LoopRoom
                 // frame, so the move itself is never seen (see task018 design note 3).
                 if(simulateDrift) rig.SimulateDesktopDrift(Model.LoopId);
                 PlaceRoom();
-                rig.ClearSelection(); room.Sound.Stop(); enemyAudio.Stop(); doorAudio.Stop();
+                rig.ClearSelection(); room.Sound.Stop(); enemyAudio.Stop(); doorAudio.Stop(); stepAudio.Stop();
                 room.Sound.PlayOneShot(room.Chime); lastLoop=Model.LoopId; lastLoopTime=0;
                 autoShieldDone=false; autoExitDone=false;
             }
@@ -462,11 +470,17 @@ namespace LoopRoom
             bool playing=Model.Phase==SessionPhase.Playing;
             room.Barrier.localPosition=new Vector3(0,Model.ShieldRaised?1.65f:.35f,1.08f);
             room.Door.SetLoopTime(t);
-            room.Enemy.gameObject.SetActive(t>=3 && (playing || Model.Phase==SessionPhase.Blackout));
-            float move=Mathf.Clamp01((t-8)/3.5f);
-            room.Enemy.localPosition=Vector3.Lerp(new Vector3(.5f,0,2.5f),new Vector3(1.25f,0,.38f),move);
-            room.Enemy.localRotation=Quaternion.Euler(0,move*75,0);
-            enemyAudio.transform.localPosition=room.Enemy.localPosition+new Vector3(0,1.4f,0);
+            bool enemyOn=t>=3 && (playing || Model.Phase==SessionPhase.Blackout);
+            room.Enemy.gameObject.SetActive(enemyOn);
+            if(enemyOn)
+            {
+                room.Figure.SetState(t,room.Root.InverseTransformPoint(rig.View.transform.position));
+                if(playing && room.Figure.StepCount>lastEnemySteps)
+                { stepAudio.transform.localPosition=room.Figure.GroundPosition; stepAudio.PlayOneShot(footstep); }
+                lastEnemySteps=room.Figure.StepCount;
+                enemyAudio.transform.localPosition=room.Figure.GroundPosition+new Vector3(0,1.4f,0);
+            }
+            else lastEnemySteps=0;
             room.Clock.text="00 : "+Mathf.FloorToInt(t).ToString("00");
             Color lamp=Model.ExitAvailable?new Color(.25f,1,.66f):new Color(.7f,.13f,.09f);
             room.ExitLamp.material.color=lamp;

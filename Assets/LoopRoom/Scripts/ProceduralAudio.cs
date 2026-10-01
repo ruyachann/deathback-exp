@@ -65,6 +65,23 @@ namespace LoopRoom
             return Build("Latch", samples, rate);
         }
 
+        // Enemy footfall: a short dull heel thud with a soft low-passed scuff, quieter and shorter than Latch.
+        public static AudioClip Footstep()
+        {
+            const int rate = SampleRate; const float duration = .11f; uint seed = 61003;
+            int n = (int)(duration * rate); var samples = new float[n];
+            float scuff = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                float t = (float)i / rate;
+                float thud = Mathf.Sin(2 * Mathf.PI * (70f + 40f * Mathf.Exp(-60f * t)) * t) * Mathf.Exp(-42f * t);
+                scuff += (NextNoise(ref seed) - scuff) * .25f;
+                samples[i] = thud * .8f + scuff * Mathf.Exp(-55f * t) * .5f;
+            }
+            Normalize(samples, .45f);
+            return Build("Footstep", samples, rate);
+        }
+
         // Entry door at t=3: the lever drops (duller click) and the latch lets go (brighter tick). The first .10s is
         // silent on purpose so these clicks trail the t=3 Latch thump instead of stacking on it.
         public static AudioClip DoorLatch()

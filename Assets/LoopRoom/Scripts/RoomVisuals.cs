@@ -9,6 +9,7 @@ namespace LoopRoom
     public sealed class RoomVisuals
     {
         public Transform Root, Barrier, Enemy;
+        public EnemyFigure Figure;
         public DoorRig Door;
         public XRSimpleInteractable ShieldHandle, ExitHandle;
         public TextMesh Card, Clock, ExitLabel;
@@ -461,14 +462,7 @@ namespace LoopRoom
             Detail("Plant leaves 2",PrimitiveType.Sphere,new Vector3(1.43f,.84f,2.62f),new Vector3(.26f,.46f,.26f),new Color(.36f,.54f,.30f),smoothness:.12f);
             Detail("Plant leaves 3",PrimitiveType.Sphere,new Vector3(1.58f,.78f,2.55f),new Vector3(.24f,.40f,.24f),new Color(.26f,.43f,.26f),smoothness:.12f);
 
-            Enemy = new GameObject("Enemy").transform; Enemy.SetParent(Root,false);
-            Shape("Coat",PrimitiveType.Capsule,new Vector3(0,1.0f,0),new Vector3(.38f,.65f,.28f),ink,true,Enemy);
-            Shape("Head",PrimitiveType.Sphere,new Vector3(0,1.68f,0),Vector3.one*.26f,ink,true,Enemy);
-            Shape("Visor",PrimitiveType.Cube,new Vector3(0,1.70f,-.13f),new Vector3(.20f,.035f,.025f),new Color(.8f,.19f,.10f),true,Enemy,emission:2f);
-            Shape("Weapon",PrimitiveType.Cube,new Vector3(-.13f,1.36f,-.24f),new Vector3(.09f,.10f,.35f),ink,true,Enemy);
-            Detail("Left shoulder",PrimitiveType.Sphere,new Vector3(-.27f,1.43f,0),new Vector3(.28f,.16f,.24f),ink,true,Enemy,smoothness:.08f);
-            Detail("Right shoulder",PrimitiveType.Sphere,new Vector3(.27f,1.43f,0),new Vector3(.28f,.16f,.24f),ink,true,Enemy,smoothness:.08f);
-            Detail("Hat brim",PrimitiveType.Cube,new Vector3(0,1.83f,-.015f),new Vector3(.43f,.035f,.34f),ink,true,Enemy,smoothness:.08f);
+            Figure = new EnemyFigure(Root); Enemy = Figure.Root;
             // Flat canopy disc plus a shallow dome shade, mounted flush on the 2.45m ceiling.
             Detail("Ceiling light canopy",PrimitiveType.Cylinder,new Vector3(0,2.435f,.2f),new Vector3(.46f,.012f,.46f),ivory,smoothness:.22f);
             Detail("Ceiling light shade",PrimitiveType.Sphere,new Vector3(0,2.44f,.2f),new Vector3(.40f,.28f,.40f),new Color(1,.93f,.82f),smoothness:.18f,emission:.55f);
